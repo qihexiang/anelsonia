@@ -1,5 +1,5 @@
 {
-  "name": "final",
+  "name": "anelsonia",
   "version": "0.0.1",
   "description": "FP style Node.js web framework.",
   "main": "dist/index.js",
@@ -11,6 +11,9 @@
     "@types/mime": "^2.0.3",
     "raw-body": "^2.4.1"
   },
+  "files": [
+    "dist/"
+  ],
   "dependencies": {
     "mime": "^2.5.2",
     "path-to-regexp": "^6.2.0"
