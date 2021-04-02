@@ -1,5 +1,5 @@
 {
-  "name": "func_web",
+  "name": "final",
   "version": "0.0.1",
   "description": "FP style Node.js web framework.",
   "main": "dist/index.js",
