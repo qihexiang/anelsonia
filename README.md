@@ -18,11 +18,11 @@ Node.js的基础Web框架已经有很多，如最为著名的Express、Koa、Fas
 
 ## hello, world
 
-处理请求的入口函数，应该实现接口 `entryPoint` ，你可以在编辑器中先引入这个接口来帮助你完成这个函数：
+处理请求的入口函数，应该实现接口 `EntryPoint` ，你可以在编辑器中先引入这个接口来帮助你完成这个函数：
 
 ```typescript
-import { entryPoint } from "anelsonia"
-const entry: entryPoint = (req) => {
+import { EntryPoint } from "anelsonia"
+const entry: EntryPoint = (req) => {
     return {
         statusCode: 200,
         statusMessage: "Ok",
@@ -32,10 +32,10 @@ const entry: entryPoint = (req) => {
 }
 ```
 
-这个函数只有一个参数，即 `req`，它是 `http` 模块的 `IncomingMessage` 接口的实现；函数的返回值是接口 `responseBody` 的实现，它的定义如下：
+这个函数只有一个参数，即 `req`，它是 `http` 模块的 `IncomingMessage` 接口的实现；函数的返回值是接口 `ResponseBody` 的实现，它的定义如下：
 
 ```typescript
-interface responseBody {
+interface ResponseBody {
     statusCode: number;
     statusMessage: string;
     header: { [name: string]: string; };
@@ -43,16 +43,16 @@ interface responseBody {
 }
 ```
 
-要更为简化的定义 `statusMessage` 属性，可以使用本框架导出的 `httpStatus` 对象来获取对应的默认消息，例如 `httpStatus[200]` 的值是 `'Ok'` ， `httpStatus[404]` 的值是 `'Not found'` 。
+要更为简化的定义 `statusMessage` 属性，可以使用本框架导出的 `HttpStatus` 对象来获取对应的默认消息，例如 `HttpStatus[200]` 的值是 `'Ok'` ， `HttpStatus[404]` 的值是 `'Not found'` 。
 
-不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 `200` ，消息为 `Ok`，并在 `header` 中设置正确的 `"Content-Type"` 的 `responseBody`的函数。
+不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 `200` ，消息为 `Ok`，并在 `header` 中设置正确的 `"Content-Type"` 的 `ResponseBody`的函数。
 
 这些函数，可以从 `resBuilders` 中获得，例如上面的案例，可以变化为：
 
 ```typescript
-import { entryPoint, resBuilders } from "anelsonia"
+import { EntryPoint, resBuilders } from "anelsonia"
 
-const entry: entryPoint = (req) => {
+const entry: EntryPoint = (req) => {
     return resBuilders.text("hello, world\n")
 }
 ```
@@ -60,9 +60,9 @@ const entry: entryPoint = (req) => {
 要建立一个完整的服务，需要建立一个服务器，可以写成如下样式：
 
 ```typescript
-import { createServer, entryPoint, resBuilders } from "anelsonia"
+import { createServer, EntryPoint, resBuilders } from "anelsonia"
 
-const entry: entryPoint = (req) => {
+const entry: EntryPoint = (req) => {
     return resBuilders.text("hello, world\n")
 }
 
@@ -72,13 +72,13 @@ server.listen(8080)
 
 注意，`server` 实际上是一个标准的 `http` 模块的 `Server` 实例。
 
-要更加细致的控制建立流程，你可以利用 `genBaseHandler` 将 `entryPoint` 实例转化为 `RequestHandler` 实例，然后传入服务器：
+要更加细致的控制建立流程，你可以利用 `genBaseHandler` 将 `EntryPoint` 实例转化为 `RequestHandler` 实例，然后传入服务器：
 
 ```typescript
 import { createServer } from "http"
-import { genBaseHandler, entryPoint, resBuilders } from "anelsonia"
+import { genBaseHandler, EntryPoint, resBuilders } from "anelsonia"
 
-const entry: entryPoint = (req) => {
+const entry: EntryPoint = (req) => {
     return resBuilders.text("hello, world\n")
 }
 
@@ -93,7 +93,7 @@ server.listen(8080)
 使用 `router` 函数构建一个路由，使用路由返回的 `match` 函数和访问的路径做匹配，使用返回的`handleBy` 指定处理的对应函数。如果 `match` 未能成功匹配，会返回 `null` 。
 
 ```typescript
-import { createServer, entryPoint, resBuilder, router, RouteHandler } from "anelsonia";
+import { createServer, EntryPoint, resBuilder, router, RouteHandler } from "anelsonia";
 import { errorHandler } from "./errorHandler";
 import { fileHandler } from "./fileHandler";
 import { helloHandler } from "./helloHandler";
@@ -102,7 +102,7 @@ const helloRoute = router("/hello/:username");
 const fileRouter = router("/public/(.*)");
 const errorTest = router("/error/:errCode");
 
-const entry: entryPoint = async (req) => {
+const entry: EntryPoint = async (req) => {
     const url = req.url ?? "/";
     return await helloRoute.match(url)?.handleBy((pathParams, searchParams) => helloHandler(pathParams, searchParams, req))
         || fileRouter.match(url)?.handleBy(fileHandler)
@@ -117,16 +117,16 @@ createServer(entry).listen(8080);
 
 `pathParams` 参数是路由参数，它是一个 `Map` 对象，使用 `get` 方法从其中获取值（字符串），利用 `forEach` 遍历键值对， `searchParams` 是查询参数，它是一个 `URLSearchParams` 实现，它和 `Map` 对象的用法基本一致。
 
-路由控制器并不一定要返回一个 `responseBody` 的实现，也可以返回任意值作为一个处理过程的中间量。
+路由控制器并不一定要返回一个 `ResponseBody` 的实现，也可以返回任意值作为一个处理过程的中间量。
 
 路由控制器 `RouteHandler` 并非只能接受路径参数和查询参数，但是 `handleBy` 只会传递给它两个参数。可以根据需要传入其他参数，例如要将 `req` 对象传递给路由时，你可以将 `handleBy` 写成：`xRouter.match(url).handleBy((p,q) => handler(p, q, req))`，`handler`的定义为：`const handler: RouteHandler = (params, querys, req) => {}`，如上面的 `helloHandler` 那样。下面是 `helloHandler` 的定义形式：
 
 ```typescript
-import { resBuilder, responseBody, RouteHandler } from "anelsonia";
+import { resBuilder, ResponseBody, RouteHandler } from "anelsonia";
 import { IncomingMessage } from "http";
 import getRawBody from "raw-body";
 
-export const helloHandler: RouteHandler<responseBody | null> = async (p, q, req: IncomingMessage) => {
+export const helloHandler: RouteHandler<ResponseBody | null> = async (p, q, req: IncomingMessage) => {
     const username = p.get("username");
     const message = q.get("message");
     if (req.method == "post") console.log((await getRawBody(req)).toString());
@@ -142,7 +142,7 @@ export const helloHandler: RouteHandler<responseBody | null> = async (p, q, req:
 
 ## resBuilder
 
-resBuilder对象下有以下函数，可返回 `responseBody` 的实现：
+resBuilder对象下有以下函数，可返回 `ResponseBody` 的实现：
 
 名称|参数|说明
 ---|---|---
@@ -155,7 +155,7 @@ stream|rStream: Readable|返回一个可读流，当其 `"data"` 事件触发时
 buffer|buf: Buffer|直接返回Buffer二进制内容，默认的Content-Type和stream方法一样是`application/octect-stream`
 file|path: string|构建一个文件读取流，调用stream函数，Content-Type由 `mime.getType` 确定，未知的内容为 `application/octect-stream`。
 
-注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 `responseBody` 还是使用我的 `stream` 和 `file` 函数都一样。所以使用前请务必小心并多加测试，如果可以的话请教教我该怎么改……
+注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 `ResponseBody` 还是使用我的 `stream` 和 `file` 函数都一样。所以使用前请务必小心并多加测试，如果可以的话请教教我该怎么改……
 
 ## 其他
 

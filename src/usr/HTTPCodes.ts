@@ -1,4 +1,4 @@
-export const httpStatus: { [statusCode: number]: string; } = {
+export const HttpStatus: { [statusCode: number]: string; } = {
     100: "continue",
     101: "switching protocols",
     102: "processing",
@@ -58,4 +58,4 @@ export const httpStatus: { [statusCode: number]: string; } = {
     510: "not extended",
     511: "network authentication required"
 };
-export default httpStatus;
+export default HttpStatus;
