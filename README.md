@@ -39,7 +39,7 @@ interface responseBody {
     statusCode: number;
     statusMessage: string;
     header: { [name: string]: string; };
-    data: string | Buffer | Readable | Object | null;
+    data: string | Buffer | Readable;
 }
 ```
 
@@ -93,51 +93,50 @@ server.listen(8080)
 使用 `router` 函数构建一个路由，使用路由返回的 `match` 函数和访问的路径做匹配，使用返回的`handleBy` 指定处理的对应函数。如果 `match` 未能成功匹配，会返回 `null` 。
 
 ```typescript
-import { createServer, router, entryPoint, RouteHandler, resBuilders } from "anelsonia"
+import { createServer, entryPoint, resBuilder, router, RouteHandler } from "anelsonia";
+import { errorHandler } from "./errorHandler";
+import { fileHandler } from "./fileHandler";
+import { helloHandler } from "./helloHandler";
 
-const helloRouter = router("/hello/:username")
-const goodByeRouter = router("/goodbye/:username")
+const helloRoute = router("/hello/:username");
+const fileRouter = router("/public/(.*)");
+const errorTest = router("/error/:errCode");
 
 const entry: entryPoint = async (req) => {
-    const url = req.url ?? "/"
-    return 
-        await helloRouter.match(url)?.handleBy((p, q) => helloHandler(p, q, req)) 
-        || goodByHandler.match(url)?.handleBy(goodByeHandler) 
-        || resBuilder.httpError(404)
-}
+    const url = req.url ?? "/";
+    return await helloRoute.match(url)?.handleBy((pathParams, searchParams) => helloHandler(pathParams, searchParams, req))
+        || fileRouter.match(url)?.handleBy(fileHandler)
+        || errorTest.match(url)?.handleBy(errorHandler)
+        || resBuilder.httpError(404);
+};
 
-const helloHandler: RouteHandler = async (params, querys, req: IncommingMessage) => {
-    const username = params.get("username")
-    const message = querys.get("msg")
-    const bodyContent = (await getRawBody(req)).toString()
-    return resBuilders.json({
-        username,
-        message,
-        body: bodyContent,
-        date: new Date(),
-        sayHello: `hello, ${username}`
-    })
-}
-
-const goodBye: RouterHandler = (params) => {
-    const username = params.get("username")
-    return resBuilders.json({
-        username,
-        date: new Date(),
-        sayGoodBye: `goodbye, ${username}`
-    })
-}
-
-createServer(entry).listen(8080)
+createServer(entry).listen(8080);
 ```
 
 因为使用了和Express一样的 `path-to-regexp` 库，因此可以使用完全一样的方式构建路由。
 
-`params`参数是一个 `Map` 对象，使用 `get` 方法从其中获取值，利用 `forEach` 遍历键值对， `querys` 是一个 `URLSearchParams` 实现，它和 `Map` 对象的用法基本一致。
+`pathParams` 参数是路由参数，它是一个 `Map` 对象，使用 `get` 方法从其中获取值（字符串），利用 `forEach` 遍历键值对， `searchParams` 是查询参数，它是一个 `URLSearchParams` 实现，它和 `Map` 对象的用法基本一致。
 
 路由控制器并不一定要返回一个 `responseBody` 的实现，也可以返回任意值作为一个处理过程的中间量。
 
-路由控制器 `RouteHandler` 并非只能接受路径参数和查询参数，但是handleBy只会传递给它两个参数。可以根据需要传入其他参数，例如要将 `req` 对象传递给路由时，你可以将 `handleBy` 写成：`xRouter.match(url).handleBy((p,q) => handler(p, q, req))`，`handler`的定义为：`const handler: RouteHandler = (params, querys, req) => {}`，如上面的 `helloHandler` 那样。
+路由控制器 `RouteHandler` 并非只能接受路径参数和查询参数，但是 `handleBy` 只会传递给它两个参数。可以根据需要传入其他参数，例如要将 `req` 对象传递给路由时，你可以将 `handleBy` 写成：`xRouter.match(url).handleBy((p,q) => handler(p, q, req))`，`handler`的定义为：`const handler: RouteHandler = (params, querys, req) => {}`，如上面的 `helloHandler` 那样。下面是 `helloHandler` 的定义形式：
+
+```typescript
+import { resBuilder, responseBody, RouteHandler } from "anelsonia";
+import { IncomingMessage } from "http";
+import getRawBody from "raw-body";
+
+export const helloHandler: RouteHandler<responseBody | null> = async (p, q, req: IncomingMessage) => {
+    const username = p.get("username");
+    const message = q.get("message");
+    if (req.method == "post") console.log((await getRawBody(req)).toString());
+    if (!(username && message)) {
+        return null;
+    } else {
+        return resBuilder.json({ username, message, date: new Date() });
+    }
+};
+```
 
 特别需要注意的是，路由控制器和入口函数都可以是异步函数，且特别建议将入口函数设置为异步函数，以使用 `await` 处理后续的异步动作；于此同时，需要注意 `Promise<null>` 在使用 `||` 进行向后传递时，会被视为 `true` 的结果，因此必须 `await` 。
 
