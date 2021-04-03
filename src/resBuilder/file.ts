@@ -4,7 +4,6 @@ import { getType } from "mime";
 import { responseBody } from "../usr/Basic";
 import { stream } from "./stream";
 import { httpError } from "./error";
-import { handleErr } from "../utils/handleError";
 
 export async function file(path: string): Promise<responseBody> {
     try {
@@ -14,8 +13,6 @@ export async function file(path: string): Promise<responseBody> {
         resBody.header["Content-Type"] = getType(path) || 'application/octect-stream';
         return resBody;
     } catch (err) {
-        if (err instanceof Error) handleErr(err);
-        else handleErr(new Error(err));
         return httpError(404, "File not found");
     }
 }
