@@ -1,12 +1,12 @@
-import { responseBody } from "../usr/Basic";
-import httpStatus from "../usr/HTTPCodes";
+import { ResponseBody } from "../usr/Basic";
+import HttpStatus from "../usr/HTTPCodes";
 
-export function httpError(code: number, message?: string): responseBody {
-    if (!(code in httpStatus)) code = 500;
+export function httpError(code: number, message?: string): ResponseBody {
+    if (!(code in HttpStatus)) code = 500;
     return {
         statusCode: code,
-        statusMessage: httpStatus[code],
+        statusMessage: HttpStatus[code],
         header: {"Content-Type": "text/plain"},
-        data: message || `${code} ${httpStatus[code]}`
+        data: message || `${code} ${HttpStatus[code]}`
     };
 }

@@ -1,10 +1,10 @@
-import { responseBody } from "../usr/Basic";
-import httpStatus from "../usr/HTTPCodes";
+import { ResponseBody } from "../usr/Basic";
+import HttpStatus from "../usr/HTTPCodes";
 
-export function text(content: string, mime: "html"|"plain"|"javascript"|"css" = "plain"): responseBody {
+export function text(content: string, mime: "html"|"plain"|"javascript"|"css" = "plain"): ResponseBody {
     return {
         statusCode: 200,
-        statusMessage: httpStatus[200],
+        statusMessage: HttpStatus[200],
         header: {"Content-Type": `text/${mime}`},
         data: content
     }

@@ -1,11 +1,11 @@
 import { createReadStream } from "fs";
 import { stat } from "fs/promises";
 import { getType } from "mime";
-import { responseBody } from "../usr/Basic";
+import { ResponseBody } from "../usr/Basic";
 import { stream } from "./stream";
 import { httpError } from "./error";
 
-export async function file(path: string): Promise<responseBody> {
+export async function file(path: string): Promise<ResponseBody> {
     try {
         if (!(await stat(path)).isFile()) throw new Error("Not a generic file.");
         const rStream = createReadStream(path);

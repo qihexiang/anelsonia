@@ -1,9 +1,9 @@
 import { RequestListener, Server, createServer as createHttpServer } from "http";
 import { Readable } from "stream";
-import { entryPoint } from "../usr/Basic";
+import { EntryPoint } from "../usr/Basic";
 import { handleErr } from "../utils/handleError";
 
-export const genBaseHandler = (entryHandler: entryPoint): RequestListener => {
+export const genBaseHandler = (entryHandler: EntryPoint): RequestListener => {
     return async (req, res) => {
         const { statusCode, statusMessage, header, data } = await entryHandler(req)
         res.writeHead(statusCode, statusMessage, header)
@@ -20,6 +20,6 @@ export const genBaseHandler = (entryHandler: entryPoint): RequestListener => {
     };
 };
 
-export const createServer = (entryHandler: entryPoint): Server => {
+export const createServer = (entryHandler: EntryPoint): Server => {
     return createHttpServer(genBaseHandler(entryHandler))
 }
