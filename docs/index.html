@@ -69,8 +69,8 @@
 				<p>自Express框架开始，这一系列洋葱模型的框架有效的利用了JavaScript的动态属性，在运行时将一系列属性绑定到它们的 <code>req</code> 、<code>res</code> 或是 <code>ctx</code> 属性上，直到服务启动之前——不，更准确的来说，当请求进入到你所设定的路径之前，你是无法知道动态绑定的属性和功能是否正常工作的。这对于TypeScript开发来说其实挺令人烦恼。</p>
 				<p>除此之外，路由这一需求实际上也和洋葱模型格格不入：一旦存在路由分支，各个路由之间的逻辑关系显然就不再“洋葱”了。而就算没有这些路由，洋葱模型也并不是真的很实用，相当数量的中间件：例如响应内容压缩、请求内容解析，都并不是真的需要在进站和出站时都要进行的，但是因为框架是洋葱模型的，因此不得不设计成洋葱中的一层。</p>
 				<p>不管上面的理由是否真的有道理，总之我认为一个HTTP请求的处理过程，是可以用函数式风格的代码来表达的，因此做了这个框架。</p>
-				<p>当然啦，我很菜，所以这个框架可能既不OOP也不FP，feature少bug多，还请见谅啦。</p>
-				<p>由于我会的很少，所以会从传统框架中学习一些东西。</p>
+				<p><del>当然啦，我很菜，所以这个框架可能既不OOP也不FP，feature少bug多，还请见谅啦。</del></p>
+				<p>我又觉得我行了。</p>
 				<a href="#hello-world" id="hello-world" style="color: inherit; text-decoration: none;">
 					<h2>hello, world</h2>
 				</a>
@@ -95,18 +95,18 @@
 </code></pre>
 				<p>要更为简化的定义 <code>statusMessage</code> 属性，可以使用本框架导出的 <code>HttpStatus</code> 对象来获取对应的默认消息，例如 <code>HttpStatus[200]</code> 的值是 <code>&#39;Ok&#39;</code> ， <code>HttpStatus[404]</code> 的值是 <code>&#39;Not found&#39;</code> 。</p>
 				<p>不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 <code>200</code> ，消息为 <code>Ok</code>，并在 <code>header</code> 中设置正确的 <code>&quot;Content-Type&quot;</code> 的 <code>ResponseBody</code>的函数。</p>
-				<p>这些函数，可以从 <code>resBuilders</code> 中获得，例如上面的案例，可以变化为：</p>
-				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilders</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
+				<p>这些函数，可以从 <code>resBuilder</code> 中获得，例如上面的案例，可以变化为：</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilder</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilders</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilder</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
 <span style="color: #000000">}</span>
 </code></pre>
 				<p>要建立一个完整的服务，需要建立一个服务器，可以写成如下样式：</p>
-				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">createServer</span><span style="color: #000000">, </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilders</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">createServer</span><span style="color: #000000">, </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilder</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilders</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilder</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
 <span style="color: #000000">}</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">server</span><span style="color: #000000"> = </span><span style="color: #795E26">createServer</span><span style="color: #000000">(</span><span style="color: #001080">entry</span><span style="color: #000000">)</span>
@@ -115,10 +115,10 @@
 				<p>注意，<code>server</code> 实际上是一个标准的 <code>http</code> 模块的 <code>Server</code> 实例。</p>
 				<p>要更加细致的控制建立流程，你可以利用 <code>genBaseHandler</code> 将 <code>EntryPoint</code> 实例转化为 <code>RequestHandler</code> 实例，然后传入服务器：</p>
 				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">createServer</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;http&quot;</span>
-<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">genBaseHandler</span><span style="color: #000000">, </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilders</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">genBaseHandler</span><span style="color: #000000">, </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilder</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilders</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilder</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
 <span style="color: #000000">}</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">httpHandler</span><span style="color: #000000"> = </span><span style="color: #795E26">genBaseHandler</span><span style="color: #000000">(</span><span style="color: #001080">entry</span><span style="color: #000000">)</span>
@@ -221,8 +221,13 @@
 							<td>path: string</td>
 							<td>构建一个文件读取流，调用stream函数，Content-Type由 <code>mime.getType</code> 确定，未知的内容为 <code>application/octect-stream</code>。</td>
 						</tr>
+						<tr>
+							<td>httpError</td>
+							<td>code: number, message?: string</td>
+							<td>返回一个HTTP错误，可以指定状态码和错误信息</td>
+						</tr>
 				</tbody></table>
-				<p>注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 <code>ResponseBody</code> 还是使用我的 <code>stream</code> 和 <code>file</code> 函数都一样。所以使用前请务必小心并多加测试，如果可以的话请教教我该怎么改……</p>
+				<p>注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 <code>ResponseBody</code> 还是使用我的 <code>stream</code> 和 <code>file</code> 函数都一样。所以使用前请务必小心并多加测试。</p>
 				<a href="#其他" id="其他" style="color: inherit; text-decoration: none;">
 					<h2>其他</h2>
 				</a>
