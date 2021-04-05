@@ -1,0 +1,297 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>anelsonia</title>
+	<meta name="description" content="Documentation for anelsonia">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">anelsonia</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>anelsonia</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#anelsonia" id="anelsonia" style="color: inherit; text-decoration: none;">
+					<h1>Anelsonia</h1>
+				</a>
+				<p>一个更加简单、静态的Node.js Web框（玩）架（具）。</p>
+				<a href="#为什么？" id="为什么？" style="color: inherit; text-decoration: none;">
+					<h2>为什么？</h2>
+				</a>
+				<p>Node.js的基础Web框架已经有很多，如最为著名的Express、Koa、Fastify等，这些框架拥有良好的生态，建立起了一系列可靠的应用，但是我不喜欢它们——</p>
+				<p>自Express框架开始，这一系列洋葱模型的框架有效的利用了JavaScript的动态属性，在运行时将一系列属性绑定到它们的 <code>req</code> 、<code>res</code> 或是 <code>ctx</code> 属性上，直到服务启动之前——不，更准确的来说，当请求进入到你所设定的路径之前，你是无法知道动态绑定的属性和功能是否正常工作的。这对于TypeScript开发来说其实挺令人烦恼。</p>
+				<p>除此之外，路由这一需求实际上也和洋葱模型格格不入：一旦存在路由分支，各个路由之间的逻辑关系显然就不再“洋葱”了。而就算没有这些路由，洋葱模型也并不是真的很实用，相当数量的中间件：例如响应内容压缩、请求内容解析，都并不是真的需要在进站和出站时都要进行的，但是因为框架是洋葱模型的，因此不得不设计成洋葱中的一层。</p>
+				<p>不管上面的理由是否真的有道理，总之我认为一个HTTP请求的处理过程，是可以用函数式风格的代码来表达的，因此做了这个框架。</p>
+				<p>当然啦，我很菜，所以这个框架可能既不OOP也不FP，feature少bug多，还请见谅啦。</p>
+				<p>由于我会的很少，所以会从传统框架中学习一些东西。</p>
+				<a href="#hello-world" id="hello-world" style="color: inherit; text-decoration: none;">
+					<h2>hello, world</h2>
+				</a>
+				<p>处理请求的入口函数，应该实现接口 <code>EntryPoint</code> ，你可以在编辑器中先引入这个接口来帮助你完成这个函数：</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EntryPoint</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">statusCode:</span><span style="color: #000000"> </span><span style="color: #098658">200</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">statusMessage:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Ok&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">        </span><span style="color: #001080">header:</span><span style="color: #000000"> { </span><span style="color: #A31515">&quot;Content-Type&quot;</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;text/plain&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #001080">data:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<p>这个函数只有一个参数，即 <code>req</code>，它是 <code>http</code> 模块的 <code>IncomingMessage</code> 接口的实现；函数的返回值是接口 <code>ResponseBody</code> 的实现，它的定义如下：</p>
+				<pre><code class="language-typescript"><span style="color: #0000FF">interface</span><span style="color: #000000"> </span><span style="color: #267F99">ResponseBody</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">statusCode</span><span style="color: #000000">: </span><span style="color: #267F99">number</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">statusMessage</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">header</span><span style="color: #000000">: { [</span><span style="color: #001080">name</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">]: </span><span style="color: #267F99">string</span><span style="color: #000000">; };</span>
+<span style="color: #000000">    </span><span style="color: #001080">data</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000"> | </span><span style="color: #267F99">Buffer</span><span style="color: #000000"> | </span><span style="color: #267F99">Readable</span><span style="color: #000000">;</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<p>要更为简化的定义 <code>statusMessage</code> 属性，可以使用本框架导出的 <code>HttpStatus</code> 对象来获取对应的默认消息，例如 <code>HttpStatus[200]</code> 的值是 <code>&#39;Ok&#39;</code> ， <code>HttpStatus[404]</code> 的值是 <code>&#39;Not found&#39;</code> 。</p>
+				<p>不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 <code>200</code> ，消息为 <code>Ok</code>，并在 <code>header</code> 中设置正确的 <code>&quot;Content-Type&quot;</code> 的 <code>ResponseBody</code>的函数。</p>
+				<p>这些函数，可以从 <code>resBuilders</code> 中获得，例如上面的案例，可以变化为：</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilders</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilders</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<p>要建立一个完整的服务，需要建立一个服务器，可以写成如下样式：</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">createServer</span><span style="color: #000000">, </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilders</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilders</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">server</span><span style="color: #000000"> = </span><span style="color: #795E26">createServer</span><span style="color: #000000">(</span><span style="color: #001080">entry</span><span style="color: #000000">)</span>
+<span style="color: #001080">server</span><span style="color: #000000">.</span><span style="color: #795E26">listen</span><span style="color: #000000">(</span><span style="color: #098658">8080</span><span style="color: #000000">)</span>
+</code></pre>
+				<p>注意，<code>server</code> 实际上是一个标准的 <code>http</code> 模块的 <code>Server</code> 实例。</p>
+				<p>要更加细致的控制建立流程，你可以利用 <code>genBaseHandler</code> 将 <code>EntryPoint</code> 实例转化为 <code>RequestHandler</code> 实例，然后传入服务器：</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">createServer</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;http&quot;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">genBaseHandler</span><span style="color: #000000">, </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilders</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilders</span><span style="color: #000000">.</span><span style="color: #795E26">text</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span><span style="color: #000000">)</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">httpHandler</span><span style="color: #000000"> = </span><span style="color: #795E26">genBaseHandler</span><span style="color: #000000">(</span><span style="color: #001080">entry</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">server</span><span style="color: #000000"> = </span><span style="color: #795E26">createServer</span><span style="color: #000000">(</span><span style="color: #001080">httpHandler</span><span style="color: #000000">)</span>
+<span style="color: #001080">server</span><span style="color: #000000">.</span><span style="color: #795E26">listen</span><span style="color: #000000">(</span><span style="color: #098658">8080</span><span style="color: #000000">)</span>
+</code></pre>
+				<a href="#路由" id="路由" style="color: inherit; text-decoration: none;">
+					<h2>路由</h2>
+				</a>
+				<p>使用 <code>router</code> 函数构建一个路由，使用路由返回的 <code>match</code> 函数和访问的路径做匹配，使用返回的<code>handleBy</code> 指定处理的对应函数。如果 <code>match</code> 未能成功匹配，会返回 <code>null</code> 。</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">createServer</span><span style="color: #000000">, </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilder</span><span style="color: #000000">, </span><span style="color: #001080">router</span><span style="color: #000000">, </span><span style="color: #001080">RouteHandler</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">errorHandler</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;./errorHandler&quot;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">fileHandler</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;./fileHandler&quot;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">helloHandler</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;./helloHandler&quot;</span><span style="color: #000000">;</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">helloRoute</span><span style="color: #000000"> = </span><span style="color: #795E26">router</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;/hello/:username&quot;</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">fileRouter</span><span style="color: #000000"> = </span><span style="color: #795E26">router</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;/public/(.*)&quot;</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">errorTest</span><span style="color: #000000"> = </span><span style="color: #795E26">router</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;/error/:errCode&quot;</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">entry</span><span style="color: #000000">: </span><span style="color: #267F99">EntryPoint</span><span style="color: #000000"> = </span><span style="color: #0000FF">async</span><span style="color: #000000"> (</span><span style="color: #001080">req</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">url</span><span style="color: #000000"> = </span><span style="color: #001080">req</span><span style="color: #000000">.</span><span style="color: #001080">url</span><span style="color: #000000"> ?? </span><span style="color: #A31515">&quot;/&quot;</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">helloRoute</span><span style="color: #000000">.</span><span style="color: #795E26">match</span><span style="color: #000000">(</span><span style="color: #001080">url</span><span style="color: #000000">)?.</span><span style="color: #795E26">handleBy</span><span style="color: #000000">((</span><span style="color: #001080">pathParams</span><span style="color: #000000">, </span><span style="color: #001080">searchParams</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #795E26">helloHandler</span><span style="color: #000000">(</span><span style="color: #001080">pathParams</span><span style="color: #000000">, </span><span style="color: #001080">searchParams</span><span style="color: #000000">, </span><span style="color: #001080">req</span><span style="color: #000000">))</span>
+<span style="color: #000000">        || </span><span style="color: #001080">fileRouter</span><span style="color: #000000">.</span><span style="color: #795E26">match</span><span style="color: #000000">(</span><span style="color: #001080">url</span><span style="color: #000000">)?.</span><span style="color: #795E26">handleBy</span><span style="color: #000000">(</span><span style="color: #001080">fileHandler</span><span style="color: #000000">)</span>
+<span style="color: #000000">        || </span><span style="color: #001080">errorTest</span><span style="color: #000000">.</span><span style="color: #795E26">match</span><span style="color: #000000">(</span><span style="color: #001080">url</span><span style="color: #000000">)?.</span><span style="color: #795E26">handleBy</span><span style="color: #000000">(</span><span style="color: #001080">errorHandler</span><span style="color: #000000">)</span>
+<span style="color: #000000">        || </span><span style="color: #001080">resBuilder</span><span style="color: #000000">.</span><span style="color: #795E26">httpError</span><span style="color: #000000">(</span><span style="color: #098658">404</span><span style="color: #000000">);</span>
+<span style="color: #000000">};</span>
+
+<span style="color: #795E26">createServer</span><span style="color: #000000">(</span><span style="color: #001080">entry</span><span style="color: #000000">).</span><span style="color: #795E26">listen</span><span style="color: #000000">(</span><span style="color: #098658">8080</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>因为使用了和Express一样的 <code>path-to-regexp</code> 库，因此可以使用完全一样的方式构建路由。</p>
+				<p><code>pathParams</code> 参数是路由参数，它是一个 <code>Map</code> 对象，使用 <code>get</code> 方法从其中获取值（字符串），利用 <code>forEach</code> 遍历键值对， <code>searchParams</code> 是查询参数，它是一个 <code>URLSearchParams</code> 实现，它和 <code>Map</code> 对象的用法基本一致。</p>
+				<p>路由控制器并不一定要返回一个 <code>ResponseBody</code> 的实现，也可以返回任意值作为一个处理过程的中间量。</p>
+				<p>路由控制器 <code>RouteHandler</code> 并非只能接受路径参数和查询参数，但是 <code>handleBy</code> 只会传递给它两个参数。可以根据需要传入其他参数，例如要将 <code>req</code> 对象传递给路由时，你可以将 <code>handleBy</code> 写成：<code>xRouter.match(url).handleBy((p,q) =&gt; handler(p, q, req))</code>，<code>handler</code>的定义为：<code>const handler: RouteHandler = (params, querys, req) =&gt; {}</code>，如上面的 <code>helloHandler</code> 那样。下面是 <code>helloHandler</code> 的定义形式：</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">resBuilder</span><span style="color: #000000">, </span><span style="color: #001080">ResponseBody</span><span style="color: #000000">, </span><span style="color: #001080">RouteHandler</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">IncomingMessage</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;http&quot;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #001080">getRawBody</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;raw-body&quot;</span><span style="color: #000000">;</span>
+
+<span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #795E26">helloHandler</span><span style="color: #000000">: </span><span style="color: #267F99">RouteHandler</span><span style="color: #000000">&lt;</span><span style="color: #267F99">ResponseBody</span><span style="color: #000000"> | </span><span style="color: #267F99">null</span><span style="color: #000000">&gt; = </span><span style="color: #0000FF">async</span><span style="color: #000000"> (</span><span style="color: #001080">p</span><span style="color: #000000">, </span><span style="color: #001080">q</span><span style="color: #000000">, </span><span style="color: #001080">req</span><span style="color: #000000">: </span><span style="color: #267F99">IncomingMessage</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">username</span><span style="color: #000000"> = </span><span style="color: #001080">p</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;username&quot;</span><span style="color: #000000">);</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">message</span><span style="color: #000000"> = </span><span style="color: #001080">q</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;message&quot;</span><span style="color: #000000">);</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">req</span><span style="color: #000000">.</span><span style="color: #001080">method</span><span style="color: #000000"> == </span><span style="color: #A31515">&quot;post&quot;</span><span style="color: #000000">) </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">((</span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">getRawBody</span><span style="color: #000000">(</span><span style="color: #001080">req</span><span style="color: #000000">)).</span><span style="color: #795E26">toString</span><span style="color: #000000">());</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (!(</span><span style="color: #001080">username</span><span style="color: #000000"> &amp;&amp; </span><span style="color: #001080">message</span><span style="color: #000000">)) {</span>
+<span style="color: #000000">        </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #0000FF">null</span><span style="color: #000000">;</span>
+<span style="color: #000000">    } </span><span style="color: #AF00DB">else</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">resBuilder</span><span style="color: #000000">.</span><span style="color: #795E26">json</span><span style="color: #000000">({ </span><span style="color: #001080">username</span><span style="color: #000000">, </span><span style="color: #001080">message</span><span style="color: #000000">, </span><span style="color: #001080">date:</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Date</span><span style="color: #000000">() });</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">};</span>
+</code></pre>
+				<p>特别需要注意的是，路由控制器和入口函数都可以是异步函数，且特别建议将入口函数设置为异步函数，以使用 <code>await</code> 处理后续的异步动作；于此同时，需要注意 <code>Promise&lt;null&gt;</code> 在使用 <code>||</code> 进行向后传递时，会被视为 <code>true</code> 的结果，因此必须 <code>await</code> 。</p>
+				<a href="#resbuilder" id="resbuilder" style="color: inherit; text-decoration: none;">
+					<h2>resBuilder</h2>
+				</a>
+				<p>resBuilder对象下有以下函数，可返回 <code>ResponseBody</code> 的实现：</p>
+				<table>
+					<thead>
+						<tr>
+							<th>名称</th>
+							<th>参数</th>
+							<th>说明</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>text</td>
+							<td>content: stirng, type: string</td>
+							<td>文本内容相应，指定的类型会被设置为&quot;Content-Type&quot;: &quot;text/${type}&quot;，type留空时，默认值为&quot;plain&quot;</td>
+						</tr>
+						<tr>
+							<td>html</td>
+							<td>content: string</td>
+							<td>响应一个HTML，Content-Type与之对应</td>
+						</tr>
+						<tr>
+							<td>css</td>
+							<td>同上</td>
+							<td>响应一个CSS，Content-Type与之对应</td>
+						</tr>
+						<tr>
+							<td>js</td>
+							<td>同上</td>
+							<td>响应一个JavaScript，Content-Type与之对应</td>
+						</tr>
+						<tr>
+							<td>json</td>
+							<td>object: Object</td>
+							<td>响应一个JSON，响应前会被JSON.stringify转换成字符串</td>
+						</tr>
+						<tr>
+							<td>stream</td>
+							<td>rStream: Readable</td>
+							<td>返回一个可读流，当其 <code>&quot;data&quot;</code> 事件触发时，会写入到响应流中</td>
+						</tr>
+						<tr>
+							<td>buffer</td>
+							<td>buf: Buffer</td>
+							<td>直接返回Buffer二进制内容，默认的Content-Type和stream方法一样是<code>application/octect-stream</code></td>
+						</tr>
+						<tr>
+							<td>file</td>
+							<td>path: string</td>
+							<td>构建一个文件读取流，调用stream函数，Content-Type由 <code>mime.getType</code> 确定，未知的内容为 <code>application/octect-stream</code>。</td>
+						</tr>
+				</tbody></table>
+				<p>注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 <code>ResponseBody</code> 还是使用我的 <code>stream</code> 和 <code>file</code> 函数都一样。所以使用前请务必小心并多加测试，如果可以的话请教教我该怎么改……</p>
+				<a href="#其他" id="其他" style="color: inherit; text-decoration: none;">
+					<h2>其他</h2>
+				</a>
+				<p>等我有空了改改变量名。</p>
+				<p>路由是不是应该限制一下请求方法。</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/entrypoint.html" class="tsd-kind-icon">Entry<wbr>Point</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/responsebody.html" class="tsd-kind-icon">Response<wbr>Body</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/routehandler.html" class="tsd-kind-icon">Route<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#routeparams" class="tsd-kind-icon">Route<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#httpstatus" class="tsd-kind-icon">Http<wbr>Status</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#resbuilder" class="tsd-kind-icon">res<wbr>Builder</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#createserver" class="tsd-kind-icon">create<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#genbasehandler" class="tsd-kind-icon">gen<wbr>Base<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#handleerr" class="tsd-kind-icon">handle<wbr>Err</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#router" class="tsd-kind-icon">router</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#stdoutlog" class="tsd-kind-icon">stdout<wbr>Log</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

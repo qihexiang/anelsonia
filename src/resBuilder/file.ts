@@ -6,6 +6,7 @@ import { stream } from "./stream";
 import { httpError } from "./error";
 
 /**
+ * Generate a file response.
  * 
  * @param path The path of the file you want to send.
  * @returns A ResponseBody includes a Readable stream 
