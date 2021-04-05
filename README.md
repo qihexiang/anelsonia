@@ -12,9 +12,9 @@ Node.js的基础Web框架已经有很多，如最为著名的Express、Koa、Fas
 
 不管上面的理由是否真的有道理，总之我认为一个HTTP请求的处理过程，是可以用函数式风格的代码来表达的，因此做了这个框架。
 
-当然啦，我很菜，所以这个框架可能既不OOP也不FP，feature少bug多，还请见谅啦。
+~~当然啦，我很菜，所以这个框架可能既不OOP也不FP，feature少bug多，还请见谅啦。~~
 
-由于我会的很少，所以会从传统框架中学习一些东西。
+我又觉得我行了。
 
 ## hello, world
 
@@ -47,23 +47,23 @@ interface ResponseBody {
 
 不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 `200` ，消息为 `Ok`，并在 `header` 中设置正确的 `"Content-Type"` 的 `ResponseBody`的函数。
 
-这些函数，可以从 `resBuilders` 中获得，例如上面的案例，可以变化为：
+这些函数，可以从 `resBuilder` 中获得，例如上面的案例，可以变化为：
 
 ```typescript
-import { EntryPoint, resBuilders } from "anelsonia"
+import { EntryPoint, resBuilder } from "anelsonia"
 
 const entry: EntryPoint = (req) => {
-    return resBuilders.text("hello, world\n")
+    return resBuilder.text("hello, world\n")
 }
 ```
 
 要建立一个完整的服务，需要建立一个服务器，可以写成如下样式：
 
 ```typescript
-import { createServer, EntryPoint, resBuilders } from "anelsonia"
+import { createServer, EntryPoint, resBuilder } from "anelsonia"
 
 const entry: EntryPoint = (req) => {
-    return resBuilders.text("hello, world\n")
+    return resBuilder.text("hello, world\n")
 }
 
 const server = createServer(entry)
@@ -76,10 +76,10 @@ server.listen(8080)
 
 ```typescript
 import { createServer } from "http"
-import { genBaseHandler, EntryPoint, resBuilders } from "anelsonia"
+import { genBaseHandler, EntryPoint, resBuilder } from "anelsonia"
 
 const entry: EntryPoint = (req) => {
-    return resBuilders.text("hello, world\n")
+    return resBuilder.text("hello, world\n")
 }
 
 const httpHandler = genBaseHandler(entry)
@@ -154,8 +154,9 @@ json|object: Object|响应一个JSON，响应前会被JSON.stringify转换成字
 stream|rStream: Readable|返回一个可读流，当其 `"data"` 事件触发时，会写入到响应流中
 buffer|buf: Buffer|直接返回Buffer二进制内容，默认的Content-Type和stream方法一样是`application/octect-stream`
 file|path: string|构建一个文件读取流，调用stream函数，Content-Type由 `mime.getType` 确定，未知的内容为 `application/octect-stream`。
+httpError|code: number, message?: string|返回一个HTTP错误，可以指定状态码和错误信息
 
-注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 `ResponseBody` 还是使用我的 `stream` 和 `file` 函数都一样。所以使用前请务必小心并多加测试，如果可以的话请教教我该怎么改……
+注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 `ResponseBody` 还是使用我的 `stream` 和 `file` 函数都一样。所以使用前请务必小心并多加测试。
 
 ## 其他
 

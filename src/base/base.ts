@@ -14,12 +14,12 @@ export const genBaseHandler = (entryHandler: EntryPoint): RequestListener => {
         const { statusCode, statusMessage, header, data } = await entryHandler(req)
         res.writeHead(statusCode, statusMessage, header)
         if(data instanceof Readable) {
-            data.on("error", err => {
+            data.on("data", chunk => res.write(chunk))
+            data.on("close", () => res.end())
+            res.on("error", err => {
                 handleErr(err)
                 data.destroy()
             })
-            data.on("data", chunk => res.write(chunk))
-            data.on("close", () => res.end())
         } else {
             res.end(data)
         }
