@@ -4,12 +4,17 @@
   "description": "FP style Node.js web framework.",
   "main": "dist/index.js",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
-  "license": "MIT",
+  "license": "MPL 2.0",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qihexiang/anelsonia-web.git"
+  },
   "devDependencies": {
     "@types/mime": "^2.0.3",
     "raw-body": "^2.4.1",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "typedoc": "^0.20.35"
   },
   "files": [
     "dist/"
@@ -17,8 +22,7 @@
   "dependencies": {
     "@types/node": "^14.14.37",
     "mime": "^2.5.2",
-    "path-to-regexp": "^6.2.0",
-    "typedoc": "^0.20.35"
+    "path-to-regexp": "^6.2.0"
   },
   "scripts": {
     "prepublish": "tsc && typedoc ./src/index.ts",
