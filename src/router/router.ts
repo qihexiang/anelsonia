@@ -18,12 +18,12 @@ export function router(pathToMatch: string) {
          */
         match(reqUrl: string) {
             const { pathname, searchParams } = new URL(reqUrl, 'http://localhost');
-            const pathParsed = pathRegExp.exec(pathname)
-            if(pathParsed === null) return null
-            const pathParams: RouteParams = new Map()
+            const pathParsed = pathRegExp.exec(pathname);
+            if (pathParsed === null) return null;
+            const pathParams: RouteParams = new Map();
             keys.forEach((key, index) => {
-                pathParams.set(key.name, pathParsed[index + 1])
-            })
+                pathParams.set(key.name, pathParsed[index + 1]);
+            });
             return {
                 /**
                  * handle condition when route matched.
@@ -31,10 +31,10 @@ export function router(pathToMatch: string) {
                  * @param handler The RouteHandler you want to use to handle this condition.
                  * @returns what the `handler` returns
                  */
-                handleBy: function<T>(handler: RouteHandler<T>): T | Promise<T> {
-                    return handler(pathParams, searchParams)
+                handleBy: function <T>(handler: RouteHandler<T>): T {
+                    return handler(pathParams, searchParams);
                 }
-            }
+            };
         }
     };
 }
