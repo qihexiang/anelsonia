@@ -1,6 +1,13 @@
 import { ResponseBody } from "../usr/Basic";
 import HttpStatus from "../usr/HTTPCodes";
 
+/**
+ * Generate a HTTP error response.
+ * 
+ * @param code HTTP Status code, like `404`, `500`.
+ * @param message The message you want to send.
+ * @returns A ResponseBody.
+ */
 export function httpError(code: number, message?: string): ResponseBody {
     if (!(code in HttpStatus)) code = 500;
     return {

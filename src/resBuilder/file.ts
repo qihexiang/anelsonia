@@ -5,9 +5,15 @@ import { ResponseBody } from "../usr/Basic";
 import { stream } from "./stream";
 import { httpError } from "./error";
 
+/**
+ * 
+ * @param path The path of the file you want to send.
+ * @returns A ResponseBody includes a Readable stream 
+ * or a HTTP error ResponseBody if file not exits or not a regular file.
+ */
 export async function file(path: string): Promise<ResponseBody> {
     try {
-        if (!(await stat(path)).isFile()) throw new Error("Not a generic file.");
+        if (!(await stat(path)).isFile()) return httpError(403, "Not a regular file.");
         const rStream = createReadStream(path);
         const resBody = stream(rStream);
         resBody.header["Content-Type"] = getType(path) || 'application/octect-stream';

@@ -3,6 +3,12 @@ import { Readable } from "stream";
 import { EntryPoint } from "../usr/Basic";
 import { handleErr } from "../utils/handleError";
 
+/**
+ * Build a HTTP RequestListner using given EntryPoint function.
+ * 
+ * @param entryHandler The entry function that you write.
+ * @returns A RequestListener of http module.
+ */
 export const genBaseHandler = (entryHandler: EntryPoint): RequestListener => {
     return async (req, res) => {
         const { statusCode, statusMessage, header, data } = await entryHandler(req)
@@ -20,6 +26,12 @@ export const genBaseHandler = (entryHandler: EntryPoint): RequestListener => {
     };
 };
 
+/**
+ * Build a http server directly using given EntryPoint function.
+ * 
+ * @param entryHandler The entry function that you write.
+ * @returns A Server of http module.
+ */
 export const createServer = (entryHandler: EntryPoint): Server => {
     return createHttpServer(genBaseHandler(entryHandler))
 }
