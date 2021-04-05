@@ -1,3 +1,6 @@
+/**
+ * Get http status code and default status message from here.
+ */
 export const HttpStatus: { [statusCode: number]: string; } = {
     100: "continue",
     101: "switching protocols",
