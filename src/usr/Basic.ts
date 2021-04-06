@@ -1,5 +1,4 @@
-import { IncomingMessage } from "http";
-import { OutgoingHttpHeaders } from "node:http";
+import { IncomingMessage, OutgoingHttpHeaders } from "http";
 import { Readable } from "stream";
 
 export interface ResponseBody {
@@ -10,5 +9,5 @@ export interface ResponseBody {
 }
 
 export interface EntryPoint {
-    (req: IncomingMessage): ResponseBody | Promise<ResponseBody>;
+    (req: IncomingMessage): Promise<ResponseBody>;
 }
