@@ -158,8 +158,13 @@ httpError|code: number, message?: string|返回一个HTTP错误，可以指定�
 
 注意，因为处理流时对于出错的情况，我是瞎几把处理的（其实就是没处理），不管是手动实现 `ResponseBody` 还是使用我的 `stream` 和 `file` 函数都一样。所以使用前请务必小心并多加测试。
 
-## 其他
+## 建议插件列表
 
-等我有空了改改变量名。
+大部分可能用到的插件实际上是Express/Koa的依赖或者依赖的依赖。
 
-路由是不是应该限制一下请求方法。
+目的|插件名称
+---|---
+Cookie解析|cookie
+Body解析|raw-body
+设置Content-Type|mime
+设置Content-Type|content-type
