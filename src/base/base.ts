@@ -11,17 +11,18 @@ import { handleErr } from "../utils/handleError";
  */
 export const genBaseHandler = (entryHandler: EntryPoint): RequestListener => {
     return async (req, res) => {
-        const { statusCode, statusMessage, header, data } = await entryHandler(req)
-        res.writeHead(statusCode, statusMessage, header)
-        if(data instanceof Readable) {
-            data.on("data", chunk => res.write(chunk))
-            data.on("close", () => res.end())
+        const { statusCode, statusMessage, header, data } = await entryHandler(req);
+        res.writeHead(statusCode, statusMessage, header);
+        if (data instanceof Readable) {
+            data.on("data", chunk => res.write(chunk));
+            data.on("close", () => res.end());
             res.on("error", err => {
-                handleErr(err)
-                data.destroy()
-            })
+                handleErr(err);
+                data.destroy();
+            });
         } else {
-            res.end(data)
+            res.write(data);
+            res.end();
         }
     };
 };
@@ -33,5 +34,5 @@ export const genBaseHandler = (entryHandler: EntryPoint): RequestListener => {
  * @returns A Server of http module.
  */
 export const createServer = (entryHandler: EntryPoint): Server => {
-    return createHttpServer(genBaseHandler(entryHandler))
-}
+    return createHttpServer(genBaseHandler(entryHandler));
+};
