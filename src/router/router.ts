@@ -33,7 +33,8 @@ export function router(pathToMatch: string) {
                  */
                 handleBy: function <T>(handler: RouteHandler<T>): T {
                     return handler(pathParams, searchParams);
-                }
+                },
+                pathParams, searchParams
             };
         }
     };
