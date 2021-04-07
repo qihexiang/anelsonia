@@ -26,7 +26,7 @@ const entry: EntryPoint = (req) => {
     return {
         statusCode: 200,
         statusMessage: "Ok",
-        header: { "Content-Type": "text/plain" },
+        headers: { "Content-Type": "text/plain" },
         data: "hello, world\n"
     }
 }
@@ -38,14 +38,14 @@ const entry: EntryPoint = (req) => {
 interface ResponseBody {
     statusCode: number;
     statusMessage: string;
-    header: { [name: string]: string; };
+    headers: { [name: string]: string; };
     data: string | Buffer | Readable;
 }
 ```
 
 要更为简化的定义 `statusMessage` 属性，可以使用本框架导出的 `HttpStatus` 对象来获取对应的默认消息，例如 `HttpStatus[200]` 的值是 `'Ok'` ， `HttpStatus[404]` 的值是 `'Not found'` 。
 
-不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 `200` ，消息为 `Ok`，并在 `header` 中设置正确的 `"Content-Type"` 的 `ResponseBody`的函数。
+不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 `200` ，消息为 `Ok`，并在 `headers` 中设置正确的 `"Content-Type"` 的 `ResponseBody`的函数。
 
 这些函数，可以从 `resBuilder` 中获得，例如上面的案例，可以变化为：
 

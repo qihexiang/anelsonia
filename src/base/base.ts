@@ -11,8 +11,8 @@ import { handleErr } from "../utils/handleError";
  */
 export const genBaseHandler = (entryHandler: EntryPoint): RequestListener => {
     return async (req, res) => {
-        const { statusCode, statusMessage, header, data } = await entryHandler(req);
-        res.writeHead(statusCode, statusMessage, header);
+        const { statusCode, statusMessage, headers, data } = await entryHandler(req);
+        res.writeHead(statusCode, statusMessage, headers);
         if (data instanceof Readable) {
             data.on("data", chunk => res.write(chunk));
             data.on("close", () => res.end());

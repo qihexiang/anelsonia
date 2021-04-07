@@ -12,7 +12,7 @@ export function text(content: string, mime: "html"|"plain"|"javascript"|"css" = 
     return {
         statusCode: 200,
         statusMessage: HttpStatus[200],
-        header: {"Content-Type": `text/${mime}`},
+        headers: {"Content-Type": `text/${mime}`},
         data: content
     }
 }

@@ -12,7 +12,7 @@ export function json(object: Object): ResponseBody {
     return {
         statusCode: 200,
         statusMessage: HttpStatus[200],
-        header: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         data: content
     };
 }

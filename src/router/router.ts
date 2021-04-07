@@ -17,7 +17,7 @@ export function router(pathToMatch: string) {
          * @returns `{ handleBy }` if matched and `null` if not.
          */
         match(reqUrl: string) {
-            const { pathname, searchParams } = new URL(reqUrl, 'http://localhost');
+            const { pathname, searchParams } = new URL(reqUrl, "http://localhost");
             const pathParsed = pathRegExp.exec(pathname);
             if (pathParsed === null) return null;
             const pathParams: RouteParams = new Map();

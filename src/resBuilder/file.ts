@@ -17,7 +17,7 @@ export async function file(path: string): Promise<ResponseBody> {
         if (!(await stat(path)).isFile()) return httpError(403, "Not a regular file.");
         const rStream = createReadStream(path);
         const resBody = stream(rStream);
-        resBody.header["Content-Type"] = getType(path) || 'application/octect-stream';
+        resBody.headers["Content-Type"] = getType(path) || "application/octect-stream";
         return resBody;
     } catch (err) {
         return httpError(404, "File not found");

@@ -4,7 +4,7 @@ import { Readable } from "stream";
 export interface ResponseBody {
     statusCode: number;
     statusMessage: string;
-    header: OutgoingHttpHeaders;
+    headers: OutgoingHttpHeaders;
     data: string | Buffer | Readable;
 }
 

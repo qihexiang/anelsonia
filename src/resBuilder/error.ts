@@ -13,7 +13,7 @@ export function httpError(code: number, message?: string): ResponseBody {
     return {
         statusCode: code,
         statusMessage: HttpStatus[code],
-        header: {"Content-Type": "text/plain"},
+        headers: {"Content-Type": "text/plain"},
         data: message || `${code} ${HttpStatus[code]}`
     };
 }
