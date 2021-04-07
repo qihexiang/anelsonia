@@ -80,7 +80,7 @@
 <span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> {</span>
 <span style="color: #000000">        </span><span style="color: #001080">statusCode:</span><span style="color: #000000"> </span><span style="color: #098658">200</span><span style="color: #000000">,</span>
 <span style="color: #000000">        </span><span style="color: #001080">statusMessage:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Ok&quot;</span><span style="color: #000000">,</span>
-<span style="color: #000000">        </span><span style="color: #001080">header:</span><span style="color: #000000"> { </span><span style="color: #A31515">&quot;Content-Type&quot;</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;text/plain&quot;</span><span style="color: #000000"> },</span>
+<span style="color: #000000">        </span><span style="color: #001080">headers:</span><span style="color: #000000"> { </span><span style="color: #A31515">&quot;Content-Type&quot;</span><span style="color: #001080">:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;text/plain&quot;</span><span style="color: #000000"> },</span>
 <span style="color: #000000">        </span><span style="color: #001080">data:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;hello, world</span><span style="color: #EE0000">\n</span><span style="color: #A31515">&quot;</span>
 <span style="color: #000000">    }</span>
 <span style="color: #000000">}</span>
@@ -89,12 +89,12 @@
 				<pre><code class="language-typescript"><span style="color: #0000FF">interface</span><span style="color: #000000"> </span><span style="color: #267F99">ResponseBody</span><span style="color: #000000"> {</span>
 <span style="color: #000000">    </span><span style="color: #001080">statusCode</span><span style="color: #000000">: </span><span style="color: #267F99">number</span><span style="color: #000000">;</span>
 <span style="color: #000000">    </span><span style="color: #001080">statusMessage</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
-<span style="color: #000000">    </span><span style="color: #001080">header</span><span style="color: #000000">: { [</span><span style="color: #001080">name</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">]: </span><span style="color: #267F99">string</span><span style="color: #000000">; };</span>
+<span style="color: #000000">    </span><span style="color: #001080">headers</span><span style="color: #000000">: { [</span><span style="color: #001080">name</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">]: </span><span style="color: #267F99">string</span><span style="color: #000000">; };</span>
 <span style="color: #000000">    </span><span style="color: #001080">data</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000"> | </span><span style="color: #267F99">Buffer</span><span style="color: #000000"> | </span><span style="color: #267F99">Readable</span><span style="color: #000000">;</span>
 <span style="color: #000000">}</span>
 </code></pre>
 				<p>要更为简化的定义 <code>statusMessage</code> 属性，可以使用本框架导出的 <code>HttpStatus</code> 对象来获取对应的默认消息，例如 <code>HttpStatus[200]</code> 的值是 <code>&#39;Ok&#39;</code> ， <code>HttpStatus[404]</code> 的值是 <code>&#39;Not found&#39;</code> 。</p>
-				<p>不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 <code>200</code> ，消息为 <code>Ok</code>，并在 <code>header</code> 中设置正确的 <code>&quot;Content-Type&quot;</code> 的 <code>ResponseBody</code>的函数。</p>
+				<p>不过，这样的返回方式依然较为麻烦，因此框架中提供了一些快速生成状态为 <code>200</code> ，消息为 <code>Ok</code>，并在 <code>headers</code> 中设置正确的 <code>&quot;Content-Type&quot;</code> 的 <code>ResponseBody</code>的函数。</p>
 				<p>这些函数，可以从 <code>resBuilder</code> 中获得，例如上面的案例，可以变化为：</p>
 				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">EntryPoint</span><span style="color: #000000">, </span><span style="color: #001080">resBuilder</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anelsonia&quot;</span>
 
