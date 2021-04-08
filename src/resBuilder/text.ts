@@ -8,7 +8,7 @@ import HttpStatus from "../usr/HTTPCodes";
  * @param mime You can specify the MIME name after "text/" here.
  * @returns A ResponseBody of text.
  */
-export function text(content: string, mime: "html"|"plain"|"javascript"|"css" = "plain"): ResponseBody {
+export function text(content: string, mime: string = "plain"): ResponseBody {
     return {
         statusCode: 200,
         statusMessage: HttpStatus[200],
