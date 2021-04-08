@@ -1,41 +1,42 @@
 import { pathToRegexp, Key } from "path-to-regexp";
 import { RouteHandler, RouteParams } from "../usr/Route";
 
-/**
- * Generate a route-match function.
- * 
- * @param pathToMatch path-to-regexp styled string
- */
-export function router(pathToMatch: string) {
-    const keys: Key[] = [];
-    const pathRegExp = pathToRegexp(pathToMatch, keys);
-    return {
-        /**
-         * Match the url with route RegExp.
-         * 
-         * @param reqUrl The requested url, you can use `req.url` or anything you want.
-         * @returns `{ handleBy }` if matched and `null` if not.
-         */
-        match(reqUrl: string) {
-            const { pathname, searchParams } = new URL(reqUrl, "http://localhost");
-            const pathParsed = pathRegExp.exec(pathname);
-            if (pathParsed === null) return null;
-            const pathParams: RouteParams = new Map();
-            keys.forEach((key, index) => {
-                pathParams.set(key.name, pathParsed[index + 1]);
-            });
-            return {
-                /**
-                 * handle condition when route matched.
-                 * 
-                 * @param handler The RouteHandler you want to use to handle this condition.
-                 * @returns what the `handler` returns
-                 */
-                handleBy: function <T>(handler: RouteHandler<T>): T {
-                    return handler(pathParams, searchParams);
-                },
-                pathParams, searchParams
-            };
-        }
-    };
+interface routeMatcher<T> {
+    (url: string, handler: RouteHandler<T>): T | null;
 }
+
+/**
+ * Create a router match specified path.
+ * 
+ * @param path The path to match given url
+ * @returns return a routeMatcher
+ */
+export function createRouter<T>(path: string): routeMatcher<T> {
+    const keys: Key[] = [];
+    const pathRegExp = pathToRegexp(path, keys);
+    /**
+     * Match the url and return the result of the handler.
+     * 
+     * @param url The requested url.
+     * @param handler The handler to handle this route.
+     * @returns returns what the handler return.
+     */
+    const matcher: routeMatcher<T> = (url, handler) => {
+        const { pathname, searchParams } = new URL(url, "http://localhost");
+        const pathParsed = pathRegExp.exec(pathname);
+        if (pathParsed === null) return null;
+        const pathParams: RouteParams = new Map();
+        keys.forEach((key, index) => {
+            pathParams.set(key.name, pathParsed[index + 1]);
+        });
+        return handler(pathParams, searchParams);
+    };
+    return matcher;
+}
+
+/**
+ * Return pathParams and searchParams back.
+ */
+export const getParams: RouteHandler<{ pathParams: RouteParams, searchParams: URLSearchParams; }> = (p, q) => {
+    return { pathParams: p, searchParams: q };
+};

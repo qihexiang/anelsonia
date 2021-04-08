@@ -5,7 +5,7 @@ export function redirection(code: 301 | 302, location: string, message: string):
     return {
         statusCode: code,
         statusMessage: HttpStatus[code],
-        headers: { location },
+        headers: { location, "Content-Type": "text/plain" },
         data: message
     };
 }

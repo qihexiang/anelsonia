@@ -62,6 +62,12 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Namespaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-namespace"><a href="modules/resbuilder.html" class="tsd-kind-icon">res<wbr>Builder</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-interface"><a href="interfaces/entrypoint.html" class="tsd-kind-icon">Entry<wbr>Point</a></li>
@@ -79,16 +85,16 @@
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-variable"><a href="modules.html#httpstatus" class="tsd-kind-icon">Http<wbr>Status</a></li>
-								<li class="tsd-kind-variable"><a href="modules.html#resbuilder" class="tsd-kind-icon">res<wbr>Builder</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#createrouter" class="tsd-kind-icon">create<wbr>Router</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#createserver" class="tsd-kind-icon">create<wbr>Server</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#genbasehandler" class="tsd-kind-icon">gen<wbr>Base<wbr>Handler</a></li>
+								<li class="tsd-kind-function"><a href="modules.html#getparams" class="tsd-kind-icon">get<wbr>Params</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#handleerr" class="tsd-kind-icon">handle<wbr>Err</a></li>
-								<li class="tsd-kind-function"><a href="modules.html#router" class="tsd-kind-icon">router</a></li>
 								<li class="tsd-kind-function"><a href="modules.html#stdoutlog" class="tsd-kind-icon">stdout<wbr>Log</a></li>
 							</ul>
 						</section>
@@ -133,334 +139,47 @@
 						</ul>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-variable">
-					<a name="resbuilder" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> res<wbr>Builder</h3>
-					<div class="tsd-signature tsd-kind-icon">res<wbr>Builder<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>buffer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>buf<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>css<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>html<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>httpError<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, message<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>js<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>json<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>redirection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">301</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">302</span>, location<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, message<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>stream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>rStream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Readable</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">; </span>text<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, mime<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;html&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;plain&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;javascript&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;css&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = ...</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in resBuilder/index.ts:7</li>
-						</ul>
-					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>buffer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>buf<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>buf<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a binary response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>buf: <span class="tsd-signature-type">Buffer</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The buf you want to write to the response.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody includes a Buffer-data</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>css<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a CSS response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>content: <span class="tsd-signature-type">string</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The CSS content you want to send.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody of CSS.</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">&gt;</span></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">&gt;</span></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a file response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>path: <span class="tsd-signature-type">string</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The path of the file you want to send.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a><span class="tsd-signature-symbol">&gt;</span></h4>
-												<p>A ResponseBody includes a Readable stream
-												or a HTTP error ResponseBody if file not exits or not a regular file.</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>html<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a HTML response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>content: <span class="tsd-signature-type">string</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The HTML content you want to send.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody of HTML.</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>http<wbr>Error<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, message<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, message<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a HTTP error response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>code: <span class="tsd-signature-type">number</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>HTTP Status code, like <code>404</code>, <code>500</code>.</p>
-														</div>
-													</li>
-													<li>
-														<h5><span class="tsd-flag ts-flagOptional">Optional</span> message: <span class="tsd-signature-type">string</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The message you want to send.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody.</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>js<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a JavaScript response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>content: <span class="tsd-signature-type">string</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The JavaScript content you want to send.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody of JavaScript/</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>json<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a JSON response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>object: <span class="tsd-signature-type">Object</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The object you want to send.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody includes stringified object.</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>redirection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">301</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">302</span>, location<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, message<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>code<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">301</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">302</span>, location<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, message<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>code: <span class="tsd-signature-type">301</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">302</span></h5>
-													</li>
-													<li>
-														<h5>location: <span class="tsd-signature-type">string</span></h5>
-													</li>
-													<li>
-														<h5>message: <span class="tsd-signature-type">string</span></h5>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>stream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>rStream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Readable</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>rStream<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Readable</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a stream response</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>rStream: <span class="tsd-signature-type">Readable</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>A Readabel stream</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody includes a Readable stream.</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-							<li class="tsd-parameter">
-								<h5>text<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, mime<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;html&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;plain&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;javascript&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;css&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h5>
-								<ul class="tsd-parameters">
-									<li class="tsd-parameter-signature">
-										<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
-											<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, mime<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">&quot;html&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;plain&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;javascript&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;css&quot;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></li>
-										</ul>
-										<ul class="tsd-descriptions">
-											<li class="tsd-description">
-												<div class="tsd-comment tsd-typography">
-													<div class="lead">
-														<p>Generate a text response.</p>
-													</div>
-												</div>
-												<h4 class="tsd-parameters-title">Parameters</h4>
-												<ul class="tsd-parameters">
-													<li>
-														<h5>content: <span class="tsd-signature-type">string</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>The content you want to send.</p>
-														</div>
-													</li>
-													<li>
-														<h5>mime: <span class="tsd-signature-type">&quot;html&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;plain&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;javascript&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;css&quot;</span><span class="tsd-signature-symbol"> = &quot;plain&quot;</span></h5>
-														<div class="tsd-comment tsd-typography">
-															<p>You can specify the MIME name after &quot;text/&quot; here.</p>
-														</div>
-													</li>
-												</ul>
-												<h4 class="tsd-returns-title">Returns <a href="interfaces/responsebody.html" class="tsd-signature-type" data-tsd-kind="Interface">ResponseBody</a></h4>
-												<p>A ResponseBody of text.</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</li>
-						</ul>
-					</div>
-				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-has-type-parameter">
+					<a name="createrouter" class="tsd-anchor"></a>
+					<h3>create<wbr>Router</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Router&lt;T&gt;<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">routeMatcher</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in router/router.ts:14</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create a router match specified path.</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>path: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The path to match given url</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">routeMatcher</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>return a routeMatcher</p>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function">
 					<a name="createserver" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> create<wbr>Server</h3>
@@ -526,6 +245,48 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="getparams" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Params</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Params<span class="tsd-signature-symbol">(</span>pathParams<span class="tsd-signature-symbol">: </span><a href="modules.html#routeparams" class="tsd-signature-type" data-tsd-kind="Type alias">RouteParams</a>, searchParams<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">URLSearchParams</span>, <span class="tsd-signature-symbol">...</span>otherArgs<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>pathParams<span class="tsd-signature-symbol">: </span><a href="modules.html#routeparams" class="tsd-signature-type" data-tsd-kind="Type alias">RouteParams</a><span class="tsd-signature-symbol">; </span>searchParams<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">URLSearchParams</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in router/router.ts:40</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return pathParams and searchParams back.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>pathParams: <a href="modules.html#routeparams" class="tsd-signature-type" data-tsd-kind="Type alias">RouteParams</a></h5>
+								</li>
+								<li>
+									<h5>searchParams: <span class="tsd-signature-type">URLSearchParams</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>otherArgs: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>pathParams<span class="tsd-signature-symbol">: </span><a href="modules.html#routeparams" class="tsd-signature-type" data-tsd-kind="Type alias">RouteParams</a><span class="tsd-signature-symbol">; </span>searchParams<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">URLSearchParams</span><span class="tsd-signature-symbol"> }</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>path<wbr>Params<span class="tsd-signature-symbol">: </span><a href="modules.html#routeparams" class="tsd-signature-type" data-tsd-kind="Type alias">RouteParams</a></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>search<wbr>Params<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">URLSearchParams</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
 					<a name="handleerr" class="tsd-anchor"></a>
 					<h3>handle<wbr>Err</h3>
 					<ul class="tsd-signatures tsd-kind-function">
@@ -545,70 +306,6 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function">
-					<a name="router" class="tsd-anchor"></a>
-					<h3>router</h3>
-					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">router<span class="tsd-signature-symbol">(</span>pathToMatch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>match<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in router/router.ts:9</li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Generate a route-match function.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>pathToMatch: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>path-to-regexp styled string</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>match<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></h4>
-							<ul class="tsd-parameters">
-								<li class="tsd-parameter">
-									<h5>match<span class="tsd-signature-symbol">: </span>function</h5>
-									<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-type-literal">
-										<li class="tsd-signature tsd-kind-icon">match<span class="tsd-signature-symbol">(</span>reqUrl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>handleBy<span class="tsd-signature-symbol">: </span>&lt;T&gt;<span class="tsd-signature-symbol">(</span>handler<span class="tsd-signature-symbol">: </span><a href="interfaces/routehandler.html" class="tsd-signature-type" data-tsd-kind="Interface">RouteHandler</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">; </span>pathParams<span class="tsd-signature-symbol">: </span><a href="modules.html#routeparams" class="tsd-signature-type" data-tsd-kind="Type alias">RouteParams</a><span class="tsd-signature-symbol">; </span>searchParams<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">URLSearchParams</span><span class="tsd-signature-symbol"> }</span></li>
-									</ul>
-									<ul class="tsd-descriptions">
-										<li class="tsd-description">
-											<aside class="tsd-sources">
-												<ul>
-													<li>Defined in router/router.ts:19</li>
-												</ul>
-											</aside>
-											<div class="tsd-comment tsd-typography">
-												<div class="lead">
-													<p>Match the url with route RegExp.</p>
-												</div>
-											</div>
-											<h4 class="tsd-parameters-title">Parameters</h4>
-											<ul class="tsd-parameters">
-												<li>
-													<h5>reqUrl: <span class="tsd-signature-type">string</span></h5>
-													<div class="tsd-comment tsd-typography">
-														<p>The requested url, you can use <code>req.url</code> or anything you want.</p>
-													</div>
-												</li>
-											</ul>
-											<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>handleBy<span class="tsd-signature-symbol">: </span>&lt;T&gt;<span class="tsd-signature-symbol">(</span>handler<span class="tsd-signature-symbol">: </span><a href="interfaces/routehandler.html" class="tsd-signature-type" data-tsd-kind="Interface">RouteHandler</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">; </span>pathParams<span class="tsd-signature-symbol">: </span><a href="modules.html#routeparams" class="tsd-signature-type" data-tsd-kind="Type alias">RouteParams</a><span class="tsd-signature-symbol">; </span>searchParams<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">URLSearchParams</span><span class="tsd-signature-symbol"> }</span></h4>
-											<p><code>{ handleBy }</code> if matched and <code>null</code> if not.</p>
-										</li>
-									</ul>
-								</li>
-							</ul>
 						</li>
 					</ul>
 				</section>
@@ -643,6 +340,9 @@
 					<li class="current ">
 						<a href="modules.html">Exports</a>
 					</li>
+					<li class=" tsd-kind-namespace">
+						<a href="modules/resbuilder.html">res<wbr>Builder</a>
+					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
@@ -662,8 +362,8 @@
 					<li class=" tsd-kind-variable">
 						<a href="modules.html#httpstatus" class="tsd-kind-icon">Http<wbr>Status</a>
 					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#resbuilder" class="tsd-kind-icon">res<wbr>Builder</a>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="modules.html#createrouter" class="tsd-kind-icon">create<wbr>Router</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#createserver" class="tsd-kind-icon">create<wbr>Server</a>
@@ -672,10 +372,10 @@
 						<a href="modules.html#genbasehandler" class="tsd-kind-icon">gen<wbr>Base<wbr>Handler</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="modules.html#handleerr" class="tsd-kind-icon">handle<wbr>Err</a>
+						<a href="modules.html#getparams" class="tsd-kind-icon">get<wbr>Params</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="modules.html#router" class="tsd-kind-icon">router</a>
+						<a href="modules.html#handleerr" class="tsd-kind-icon">handle<wbr>Err</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#stdoutlog" class="tsd-kind-icon">stdout<wbr>Log</a>

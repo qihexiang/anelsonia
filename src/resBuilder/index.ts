@@ -1,10 +1,6 @@
-import { text, html, css, js } from "./text";
-import { json } from "./json";
-import { stream, buffer } from "./stream";
-import { file } from "./file";
-import { httpError } from "./error";
-import { redirection } from "./redirection"
-export const resBuilder = {
-    text, html, css, js, json, stream, buffer, file, httpError, redirection
-};
-export default resBuilder;
+export { text, html, css, js } from "./text";
+export { json } from "./json";
+export { stream, buffer } from "./stream";
+export { file } from "./file";
+export { httpError } from "./error";
+export { redirection } from "./redirection"

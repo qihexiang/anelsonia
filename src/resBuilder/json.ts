@@ -4,7 +4,7 @@ import HttpStatus from "../usr/HTTPCodes";
 /**
  * Generate a JSON response.
  * 
- * @param object The object you want to send.
+ * @param object The object you want to send, it will be stringified with JSON.stringify.
  * @returns A ResponseBody includes stringified object.
  */
 export function json(object: Object): ResponseBody {
