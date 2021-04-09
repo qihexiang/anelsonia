@@ -38,7 +38,7 @@ const entry: EntryPoint = (req) => {
 interface ResponseBody {
     statusCode: number;
     statusMessage: string;
-    headers: { [name: string]: string; };
+    headers: OutgoingHttpHeaders;
     data: string | Buffer | Readable;
 }
 ```
@@ -90,36 +90,47 @@ server.listen(8080)
 
 ## 路由
 
-使用 `router` 函数构建一个路由，使用路由返回的 `match` 函数和访问的路径做匹配，使用返回的`handleBy` 指定处理的对应函数。如果 `match` 未能成功匹配，会返回 `null` 。
+使用 `createRouter` 函数构建一个路由，使用路由返回的 `routeMatcher` 可以传入 `url` 变量用于匹配和解析，传入的 `handler` 是 `RouteHandler` 的实现用于处理对应路由下的操作。 `routeMatcher` 的返回值取决于 `handler` 的返回值，例如下面的案例中匹配上的路由会返回 `ResponseBody` 或 `Promise<ResponseBody>`，没有的则返回 `null`。
 
 ```typescript
-import { createServer, EntryPoint, resBuilder, router, RouteHandler } from "anelsonia";
+import { createServer, EntryPoint, resBuilder, createRouter, RouteHandler, ResponseBody } from "anelsonia";
 import { errorHandler } from "./errorHandler";
 import { fileHandler } from "./fileHandler";
 import { helloHandler } from "./helloHandler";
 
-const helloRoute = router("/hello/:username");
-const fileRouter = router("/public/(.*)");
-const errorTest = router("/error/:errCode");
+const helloRoute = createRouter("/hello/:username");
+const fileRouter = createRouter("/public/(.*)");
+const fileFallbackRouter = createRouter("/public")
+const errorTest = createRouter("/error/:errCode");
 
 const entry: EntryPoint = async (req) => {
     const url = req.url ?? "/";
-    return await helloRoute.match(url)?.handleBy((pathParams, searchParams) => helloHandler(pathParams, searchParams, req))
-        || fileRouter.match(url)?.handleBy(fileHandler)
-        || errorTest.match(url)?.handleBy(errorHandler)
+    return helloRoute(url, (p, q) => helloHandler(p, q, req))
+        || fileRouter(url, fileHandler)
+        || fileFallbackRouter(url, (p, q) => {
+            return resBuilder.redirection(
+                302, "http://" + req.headers.host + "/public/", ""
+            )
+        })
+        || errorTest(url, errorHandler)
         || resBuilder.httpError(404);
 };
 
 createServer(entry).listen(8080);
 ```
+### 匹配语法
 
 因为使用了和Express一样的 `path-to-regexp` 库，因此可以使用完全一样的方式构建路由。
 
+### RouteHandler和路由参数
+
 `pathParams` 参数是路由参数，它是一个 `Map` 对象，使用 `get` 方法从其中获取值（字符串），利用 `forEach` 遍历键值对， `searchParams` 是查询参数，它是一个 `URLSearchParams` 实现，它和 `Map` 对象的用法基本一致。
 
-路由控制器并不一定要返回一个 `ResponseBody` 的实现，也可以返回任意值作为一个处理过程的中间量。
+如果想要直接返回 `pathParams` 或 `searchParams` 而不经过特别的 `RouteHandler`，可以使用导出的 `getParams` 作为 `handler` 参数的值。
 
-路由控制器 `RouteHandler` 并非只能接受路径参数和查询参数，但是 `handleBy` 只会传递给它两个参数。可以根据需要传入其他参数，例如要将 `req` 对象传递给路由时，你可以将 `handleBy` 写成：`xRouter.match(url).handleBy((p,q) => handler(p, q, req))`，`handler`的定义为：`const handler: RouteHandler = (params, querys, req) => {}`，如上面的 `helloHandler` 那样。下面是 `helloHandler` 的定义形式：
+`RouteHndler` 并不一定要返回一个 `ResponseBody` 的实现，也可以返回任意值作为一个处理过程的中间量。
+
+`RouteHandler` 可以接受超过两个参数，可以使用箭头函数来进行传参，如上面的 `helloHandler` ，它对应的定义如下：
 
 ```typescript
 import { resBuilder, ResponseBody, RouteHandler } from "anelsonia";
@@ -138,7 +149,7 @@ export const helloHandler: RouteHandler<ResponseBody | null> = async (p, q, req:
 };
 ```
 
-特别需要注意的是，路由控制器和入口函数都可以是异步函数，且特别建议将入口函数设置为异步函数，以使用 `await` 处理后续的异步动作；于此同时，需要注意 `Promise<null>` 在使用 `||` 进行向后传递时，会被视为 `true` 的结果，因此必须 `await` 。
+特别需要注意的是，路由控制器和入口函数都可以是异步函数，且特别建议将入口函数设置为异步函数，以使用 `await` 处理后续的异步动作；于此同时，需要注意 `Promise<null>` 在使用 `||` 进行向后传递时，会被视为 `true` 的结果，如果想要以此方法在进入 `RouteHandler` 后再逃出路由时必须 `await` 。
 
 ## resBuilder
 

@@ -1,6 +1,10 @@
 import { pathToRegexp, Key } from "path-to-regexp";
 import { RouteHandler, RouteParams } from "../usr/Route";
 
+interface routeMatcher<T> {
+    (url: string, handler: RouteHandler<T>): T | null;
+}
+
 /**
  * Create a router match specified path.
  * 
