@@ -1,4 +1,8 @@
 export type RouteParams = Map<string | number, string>;
-export interface RouteHandler<T> {
-    (pathParams: RouteParams, searchParams: URLSearchParams, ...otherArgs: any[]): T;
+export interface RouteHandler<Rt, Ex> {
+    (
+        pathParams: RouteParams,
+        searchParams: URLSearchParams,
+        otherArgs?: Ex
+    ): Rt;
 }

@@ -1,10 +1,6 @@
 import { pathToRegexp, Key } from "path-to-regexp";
 import { RouteHandler, RouteParams } from "../usr/Route";
 
-interface routeMatcher<T> {
-    (url: string, handler: RouteHandler<T>): T | null;
-}
-
 /**
  * Create a router match specified path.
  * 
@@ -21,7 +17,7 @@ export function createRouter(path: string) {
      * @param handler The handler to handle this route.
      * @returns returns what the handler return.
      */
-    function matcher<T>(url: string, handler: RouteHandler<T>) {
+    function matcher<Rt, Ex>(url: string, handler: RouteHandler<Rt, Ex>) {
         const { pathname, searchParams } = new URL(url, "http://localhost");
         const pathParsed = pathRegExp.exec(pathname);
         if (pathParsed === null) return null;
@@ -37,6 +33,6 @@ export function createRouter(path: string) {
 /**
  * Return pathParams and searchParams back.
  */
-export const getParams: RouteHandler<{ pathParams: RouteParams, searchParams: URLSearchParams; }> = (p, q) => {
+export const getParams: RouteHandler<{ pathParams: RouteParams, searchParams: URLSearchParams; }, null> = (p, q) => {
     return { pathParams: p, searchParams: q };
 };
