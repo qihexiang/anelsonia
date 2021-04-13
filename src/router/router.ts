@@ -17,7 +17,7 @@ export function createRouter(path: string) {
      * @param handler The handler to handle this route.
      * @returns returns what the handler return.
      */
-    function matcher<Rt, Ex>(url: string, handler: RouteHandler<Rt, Ex>) {
+    function matcher<Rt>(url: string, handler: RouteHandler<Rt>) {
         const { pathname, searchParams } = new URL(url, "http://localhost");
         const pathParsed = pathRegExp.exec(pathname);
         if (pathParsed === null) return null;
@@ -33,6 +33,6 @@ export function createRouter(path: string) {
 /**
  * Return pathParams and searchParams back.
  */
-export const getParams: RouteHandler<{ pathParams: RouteParams, searchParams: URLSearchParams; }, null> = (p, q) => {
+export const getParams: RouteHandler<{ pathParams: RouteParams, searchParams: URLSearchParams; }> = (p, q) => {
     return { pathParams: p, searchParams: q };
 };
