@@ -1,7 +1,7 @@
 /**
  * Get http status code and default status message from here.
  */
-export const HttpStatus: { [statusCode: number]: string; } = {
+export const HttpStatus = {
     100: "continue",
     101: "switching protocols",
     102: "processing",
@@ -61,4 +61,6 @@ export const HttpStatus: { [statusCode: number]: string; } = {
     510: "not extended",
     511: "network authentication required"
 };
+
+export type validHttpStatusCode = keyof typeof HttpStatus
 export default HttpStatus;
