@@ -1,5 +1,5 @@
 import { pathToRegexp, Key } from "path-to-regexp";
-import { RouteHandler, RouteParams } from "../usr/Route";
+import { ExtendRouteHandler, RouteHandler, RouteParams } from "../usr/Route";
 
 /**
  * Create a router match specified path.
@@ -10,6 +10,9 @@ import { RouteHandler, RouteParams } from "../usr/Route";
 export function createRouter(path: string) {
     const keys: Key[] = [];
     const pathRegExp = pathToRegexp(path, keys);
+    function matcher<Rt>(url: string): { pathParams: RouteParams, searchParams: URLSearchParams; } | null;
+    function matcher<Rt>(url: string, handler: RouteHandler<Rt>): Rt | null;
+    function matcher<Rt, Ex>(url: string, handler: ExtendRouteHandler<Rt, Ex>, extraArgs: Ex): Rt | null;
     /**
      * Match the url and return the result of the handler.
      * 
@@ -17,7 +20,7 @@ export function createRouter(path: string) {
      * @param handler The handler to handle this route.
      * @returns returns what the handler return.
      */
-    function matcher<Rt>(url: string, handler: RouteHandler<Rt>) {
+    function matcher<Rt, Ex>(url: string, handler?: RouteHandler<Rt> | ExtendRouteHandler<Rt, Ex>, extraArgs?: Ex): { pathParams: RouteParams, searchParams: URLSearchParams; } | Rt | null {
         const { pathname, searchParams } = new URL(url, "http://localhost");
         const pathParsed = pathRegExp.exec(pathname);
         if (pathParsed === null) return null;
@@ -25,14 +28,14 @@ export function createRouter(path: string) {
         keys.forEach((key, index) => {
             pathParams.set(key.name, pathParsed[index + 1]);
         });
-        return handler(pathParams, searchParams);
+        // return handler(pathParams, searchParams);
+        if (!handler) return { pathParams, searchParams };
+        if (handler.length === 3 && extraArgs !== undefined) {
+            const routerHandler = handler as ExtendRouteHandler<Rt, Ex>;
+            return routerHandler(pathParams, searchParams, extraArgs);
+        }
+        const routerHandler = handler as RouteHandler<Rt>;
+        return routerHandler(pathParams, searchParams);
     };
     return matcher;
 }
-
-/**
- * Return pathParams and searchParams back.
- */
-export const getParams: RouteHandler<{ pathParams: RouteParams, searchParams: URLSearchParams; }> = (p, q) => {
-    return { pathParams: p, searchParams: q };
-};
