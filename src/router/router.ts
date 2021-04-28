@@ -10,16 +10,30 @@ import { ExtendRouteHandler, RouteHandler, RouteParams } from "../usr/Route";
 export function createRouter(path: string) {
     const keys: Key[] = [];
     const pathRegExp = pathToRegexp(path, keys);
-    function matcher<Rt>(url: string): { pathParams: RouteParams, searchParams: URLSearchParams; } | null;
-    function matcher<Rt>(url: string, handler: RouteHandler<Rt>): Rt | null;
-    function matcher<Rt, Ex>(url: string, handler: ExtendRouteHandler<Rt, Ex>, extraArgs: Ex): Rt | null;
+    /**
+     * Match the url and returns pathParams and searchParams.
+     * 
+     * @param url The requested url.
+     * @returns returns pathParams and searchParams.
+     */
+    function matcher<Rt>(url: string): { pathParams: RouteParams, searchParams: URLSearchParams; } | null
     /**
      * Match the url and return the result of the handler.
      * 
      * @param url The requested url.
      * @param handler The handler to handle this route.
      * @returns returns what the handler return.
+     */;
+    function matcher<Rt>(url: string, handler: RouteHandler<Rt>): Rt | null;
+    /**
+     * Match the url and return the result of the handler.
+     * 
+     * @param url The requested url.
+     * @param handler The handler to handle this route.
+     * @param extraArgs Exta arguments send to the handler.
+     * @returns returns what the handler return.
      */
+    function matcher<Rt, Ex>(url: string, handler: ExtendRouteHandler<Rt, Ex>, extraArgs: Ex): Rt | null;
     function matcher<Rt, Ex>(url: string, handler?: RouteHandler<Rt> | ExtendRouteHandler<Rt, Ex>, extraArgs?: Ex): { pathParams: RouteParams, searchParams: URLSearchParams; } | Rt | null {
         const { pathname, searchParams } = new URL(url, "http://localhost");
         const pathParsed = pathRegExp.exec(pathname);
