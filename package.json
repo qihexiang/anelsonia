@@ -4,7 +4,7 @@
   "description": "FP style Node.js web framework.",
   "main": "dist/index.js",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
-  "license": "mpl2.0",
+  "license": "MPL-2.0",
   "private": false,
   "repository": {
     "type": "git",

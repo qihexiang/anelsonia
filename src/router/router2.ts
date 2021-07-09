@@ -16,7 +16,6 @@ export class Route2<T> {
         this.fallback = fallback;
     }
     match(re: RegExp, cb: ((result: RegExpExecArray) => T)) {
-        console.log(re.exec(this.url));
         if (this.result === null) {
             this.result = re.exec(this.url);
             if (this.result !== null) this.callback = cb;
@@ -28,4 +27,19 @@ export class Route2<T> {
     }
 }
 
-export default Route2
+export default Route2;
+
+export interface Route2Params<T> {
+    re: RegExp | string;
+    cb: (reuslt: RegExpMatchArray) => T;
+}
+
+export function createRoute2<T>(...routes: Route2Params<T>[]) {
+    return (reqUrl: string, fallback: T | null = null) => {
+        const matched = routes.map(route => ({
+            result: reqUrl.match(route.re),
+            cb: route.cb
+        })).find(route => route.result);
+        return matched?.cb(matched.result!) ?? fallback;
+    };
+}
