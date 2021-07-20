@@ -1,10 +1,15 @@
 /**
  * Get http status code and default status message from here.
  */
-export const HttpStatus = {
+export const info = {
     100: "continue",
     101: "switching protocols",
-    102: "processing",
+    102: "processing"
+};
+
+export type infoStatusCode = keyof typeof info;
+
+export const success = {
     200: "ok",
     201: "created",
     202: "accepted",
@@ -14,7 +19,12 @@ export const HttpStatus = {
     206: "partial content",
     207: "multi-status",
     208: "already reported",
-    226: "im used",
+    226: "im used"
+};
+
+export type successStatusCode = keyof typeof success;
+
+export const redirect = {
     300: "multiple choices",
     301: "moved permanently",
     302: "found",
@@ -22,7 +32,12 @@ export const HttpStatus = {
     304: "not modified",
     305: "use proxy",
     307: "temporary redirect",
-    308: "permanent redirect",
+    308: "permanent redirect"
+};
+
+export type redirectStatusCode = keyof typeof redirect;
+
+export const clientError = {
     400: "bad request",
     401: "unauthorized",
     402: "payment required",
@@ -49,6 +64,11 @@ export const HttpStatus = {
     428: "precondition required",
     429: "too many requests",
     431: "request header fields too large",
+};
+
+export type clientErrorCode = keyof typeof clientError;
+
+export const serverError = {
     500: "internal server error",
     501: "not implemented",
     502: "bad gateway",
@@ -62,5 +82,11 @@ export const HttpStatus = {
     511: "network authentication required"
 };
 
-export type validHttpStatusCode = keyof typeof HttpStatus
-export default HttpStatus;
+export type serverErrorCode = keyof typeof serverError;
+
+export const httpCodes = {
+    ...info, ...success, ...redirect, ...clientError, ...serverError
+};
+
+export type validHttpStatusCode = keyof typeof httpCodes;
+export default httpCodes;

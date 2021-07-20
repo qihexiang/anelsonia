@@ -1,8 +1,8 @@
 {
-  "name": "anelsonia",
-  "version": "0.4.0",
+  "name": "freesia",
+  "version": "0.0.0",
   "description": "FP style Node.js web framework.",
-  "main": "dist/index.js",
+  "main": "lib/",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
   "license": "MPL-2.0",
   "private": false,
@@ -17,12 +17,11 @@
     "typescript": "^4.2.3"
   },
   "files": [
-    "dist/"
+    "freesia/", "response/", "router/", "http/"
   ],
   "dependencies": {
     "@types/node": "^14.14.37",
-    "mime": "^2.5.2",
-    "path-to-regexp": "^6.2.0"
+    "mime": "^2.5.2"
   },
   "scripts": {
     "prepublish": "tsc && typedoc ./src/index.ts",
