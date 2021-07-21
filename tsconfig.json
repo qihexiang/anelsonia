@@ -1,6 +1,6 @@
 {
   "include": ["./src"],
-  "exclude": ["./freesia", "./http", "./response", "./router"],
+  "exclude": ["./core", "./utils", "./response", "./router"],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 

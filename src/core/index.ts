@@ -6,16 +6,16 @@ export type FreesiaEntryPoint = (req: IncomingMessage) => Promise<ResponseProps>
 
 export function shim(handler: FreesiaEntryPoint): RequestListener {
     return async (req, res) => {
-        const { statusCode, statusMessage, data, headers } = await handler(req);
+        const { statusCode, statusMessage, body, headers } = await handler(req);
         res.writeHead(statusCode, statusMessage, headers);
-        if (data instanceof Readable) {
-            data.pipe(res);
-            data.on("error", (err) => {})
+        if (body instanceof Readable) {
+            body.pipe(res);
+            body.on("error", (err) => {})
             res.on("finish", () => {
-                data.destroy()
+                body.destroy()
             })
         } else {
-            res.write(data);
+            res.write(body);
             res.end();
         }
     };

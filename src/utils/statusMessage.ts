@@ -1,15 +1,15 @@
 /**
  * Get http status code and default status message from here.
  */
-export const info = {
+export const infoMessage = {
     100: "continue",
     101: "switching protocols",
     102: "processing"
 };
 
-export type infoStatusCode = keyof typeof info;
+export type infoStatusCode = keyof typeof infoMessage;
 
-export const success = {
+export const successMessage = {
     200: "ok",
     201: "created",
     202: "accepted",
@@ -22,9 +22,9 @@ export const success = {
     226: "im used"
 };
 
-export type successStatusCode = keyof typeof success;
+export type successStatusCode = keyof typeof successMessage;
 
-export const redirect = {
+export const redirectMessage = {
     300: "multiple choices",
     301: "moved permanently",
     302: "found",
@@ -35,9 +35,9 @@ export const redirect = {
     308: "permanent redirect"
 };
 
-export type redirectStatusCode = keyof typeof redirect;
+export type redirectStatusCode = keyof typeof redirectMessage;
 
-export const clientError = {
+export const clientErrorMessage = {
     400: "bad request",
     401: "unauthorized",
     402: "payment required",
@@ -66,9 +66,9 @@ export const clientError = {
     431: "request header fields too large",
 };
 
-export type clientErrorCode = keyof typeof clientError;
+export type clientErrorCode = keyof typeof clientErrorMessage;
 
-export const serverError = {
+export const serverErrorMessage = {
     500: "internal server error",
     501: "not implemented",
     502: "bad gateway",
@@ -82,11 +82,11 @@ export const serverError = {
     511: "network authentication required"
 };
 
-export type serverErrorCode = keyof typeof serverError;
+export type serverErrorCode = keyof typeof serverErrorMessage;
 
-export const httpCodes = {
-    ...info, ...success, ...redirect, ...clientError, ...serverError
+export const statusMessage = {
+    ...infoMessage, ...successMessage, ...redirectMessage, ...clientErrorMessage, ...serverErrorMessage
 };
 
-export type validHttpStatusCode = keyof typeof httpCodes;
-export default httpCodes;
+export type validHttpStatusCode = keyof typeof statusMessage;
+export default statusMessage;

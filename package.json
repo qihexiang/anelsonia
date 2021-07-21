@@ -1,5 +1,5 @@
 {
-  "name": "freesia",
+  "name": "anelsonia2",
   "version": "0.0.0",
   "description": "FP style Node.js web framework.",
   "main": "lib/",
@@ -24,8 +24,6 @@
     "mime": "^2.5.2"
   },
   "scripts": {
-    "prepublish": "tsc && typedoc ./src/index.ts",
-    "build": "tsc",
-    "docs": "typedoc ./src/index.ts"
+    "build": "tsc"
   }
 }
