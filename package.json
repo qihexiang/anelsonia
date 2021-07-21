@@ -1,6 +1,6 @@
 {
   "name": "anelsonia2",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "FP style Node.js web framework.",
   "main": "lib/",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
@@ -17,7 +17,10 @@
     "typescript": "^4.2.3"
   },
   "files": [
-    "freesia/", "response/", "router/", "http/"
+    "core/",
+    "response/",
+    "router/",
+    "utils/"
   ],
   "dependencies": {
     "@types/node": "^14.14.37",
