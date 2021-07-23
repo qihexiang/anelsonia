@@ -26,8 +26,8 @@ export type Http2EntryPoint = (req: Http2ServerRequest) => Promise<ResponseProps
 
 export function http2Shim(handler: Http2EntryPoint) {
     return async (req: Http2ServerRequest, res: Http2ServerResponse) => {
-        const { statusCode, statusMessage, body, headers } = await handler(req);
-        res.writeHead(statusCode, statusMessage, headers);
+        const { statusCode, body, headers } = await handler(req);
+        res.writeHead(statusCode, headers);
         if (body instanceof Readable) {
             body.pipe(res);
             body.on("error", (err) => { });
