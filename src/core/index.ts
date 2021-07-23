@@ -1,19 +1,39 @@
 import { RequestListener, IncomingMessage } from "http";
+import { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 import { Readable } from "stream";
-import { ResponseProps } from "../response";
+import { Response, ResponseProps } from "../response";
 
-export type FreesiaEntryPoint = (req: IncomingMessage) => Promise<ResponseProps> | ResponseProps;
+export type EntryPoint = (req: IncomingMessage) => Promise<ResponseProps> | ResponseProps;
 
-export function shim(handler: FreesiaEntryPoint): RequestListener {
+export function shim(handler: EntryPoint): RequestListener {
     return async (req, res) => {
         const { statusCode, statusMessage, body, headers } = await handler(req);
         res.writeHead(statusCode, statusMessage, headers);
         if (body instanceof Readable) {
             body.pipe(res);
-            body.on("error", (err) => {})
+            body.on("error", (err) => { });
             res.on("finish", () => {
-                body.destroy()
-            })
+                body.destroy();
+            });
+        } else {
+            res.write(body);
+            res.end();
+        }
+    };
+}
+
+export type Http2EntryPoint = (req: Http2ServerRequest) => Promise<ResponseProps> | ResponseProps;
+
+export function http2Shim(handler: Http2EntryPoint) {
+    return async (req: Http2ServerRequest, res: Http2ServerResponse) => {
+        const { statusCode, statusMessage, body, headers } = await handler(req);
+        res.writeHead(statusCode, statusMessage, headers);
+        if (body instanceof Readable) {
+            body.pipe(res);
+            body.on("error", (err) => { });
+            res.on("finish", () => {
+                body.destroy();
+            });
         } else {
             res.write(body);
             res.end();
