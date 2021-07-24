@@ -1,6 +1,3 @@
-/**
- * Get http status code and default status message from here.
- */
 export const infoMessage = {
     100: "continue",
     101: "switching protocols",

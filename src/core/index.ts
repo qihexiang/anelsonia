@@ -22,7 +22,9 @@ export function shim(handler: EntryPoint): RequestListener {
     };
 }
 
-export type Http2EntryPoint = (req: Http2ServerRequest) => Promise<ResponseProps> | ResponseProps;
+export type Http2ResponseProps = Omit<ResponseProps, "statusMessage">
+
+export type Http2EntryPoint = (req: Http2ServerRequest) => Promise<Http2ResponseProps> | Http2ResponseProps;
 
 export function http2Shim(handler: Http2EntryPoint) {
     return async (req: Http2ServerRequest, res: Http2ServerResponse) => {
