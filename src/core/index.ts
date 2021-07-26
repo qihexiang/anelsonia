@@ -1,5 +1,5 @@
 import { RequestListener, IncomingMessage } from "http";
-import { Http2ServerRequest, Http2ServerResponse } from "node:http2";
+import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Readable } from "stream";
 import { Response, ResponseProps } from "../response";
 
