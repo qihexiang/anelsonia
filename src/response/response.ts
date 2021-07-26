@@ -25,14 +25,14 @@ export class Response implements ResponseProps {
         this._body = body;
         return this;
     }
-    get body(): ResponseBody {
-        return this._body ?? this.statusMessage;
+    get body(): ResponseBody | undefined {
+        return this._body;
     }
     setHeaders(...headers: Partial<OutgoingHttpHeaders>[]): Response {
         this._headers = { ...this._headers, ...headers.reduce((pre, cur) => ({ ...pre, ...cur }), {}) };
         return this;
     }
     get headers(): OutgoingHttpHeaders {
-        return { ...this._headers, ...(this._body ? {} : { "content-type": "text/plain" }) };
+        return { ...this._headers };
     }
 }

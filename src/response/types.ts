@@ -5,7 +5,7 @@ import { validHttpStatusCode } from "../utils";
 export interface ResponseProps {
     statusCode: validHttpStatusCode,
     statusMessage: string,
-    body: string | Buffer | Readable,
+    body?: string | Buffer | Readable,
     headers: OutgoingHttpHeaders;
 }
 
