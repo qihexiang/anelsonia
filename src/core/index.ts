@@ -1,6 +1,5 @@
-import { IncomingMessage } from "http";
-import { ServerResponse } from "node:http";
-import { Http2ServerRequest, Http2ServerResponse } from "node:http2";
+import { IncomingMessage, ServerResponse } from "http";
+import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Readable } from "stream";
 import { ResponseProps } from "../response";
 
