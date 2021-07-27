@@ -2,7 +2,7 @@
 
 Anelsonia2是一个Web服务工具组。它包含：
 
-1. 核心组件：`shim`和`http2Shim`函数，将入口函数转换成`http`或`http2`模块可以使用的请求监听器。
+1. 核心组件：`shim`函数，将入口函数转换成`http`，`https`或`http2`模块可以使用的请求监听器。
 2. 路由组件：用于创建路由和响应路由的函数
 3. 响应组件：快速构建响应体的工具
 4. 工具组件：目前包含了一个可以根据HTTP状态码查询对映状态消息的对象
@@ -17,11 +17,12 @@ npm install anelsonia2
 
 ### 创建入口
 
-需要使用`shim`来将入口函数`EntryPoint`转换为`http`或`https`使用的`RequestListener`，这个函数在`anelsonia2/core`中。
+需要使用`shim`来将入口函数`EntryPoint`转换为`createServer`或`createSecureServer`的处理器函数的函数，这个函数在`anelsonia2/core`中。
 
 ```typescript
 import { shim } from "anelsonia2/core"
 import { createServer } from "http"
+import { createSecureServer } from "http2"
 
 const reqHandler = shim(async req => {
     return {
@@ -31,11 +32,10 @@ const reqHandler = shim(async req => {
 })
 
 createServer(reqHandler).listen(8080)
+createServer(http2Options, reqHandler).listen(8081)
 ```
 
-> `shim`只支持HTTP 1.x，要使用HTTP/2，使用`http2Shim`代替。
->
-> 但是要注意，因为没有暴露响应对象，这里对HTTP/2的支持是不完整的，要充分使用HTTP/2的功能，应该直接使用`http2`模块进行编程而不是使用`anelsonia2`来处理请求，但路由、响应构建工具仍然可以单独使用。
+> 这里对HTTP/2的支持是不完整的，无法自行操作整个会话的Socket，要充分使用HTTP/2的功能，应该直接使用`http2`模块进行编程而不是使用`anelsonia2`来处理请求，但路由、响应构建工具仍然可以单独使用。
 
 ### 响应工具
 
@@ -87,7 +87,7 @@ const reqHandler = shim(async req => {
 
 ```typescript
 import { createRouter } from "anelsonia2/router"
-const helloRt = createRouter("^/hello/(?<yourname>.*)", (matched) => {
+export const helloRt = createRouter("^/hello/(?<yourname>.*)", (matched) => {
     return matched.yourname
 })
 ```
@@ -150,10 +150,12 @@ export type HalfExtendRouter<T, X> = (extraArgs: X) => Router<T>;
 
 ```typescript
 import rawBody from "raw-body"
+import { FreesiaRequest } from "anelsonia2/core"
 import { createHalfExtendRouter } from "anelsonia2/router"
 
+// FreesiaRequest是入口函数的req参数的类型。
 const receiveMsgRt = createHalfExtendRouter(
-    "^/api/(?<username>.*)", async (matched, req: IncommingMessage) => {
+    "^/api/(?<username>.*)", async (matched, req: FreesiaRequest) => {
         try {
             const message = (await rawBody(req)).toString()
             const response = {
@@ -201,6 +203,24 @@ const reqHandler = shim(async req => {
 > 为什么不能直接`createExtendRouter(pathname, handler, extraArgs)`？
 >
 > 这种方式在Anelsonia的v1版本中使用过，但是存在一个严重的问题：路由的创建可能是在`extraArgs`的作用域外进行的，例如要使用`req`作为参数时，如果使用这样的写法，那么必须在入口函数内创建路由，而`handler`又常常和路由一同创建（分开创建会变得麻烦），这样的写法是不好的。
+
+#### 条件匹配
+
+有时候，处理过程中会出现以字符串为形式的标识符，对不同的标识符会进入不同的路由处理器。此时没有必要大动干戈使用`createRouter`，而可以使用路由模块导出的`condition`函数，像这样：
+
+```typescript
+const lowerCaseName = "firefox"
+const fullBrowserName = condition(lowerCaseName)
+    .match("firefox", (cond) => "Mozilla Firefox")
+    .match("safari", (cond) => "Apple Safari")
+    .match("chrome", (cond) => "Google Chrome")
+    .match("edge", (cond) => "Microsoft Edge")
+    .getResult()
+```
+
+`condition`有一个参数`reality`，为字符串格式，是待匹配的标志。其返回的对象含有`match`和`getResult`方法，`match`方法用于提供可能的情形和对应的回调函数，情形（`condition`）为字符串参数，回调函数有一个参数，是输入的`condition`的值。
+
+若多次调用`match`方法匹配同一个情形，最终`getResult`的结果取最后一次的回调函数的结果。
 
 ### 工具组件
 
