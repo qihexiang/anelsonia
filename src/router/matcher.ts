@@ -1,3 +1,5 @@
+import { RouteHandler, createRouter, RouterChain } from ".";
+
 interface ConditionCallback<T> {
     (condition: string): T;
 }
@@ -19,4 +21,16 @@ export function condition<T>(reality: string): Condition<T> {
         };
     }
     return { match, getResult };
+}
+
+export function routing<T>(url: string): RouterChain<T> {
+    let executed: T | null = null;
+    function match<P extends string>(pathname: P, handler: RouteHandler<P, T>): RouterChain<T> {
+        executed = executed ?? createRouter(pathname, handler)(url);
+        return { match, route };
+    }
+    function route(): T | null {
+        return executed;
+    }
+    return { match, route };
 }

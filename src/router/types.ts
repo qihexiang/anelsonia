@@ -7,3 +7,7 @@ export type RouteHandler<P extends string, T> = (matched: RouteSchema<P>) => T;
 export type ExtendedRouteHandler<P extends string, T, X> = (matched: RouteSchema<P>, extraArgs: X) => T;
 export type Router<T> = (url: string) => T | null;
 export type HalfExtendRouter<T, X> = (extraArgs: X) => Router<T>;
+export type RouterChain<T> = {
+    match: <P extends string>(pathname: P, handler: RouteHandler<P, T>) => RouterChain<T>;
+    route: () => T | null;
+};
