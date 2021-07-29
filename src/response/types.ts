@@ -1,12 +1,13 @@
 import { OutgoingHttpHeaders } from "http";
-import { Readable } from "stream";
 import { validHttpStatusCode } from "../utils";
 
 export interface ResponseProps {
     statusCode: validHttpStatusCode,
     statusMessage: string,
-    body?: string | Buffer | Readable,
+    body?: ResponseBody,
     headers: OutgoingHttpHeaders;
 }
 
-export type ResponseBody = string | Buffer | Readable;
+export type ResponseBody = string | Buffer | ReadableStream;
+
+export type AsyncResponse = ResponseProps | Promise<ResponseProps>;
