@@ -1,7 +1,7 @@
 import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
-import { Stream } from "node:stream";
+import { Stream } from "stream";
 import { ResponseProps } from "../response";
 
 export type FreesiaRequest = IncomingMessage | Http2ServerRequest;
