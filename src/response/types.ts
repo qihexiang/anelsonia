@@ -1,4 +1,5 @@
 import { OutgoingHttpHeaders } from "http";
+import Stream from "stream";
 import { validHttpStatusCode } from "../utils";
 
 export interface ResponseProps {
@@ -8,6 +9,6 @@ export interface ResponseProps {
     headers: OutgoingHttpHeaders;
 }
 
-export type ResponseBody = string | Buffer | ReadableStream;
+export type ResponseBody = string | Buffer | Stream;
 
 export type AsyncResponse = ResponseProps | Promise<ResponseProps>;

@@ -1,6 +1,7 @@
+import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
-import { Readable } from "stream";
+import { Stream } from "node:stream";
 import { ResponseProps } from "../response";
 
 export type FreesiaRequest = IncomingMessage | Http2ServerRequest;
@@ -11,15 +12,15 @@ export type EntryPoint = (req: FreesiaRequest) => ResponseProps | Promise<Respon
 export function shim(entry: EntryPoint): ReqHandler {
     return async (req, res) => {
         const { statusCode, statusMessage, body, headers } = await entry(req);
-        res.writeHead(statusCode, statusMessage, headers);
-        if (body instanceof Readable) {
+        if (res instanceof IncomingMessage) res.writeHead(statusCode, statusMessage, headers);
+        res.writeHead(statusCode, headers);
+        if (body instanceof Stream) {
             body.pipe(res);
-            body.on("error", (err) => { body.unpipe(res) });
             res.on("finish", () => {
-                body.destroy();
+                destroy(body);
             });
         } else {
-            body ? res.end(body) : res.end();
+            body ? res.end(body as Buffer | string) : res.end();
         }
     };
 }
