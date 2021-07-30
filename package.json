@@ -1,6 +1,6 @@
 {
   "name": "anelsonia2",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "FP style Node.js web framework.",
   "main": "lib/",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
