@@ -1,4 +1,4 @@
 export * from "./types"
-export * from "./createRouter"
+export * from "./createRoute"
 export * from "./createHub"
 export * from "./matcher"

@@ -1,6 +1,6 @@
 import { ExtendedRouteHandler, HalfExtendRouter, RouteHandler, Router, RouteSchema } from "./types";
 
-export function createRouter<P extends string, T>(pathname: P, handler: RouteHandler<P, T>): Router<T> {
+export function createRoute<P extends string, T>(pathname: P, handler: RouteHandler<P, T>): Router<T> {
     const re = new RegExp(pathname);
     function match(url: string): T | null {
         const result = url.match(re);
@@ -13,7 +13,7 @@ export function createRouter<P extends string, T>(pathname: P, handler: RouteHan
     return match;
 }
 
-export function createHalfExtendRouter<P extends string, T, X>(pathname: P, handler: ExtendedRouteHandler<P, T, X>): HalfExtendRouter<T, X> {
+export function createHalfExtendRoute<P extends string, T, X>(pathname: P, handler: ExtendedRouteHandler<P, T, X>): HalfExtendRouter<T, X> {
     return (extraArgs: X) => {
         const re = new RegExp(pathname);
         function match(url: string) {

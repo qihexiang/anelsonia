@@ -1,13 +1,6 @@
-import { RouteHandler, createRouter, RouterChain } from ".";
-
-interface ConditionCallback<T> {
-    (condition: string): T;
-}
-
-interface Condition<T> {
-    match: (condition: string, callback: ConditionCallback<T>) => Condition<T>;
-    getResult: () => T | null;
-}
+import { RouteHandler, RouterChain, Router, Condition } from "./types";
+import { createRoute } from "./createRoute"
+import { hubRoutes } from "./createHub";
 
 export function condition<T>(reality: string): Condition<T> {
     let result: T | null = null;
@@ -23,14 +16,14 @@ export function condition<T>(reality: string): Condition<T> {
     return { match, getResult };
 }
 
-export function routing<T>(url: string): RouterChain<T> {
-    let executed: T | null = null;
+export function routing<T>(): RouterChain<T> {
+    const routes: Router<T>[] = []
     function match<P extends string>(pathname: P, handler: RouteHandler<P, T>): RouterChain<T> {
-        executed = executed ?? createRouter(pathname, handler)(url);
+        routes.push(createRoute(pathname, handler));
         return { match, route };
     }
-    function route(): T | null {
-        return executed;
+    function route(url: string): T | null {
+        return hubRoutes(...routes)(url);
     }
     return { match, route };
 }
