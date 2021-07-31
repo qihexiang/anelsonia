@@ -21,10 +21,12 @@ export function contentEncoding(encodingType: EncodingType) {
     return { "Content-Encoding": encodingType };
 }
 
-export function contentLanguage(languageTag: string) {
-    return { "Content-Language": languageTag };
+export function contentLanguage(lang: string, variant?: string) {
+    return { "Content-Language": `${lang.toLowerCase()}${variant ? `-${variant.toUpperCase()}` : ""}` };
 }
 
 export function serverHeader(product: string = "anelsonia2") {
     return { "Server": product };
 }
+
+export const location = (url: string) => ({ "Location": url });
