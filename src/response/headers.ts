@@ -30,3 +30,5 @@ export function serverHeader(product: string = "anelsonia2") {
 }
 
 export const location = (url: string) => ({ "Location": url });
+
+export const acceptRanges = (range: string) => ({"Accept-Ranges": range})
