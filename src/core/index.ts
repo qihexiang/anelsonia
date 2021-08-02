@@ -16,6 +16,10 @@ export function shim(entry: EntryPoint): ReqHandler {
         res.writeHead(statusCode, headers);
         if (body instanceof Stream) {
             body.pipe(res);
+            body.on("error", (err) => {
+                console.log(err)
+                res.end()
+            })
             res.on("finish", () => {
                 destroy(body);
             });
