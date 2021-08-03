@@ -25,10 +25,8 @@ export function contentLanguage(lang: string, variant?: string) {
     return { "Content-Language": `${lang.toLowerCase()}${variant ? `-${variant.toUpperCase()}` : ""}` };
 }
 
-export function serverHeader(product: string = "anelsonia2") {
-    return { "Server": product };
-}
+export function serverHeader(product: string = "anelsonia2") { return { "Server": product }; }
 
-export const location = (url: string) => ({ "Location": url });
+export function location(url: string) { return { "Location": url }; }
 
-export const acceptRanges = (range: string) => ({"Accept-Ranges": range})
+export function acceptRanges(range: string) { return { "Accept-Ranges": range }; }
