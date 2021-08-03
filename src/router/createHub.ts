@@ -1,6 +1,6 @@
-import { HalfExtendRouter, Router } from "./types";
+import { HalfExtendRouter, Route } from "./types";
 
-export function hubRoutes<T>(...routes: Router<T>[]): Router<T> {
+export function hubRoutes<T>(...routes: Route<T>[]): Route<T> {
     return (url: string) => {
         return routes.reduce<T | null>((result, current) => {
             return result ?? current(url);

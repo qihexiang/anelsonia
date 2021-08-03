@@ -1,6 +1,6 @@
-import { ExtendedRouteHandler, HalfExtendRouter, RouteHandler, Router, RouteSchema } from "./types";
+import { ExtendedRouteHandler, HalfExtendRouter, RouteHandler, Route, RouteSchema } from "./types";
 
-export function createRoute<P extends string, T>(pathname: P, handler: RouteHandler<P, T>): Router<T> {
+export function createRoute<P extends string, T>(pathname: P, handler: RouteHandler<P, T>): Route<T> {
     const re = new RegExp(pathname);
     function match(url: string): T | null {
         const result = url.match(re);

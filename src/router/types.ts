@@ -5,15 +5,15 @@ export type RouteSchema<P extends string> = P extends RouteParam<infer L, infer 
     { [propName in N | keyof RouteSchema<R>]: string } : { [propName in keyof RouteSchema<R>]: string } :
     P extends NamedRegExpStr<infer N> ? { [propName in N]: string; } : {};
 
-export type Router<T> = (url: string) => T | null;
+export type Route<T> = (url: string) => T | null;
 
 export type RouteHandler<P extends string, T> = (matched: RouteSchema<P>) => T;
 export type ExtendedRouteHandler<P extends string, T, X> = (matched: RouteSchema<P>, extraArgs: X) => T;
-export type HalfExtendRouter<T, X> = (extraArgs: X) => Router<T>;
+export type HalfExtendRouter<T, X> = (extraArgs: X) => Route<T>;
 
 export type RouterChain<T> = {
     match: <P extends string>(pathname: P, handler: RouteHandler<P, T>) => RouterChain<T>;
-    route: Router<T>;
+    build: () => Route<T>;
 };
 
 

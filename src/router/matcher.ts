@@ -1,5 +1,5 @@
-import { RouteHandler, RouterChain, Router, Condition } from "./types";
-import { createRoute } from "./createRoute"
+import { RouteHandler, RouterChain, Route, Condition } from "./types";
+import { createRoute } from "./createRoute";
 import { hubRoutes } from "./createHub";
 
 export function condition<T>(reality: string): Condition<T> {
@@ -17,13 +17,13 @@ export function condition<T>(reality: string): Condition<T> {
 }
 
 export function routing<T>(): RouterChain<T> {
-    const routes: Router<T>[] = []
+    const routes: Route<T>[] = [];
     function match<P extends string>(pathname: P, handler: RouteHandler<P, T>): RouterChain<T> {
         routes.push(createRoute(pathname, handler));
-        return { match, route };
+        return { match, build };
     }
-    function route(url: string): T | null {
-        return hubRoutes(...routes)(url);
+    function build(): Route<T> {
+        return hubRoutes(...routes);
     }
-    return { match, route };
+    return { match, build };
 }
