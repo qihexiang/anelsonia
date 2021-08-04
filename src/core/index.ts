@@ -4,10 +4,10 @@ import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
 import { ResponseProps } from "../response";
 
-export type FreesiaRequest = IncomingMessage | Http2ServerRequest;
-type FreesiaResponse = ServerResponse | Http2ServerResponse;
-type ReqHandler = (req: FreesiaRequest, res: FreesiaResponse) => void;
-export type EntryPoint = (req: FreesiaRequest) => ResponseProps | Promise<ResponseProps>;
+export type AnelsoniaReq = IncomingMessage | Http2ServerRequest;
+type AnelsoniaRes = ServerResponse | Http2ServerResponse;
+type ReqHandler = (req: AnelsoniaReq, res: AnelsoniaRes) => void;
+export type EntryPoint = (req: AnelsoniaReq) => ResponseProps | Promise<ResponseProps>;
 
 export function shim(entry: EntryPoint): ReqHandler {
     return async (req, res) => {
