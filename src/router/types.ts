@@ -7,7 +7,7 @@ export type RouteSchema<P extends string> = P extends RouteParam<infer L, infer 
 
 export type Route<T> = (url: string) => T | null;
 
-export type RouteHandler<P extends string, T> = (matched: RouteSchema<P>) => T;
+export type RouteHandler<P extends string, T> = (matched: RouteSchema<P>) => T | null;
 export type ExtendedRouteHandler<P extends string, T, X> = (matched: RouteSchema<P>, extraArgs: X) => T;
 export type HalfExtendRouter<T, X> = (extraArgs: X) => Route<T>;
 
