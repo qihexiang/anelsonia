@@ -2,33 +2,33 @@ import { OutgoingHttpHeaders } from "http";
 import { validHttpStatusCode, statusMessage } from "../utils";
 import { ResponseBody, ResponseProps } from "./types";
 
-export class Response implements ResponseProps {
+export class Respond implements ResponseProps {
     private _statusCode?: validHttpStatusCode = undefined;
     private _statusMessage?: string = undefined;
     private _body?: ResponseBody = undefined;
     private _headers: OutgoingHttpHeaders = {};
-    setStatusCode(code: validHttpStatusCode): Response {
+    setStatusCode(code: validHttpStatusCode): Respond {
         this._statusCode = code;
         return this;
     }
     get statusCode(): validHttpStatusCode {
         return this._statusCode ?? (this._body ? 200 : 404);
     }
-    setStatusMessage(message: string): | Response {
+    setStatusMessage(message: string): Respond {
         this._statusMessage = message;
         return this;
     }
     get statusMessage(): string {
         return this._statusMessage ?? statusMessage[this.statusCode];
     }
-    setBody(body: ResponseBody): Response {
+    setBody(body: ResponseBody): Respond {
         this._body = body;
         return this;
     }
     get body(): ResponseBody | undefined {
         return this._body;
     }
-    setHeaders(...headers: Partial<OutgoingHttpHeaders>[]): Response {
+    setHeaders(...headers: Partial<OutgoingHttpHeaders>[]): Respond {
         this._headers = { ...this._headers, ...headers.reduce((pre, cur) => ({ ...pre, ...cur }), {}) };
         return this;
     }
