@@ -14,6 +14,7 @@
     "@types/destroy": "^1.0.0",
     "@types/mime": "^2.0.3",
     "raw-body": "^2.4.1",
+    "ts-node": "^10.4.0",
     "typedoc": "^0.20.35",
     "typescript": "^4.2.3"
   },
