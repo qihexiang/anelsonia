@@ -169,9 +169,9 @@ export function createExtendSwRt<R, X>() {
 export function condition<T>(reality: string) {
     let result: T | null = null;
     function match(condition: string | string[] | RegExp, callback: (condition: string) => T) {
-        if (condition instanceof RegExp && reality.match(condition)) result = callback(reality);
-        if (condition instanceof Array && condition.includes(reality)) result = callback(reality);
-        if (condition === reality) result = callback(reality);
+        if (condition instanceof RegExp && reality.match(condition)) result = result ?? callback(reality);
+        if (condition instanceof Array && condition.includes(reality)) result = result ?? callback(reality);
+        if (condition === reality) result = result ?? callback(reality);
         return {
             match, result
         };
