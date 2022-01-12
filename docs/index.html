@@ -1,0 +1,136 @@
+<!DOCTYPE html><html class="default"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>anelsonia2</title><meta name="description" content="Documentation for anelsonia2"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">anelsonia2</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label><input type="checkbox" id="tsd-filter-externals" checked/><label class="tsd-widget" for="tsd-filter-externals">Externals</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1>anelsonia2</h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography">
+<a href="#anelsonia2" id="anelsonia2" style="color: inherit; text-decoration: none;">
+  <h1>Anelsonia2</h1>
+</a>
+<p>Anelsonia2是一个Web服务工具组。它包含：</p>
+<ol>
+<li>核心组件：<code>shim</code>函数，将入口函数转换成<code>http</code>，<code>https</code>或<code>http2</code>模块可以使用的请求监听器。</li>
+<li>路由组件：用于创建路由和响应路由的函数</li>
+<li>响应组件：快速构建响应体的工具</li>
+<li>工具组件：目前包含了一个可以根据HTTP状态码查询对映状态消息的对象</li>
+</ol>
+
+<a href="#快速开始" id="快速开始" style="color: inherit; text-decoration: none;">
+  <h2>快速开始</h2>
+</a>
+
+<a href="#安装" id="安装" style="color: inherit; text-decoration: none;">
+  <h3>安装</h3>
+</a>
+<pre><code class="language-bash"><span class="hl-1">npm install anelsonia2</span>
+</code></pre>
+
+<a href="#创建入口" id="创建入口" style="color: inherit; text-decoration: none;">
+  <h3>创建入口</h3>
+</a>
+<p>需要使用<code>shim</code>来将入口函数<code>EntryPoint</code>转换为<code>createServer</code>或<code>createSecureServer</code>的处理器函数的函数，这个函数在<code>anelsonia2/core</code>中。</p>
+<pre><code class="language-typescript"><span class="hl-8">import</span><span class="hl-1"> { </span><span class="hl-6">shim</span><span class="hl-1"> } </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-5">&quot;anelsonia2/core&quot;</span><br/><span class="hl-8">import</span><span class="hl-1"> { </span><span class="hl-6">createServer</span><span class="hl-1"> } </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-5">&quot;http&quot;</span><br/><span class="hl-8">import</span><span class="hl-1"> { </span><span class="hl-6">createSecureServer</span><span class="hl-1"> } </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-5">&quot;http2&quot;</span><br/><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">reqHandler</span><span class="hl-1"> = </span><span class="hl-3">shim</span><span class="hl-1">(</span><span class="hl-0">async</span><span class="hl-1"> </span><span class="hl-6">req</span><span class="hl-1"> </span><span class="hl-0">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-8">return</span><span class="hl-1"> {</span><br/><span class="hl-1">        </span><span class="hl-6">statusCode:</span><span class="hl-1"> </span><span class="hl-9">200</span><span class="hl-1">, </span><span class="hl-6">statusMessage:</span><span class="hl-1"> </span><span class="hl-5">&quot;Ok&quot;</span><span class="hl-1">, </span><span class="hl-6">body:</span><span class="hl-1"> </span><span class="hl-5">&quot;nice to meet you&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-6">headers:</span><span class="hl-1"> {</span><span class="hl-5">&quot;content-type&quot;</span><span class="hl-6">:</span><span class="hl-1"> </span><span class="hl-5">&quot;text/plain&quot;</span><span class="hl-1">}</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">})</span><br/><br/><span class="hl-3">createServer</span><span class="hl-1">(</span><span class="hl-6">reqHandler</span><span class="hl-1">).</span><span class="hl-3">listen</span><span class="hl-1">(</span><span class="hl-9">8080</span><span class="hl-1">)</span><br/><span class="hl-3">createServer</span><span class="hl-1">(</span><span class="hl-6">http2Options</span><span class="hl-1">, </span><span class="hl-6">reqHandler</span><span class="hl-1">).</span><span class="hl-3">listen</span><span class="hl-1">(</span><span class="hl-9">8081</span><span class="hl-1">)</span>
+</code></pre>
+<blockquote>
+<p>这里对HTTP/2的支持是不完整的，无法自行操作整个会话的Socket，要充分使用HTTP/2的功能，应该直接使用<code>http2</code>模块进行编程而不是使用<code>anelsonia2</code>来处理请求，但路由、响应构建工具仍然可以单独使用。</p>
+</blockquote>
+
+<a href="#响应工具" id="响应工具" style="color: inherit; text-decoration: none;">
+  <h3>响应工具</h3>
+</a>
+<p>上面我们已经构建了一个会返回<code>nice to meet you</code>消息的服务器了，但是手动构建一个返回对象是麻烦的，所以我们使用工具组提供的响应工具来构建它。</p>
+<pre><code class="language-typescript"><span class="hl-8">import</span><span class="hl-1"> { </span><span class="hl-6">Respond</span><span class="hl-1"> } </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-5">&quot;anelsonia2/response&quot;</span><br/><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">reqHandler</span><span class="hl-1"> = </span><span class="hl-3">shim</span><span class="hl-1">(</span><span class="hl-0">async</span><span class="hl-1"> </span><span class="hl-6">req</span><span class="hl-1"> </span><span class="hl-0">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-8">return</span><span class="hl-1"> </span><span class="hl-0">new</span><span class="hl-1"> </span><span class="hl-3">Responsd</span><span class="hl-1">()</span><br/><span class="hl-1">        .</span><span class="hl-3">setBody</span><span class="hl-1">(</span><span class="hl-5">&quot;nice to meet you&quot;</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">setHeaders</span><span class="hl-1">({</span><span class="hl-5">&quot;content-type&quot;</span><span class="hl-6">:</span><span class="hl-1"> </span><span class="hl-5">&quot;text/plain&quot;</span><span class="hl-1">})</span><br/><span class="hl-1">})</span>
+</code></pre>
+<p>这样，状态码和状态消息都自动设置了。</p>
+<p>响应工具是一个名为<code>Respond</code>的类。</p>
+<p>提供了四个<code>getter</code>来返回对应的值，它们实现了入口函数需要返回的<code>ResponseProps</code>：</p>
+<ul>
+<li>statusCode: 有效的Http状态码</li>
+<li>statusMessage: 字符串类型的状态消息</li>
+<li>body: 字符串或Buffer或可读流的响应主体</li>
+<li>setHeaders: 响应头</li>
+</ul>
+<p>它的构造函数没有参数，但提供四个方法来设置上述四项属性，他们的参数和属性的类型一致：</p>
+<ul>
+<li>setStatusCode: 设置状态码</li>
+<li>setStatusMessage: 设置状态消息</li>
+<li>setBody: 设置响应主体</li>
+<li>setHeaders: 设置响应头</li>
+</ul>
+<p>需要注意的事情有：</p>
+<ol>
+<li>除了<code>setHeaders</code>，对已有的<code>Respond</code>对象使用设置方法，会替换掉对象内已有的属性，而<code>setHeaders</code>会合并属性</li>
+<li><code>setHeaders</code>可以接受多个参数，他们会被合并，后面的参数具有更高的优先级</li>
+<li>未设置状态码时和响应主体时，默认的状态码是404，设置了响应主体后，默认的状态码是200</li>
+<li>未设置状态消息时，它的值会从状态码中推断出来。</li>
+<li>未设置响应主体时，它的值和状态消息相同，响应头会被加入<code>{&quot;content-type&quot;: &quot;text/plain&quot;}</code>。</li>
+</ol>
+
+<a href="#路由" id="路由" style="color: inherit; text-decoration: none;">
+  <h3>路由</h3>
+</a>
+<p>由于函数式的设计，这个库并不包含像express那样的<code>app.get(pattern, handler)</code>风格的路由，而是通过工具函数来实现请求路径的区分的。</p>
+
+<a href="#路由（route）" id="路由（route）" style="color: inherit; text-decoration: none;">
+  <h4>路由（Route）</h4>
+</a>
+<p>路由在Anelsonia中的概念是，当用户访问的路径符合某一个规则的时候，则执行对应的函数，并获得函数的返回值。要创建一个路由，使用<code>createRoute</code>函数来实现。</p>
+<p><code>createRoute</code>中可以传入两个参数，第一个是路由匹配模式<code>pattern</code>，格式像这样：<code>/user/&lt;username&gt;/&lt;age&gt;/</code>，这样，就可以匹配到类似于<code>/user/freesia/16/</code>这样的路径。具有未知层级的路径匹配时，位置的部分必须放在最后，下面是例子：</p>
+<p>对于路径：<code>/user/qihexiang/freesia/documents/index.md/</code></p>
+<ul>
+<li><code>/user/&lt;username&gt;/&lt;filepath&gt;/</code> 不能匹配上。</li>
+<li><code>/user/&lt;username&gt;/&lt;filepath&gt;</code> 能匹配上，<code>filepath</code>为<code>freesia/documents/index.md/</code>。</li>
+<li><code>/user/&lt;username/&lt;[filepath]&gt;/</code> 能匹配上，<code>filepath</code>为<code>freesia/documents/index.md</code>。</li>
+</ul>
+<p>当带有中括号时，匹配模式是贪婪的。如果路径中不应该包含未知层级的路径匹配，最好将<code>pattern</code>设置为第一种形式以拒绝非法请求。</p>
+<p>另一个参数自然是对应的函数<code>handler</code>，这个函数有2个参数，其一是根据<code>pattern</code>推导出的路由匹配参数<code>params</code>，例如上面的例子中，推导出的参数类型为<code>{username: string, age: string}</code>，所有的路由参数类型都是<code>string</code>，开发者应该根据实际的情况进行检查和类型转换。另一个参数是搜索参数<code>quries</code>，它的类型是<code>UrlSeachParams</code>，由于路由匹配并不检查搜索参数的合法性，因此并不进行类型标注，开发者在使用时应当注意到<code>quries.get</code>方法取回的值可能为<code>null</code>，这需要开发者自行谨慎处理。</p>
+<p>下面是一个示例：</p>
+<pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">route</span><span class="hl-1"> = </span><span class="hl-3">createRoute</span><span class="hl-1">(</span><span class="hl-5">&#39;/user/&lt;username&gt;/&lt;filepath&gt;&#39;</span><span class="hl-1">, </span><span class="hl-3">async</span><span class="hl-1"> ({</span><span class="hl-6">username</span><span class="hl-1">, </span><span class="hl-6">filepath</span><span class="hl-1">}, </span><span class="hl-6">queries</span><span class="hl-1">) </span><br/><span class="hl-1">    </span><span class="hl-0">=&gt;</span><span class="hl-1"> </span><span class="hl-4">JSON</span><span class="hl-1">.</span><span class="hl-3">stringify</span><span class="hl-1">(</span><span class="hl-8">await</span><span class="hl-1"> </span><span class="hl-3">readDir</span><span class="hl-1">(</span><span class="hl-6">username</span><span class="hl-1">, </span><span class="hl-6">filepath</span><span class="hl-1">)))</span><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">result</span><span class="hl-1"> = </span><span class="hl-8">await</span><span class="hl-1"> </span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-6">url</span><span class="hl-1">)</span>
+</code></pre>
+
+<a href="#交换机（switcher）" id="交换机（switcher）" style="color: inherit; text-decoration: none;">
+  <h4>交换机（Switcher）</h4>
+</a>
+<p>每个Route只是一条路径，实际上需要使用多条路径进行依次匹配。使用交换机（Switcher）实现该功能。例如有路由<code>route1</code>-<code>route6</code>，他们的<code>handler</code>拥有相同的返回类型，则可以聚合在一起。</p>
+<blockquote>
+<p>返回类型不同的平级路由，使用联合类型作为Switcher的泛型类型。</p>
+</blockquote>
+<p>方式如下：</p>
+<pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">switcher</span><span class="hl-1"> = </span><span class="hl-3">createSwitcher</span><span class="hl-1">(</span><span class="hl-6">route1</span><span class="hl-1">, </span><span class="hl-6">route2</span><span class="hl-1">, </span><span class="hl-6">route3</span><span class="hl-1">, </span><span class="hl-6">route4</span><span class="hl-1">, </span><span class="hl-6">route5</span><span class="hl-1">, </span><span class="hl-6">route6</span><span class="hl-1">)</span><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">result</span><span class="hl-1"> = </span><span class="hl-3">switcher</span><span class="hl-1">(</span><span class="hl-6">url</span><span class="hl-1">)</span>
+</code></pre>
+<p>Switcher最终得到的函数和Route实际上是一样的，因此可以逐级将多个Switcher也聚合起来。</p>
+
+<a href="#额外参数" id="额外参数" style="color: inherit; text-decoration: none;">
+  <h4>额外参数</h4>
+</a>
+<p>在实际使用中，<code>handler</code>往往还需要其他参数的输入，你可以这样来获得额外参数：</p>
+<pre><code class="language-js"><span class="hl-8">import</span><span class="hl-1"> </span><span class="hl-6">apiRouteHandler</span><span class="hl-1"> </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-5">&quot;./controller/api&quot;</span><br/><span class="hl-8">import</span><span class="hl-1"> </span><span class="hl-6">DB</span><span class="hl-1"> </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-5">&quot;./data/IO&quot;</span><br/><span class="hl-8">import</span><span class="hl-1"> </span><span class="hl-6">respond</span><span class="hl-1"> </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-5">&quot;anelsonia2/respond&quot;</span><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">db</span><span class="hl-1"> = </span><span class="hl-0">new</span><span class="hl-1"> </span><span class="hl-3">IO</span><span class="hl-1">();</span><br/><br/><span class="hl-0">function</span><span class="hl-1"> </span><span class="hl-3">main</span><span class="hl-1">(</span><span class="hl-6">req</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">result</span><span class="hl-1"> = </span><span class="hl-8">await</span><span class="hl-1"> </span><span class="hl-3">createRoute</span><span class="hl-1">(</span><span class="hl-5">&quot;/api/&lt;options&gt;&quot;</span><span class="hl-1">, ({</span><span class="hl-6">options</span><span class="hl-1">}, </span><span class="hl-6">queries</span><span class="hl-1">) </span><span class="hl-0">=&gt;</span><span class="hl-1"> </span><span class="hl-3">apiRouteHandler</span><span class="hl-1">(</span><span class="hl-6">options</span><span class="hl-1">, </span><span class="hl-6">queries</span><span class="hl-1">, {</span><span class="hl-6">req</span><span class="hl-1">, </span><span class="hl-6">db</span><span class="hl-1">}))</span><br/><span class="hl-1">    </span><span class="hl-8">return</span><span class="hl-1"> </span><span class="hl-6">result</span><br/><span class="hl-1">}</span>
+</code></pre>
+<p>但如果我们想将路径和控制器绑定之后再接收参数的话，就无法做到了。因此，本库中提供了额外的函数：<code>createExtRoute</code>。它的使用与<code>createRoute</code>基本相同，差异在于它的<code>handler</code>可以接受一个额外的自定义类型参数；返回的路由匹配时也可以接收一个对应的参数。</p>
+<p>若有多个这样的扩展路由进行聚合时，可以使用<code>createExtendSwitcher</code>来创建交换机。</p>
+
+<a href="#同时创建路由和交换机" id="同时创建路由和交换机" style="color: inherit; text-decoration: none;">
+  <h4>同时创建路由和交换机</h4>
+</a>
+<p>利用<code>createRoute</code>和<code>createSwitcher</code>，我们可以在分离的多个地方对路由规则进行定义，但与此同时，也会有人更倾向与将路径匹配模式集中定义于一处，此时重复使用<code>createRoute</code>和<code>createSwitcher</code>就显得十分麻烦。Anelsonia提供了一个额外的函数<code>createSwRt</code>来实现这个功能，他提供一个链试调用来创建一个交换机及其对应的路由。</p>
+<p>例子如下，有若干已经定义好的<code>handler</code>，其中一些返回是异步的（<code>Promise</code>）。</p>
+<pre><code class="language-js"><span class="hl-0">async</span><span class="hl-1"> </span><span class="hl-0">function</span><span class="hl-1"> </span><span class="hl-3">main</span><span class="hl-1">(</span><span class="hl-6">req</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-0">const</span><span class="hl-1"> { </span><span class="hl-2">switcher</span><span class="hl-1"> } = </span><span class="hl-3">createSwRt</span><span class="hl-1">()</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-5">&quot;/user/&lt;username&gt;/&lt;rest&gt;&quot;</span><span class="hl-1">, </span><span class="hl-6">infoHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-5">&quot;/view/&lt;rest&gt;&quot;</span><span class="hl-1">, </span><span class="hl-6">viewHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-5">&quot;/d/&lt;username&gt;/&lt;filepath&gt;&quot;</span><span class="hl-1">, </span><span class="hl-6">downloadHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-5">&quot;/b/&lt;username&gt;/&lt;[filepath]&gt;/&quot;</span><span class="hl-1">, </span><span class="hl-6">browseHandler</span><span class="hl-1">)</span><br/><span class="hl-1">    </span><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">response</span><span class="hl-1"> = (</span><span class="hl-8">await</span><span class="hl-1"> </span><span class="hl-3">switcher</span><span class="hl-1">(</span><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-6">url</span><span class="hl-1">)) ?? </span><span class="hl-0">new</span><span class="hl-1"> </span><span class="hl-3">Respond</span><span class="hl-1">().</span><span class="hl-3">setStatus</span><span class="hl-1">(</span><span class="hl-9">404</span><span class="hl-1">)</span><br/><span class="hl-1">    </span><span class="hl-8">return</span><span class="hl-1"> </span><span class="hl-6">response</span><br/><span class="hl-1">}</span>
+</code></pre>
+<p>每次链式调用中的<code>route</code>函数和<code>createRoute</code>函数参数类型一致，返回中解析出的<code>switcher</code>和<code>createSwitcher</code>的类型是一致的。</p>
+<p>另外，提供了一个<code>createExtendSwRt</code>函数，使用方法基本一致。</p>
+
+<a href="#简单匹配（condition）" id="简单匹配（condition）" style="color: inherit; text-decoration: none;">
+  <h4>简单匹配（Condition）</h4>
+</a>
+<p>上述的路由匹配模式只能支持URL的路径匹配，但实际上我们还会根据一些具体的情况，例如请求的方法、可枚举的具体路径参数等进行请求分流，这些情况一般需要精确匹配字符串。这使用上面的函数并不容易实现，或者显得更加麻烦，因此提供了一个<code>condition</code>函数，以链试调用的方式来实现类似与switch语法的功能，可以看作是一个带有返回值的switch块。</p>
+<pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> { </span><span class="hl-2">result</span><span class="hl-1"> } = </span><span class="hl-3">condition</span><span class="hl-1">(</span><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-6">method</span><span class="hl-1">)</span><br/><span class="hl-1">    .</span><span class="hl-3">match</span><span class="hl-1">(</span><span class="hl-5">&#39;GET&#39;</span><span class="hl-1">, () </span><span class="hl-0">=&gt;</span><span class="hl-1"> </span><span class="hl-3">getSw</span><span class="hl-1">(</span><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-6">url</span><span class="hl-1">))</span><br/><span class="hl-1">    .</span><span class="hl-3">match</span><span class="hl-1">([</span><span class="hl-5">&#39;POST&#39;</span><span class="hl-1">,</span><span class="hl-5">&#39;PUT&#39;</span><span class="hl-1">], () </span><span class="hl-0">=&gt;</span><span class="hl-1"> </span><span class="hl-3">uploadSw</span><span class="hl-1">(</span><span class="hl-6">req</span><span class="hl-1">.</span><span class="hl-6">url</span><span class="hl-1">, </span><span class="hl-6">req</span><span class="hl-1">));</span>
+</code></pre>
+<p>例如，这个例子分流的依据是<code>req.method</code>，我们将<code>GET</code>请求分为一组，<code>POST</code>和<code>PUT</code>请求分为一组。调用链中，<code>match</code>的一个参数是字符串或字符串数组，当字符串和分流依据相等，或数组中存在匹配的字符串时，或给定的正则表达式与分流依据匹配时，会执行后续的<code>handler</code>，所有注册的<code>handler</code>应该有相同的返回类型或符合<code>condition&lt;T&gt;</code>描述的泛型。解构出的<code>result</code>是<code>handler</code>的返回值。</p>
+<blockquote>
+<p>注意，由于此处做了变量解构，不能在<code>condition</code>前直接使用<code>await</code>来处理异步的<code>result</code>，你需要在之后使用<code>result</code>是写作<code>await result</code>。</p>
+</blockquote>
+
+<a href="#工具组件" id="工具组件" style="color: inherit; text-decoration: none;">
+  <h3>工具组件</h3>
+</a>
+
+<a href="#http状态码" id="http状态码" style="color: inherit; text-decoration: none;">
+  <h4>Http状态码</h4>
+</a>
+<p>查询状态码对应的状态消息，是<code>Respond</code>推断未设置的类型消息，限制statusCode范围的依据的依据。一般应该用不着。</p>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Exports</a></li></ul></nav><nav class="tsd-navigation secondary menu-sticky"><ul><li class="tsd-kind-class"><a href="classes/Respond.html" class="tsd-kind-icon">Respond</a></li><li class="tsd-kind-interface"><a href="interfaces/ResponseProps.html" class="tsd-kind-icon">Response<wbr/>Props</a></li><li class="tsd-kind-type-alias"><a href="modules.html#AnelsoniaReq" class="tsd-kind-icon">Anelsonia<wbr/>Req</a></li><li class="tsd-kind-type-alias"><a href="modules.html#AsyncResponse" class="tsd-kind-icon">Async<wbr/>Response</a></li><li class="tsd-kind-type-alias"><a href="modules.html#EntryPoint" class="tsd-kind-icon">Entry<wbr/>Point</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#ExtendRouteHandler" class="tsd-kind-icon">Extend<wbr/>Route<wbr/>Handler</a></li><li class="tsd-kind-type-alias"><a href="modules.html#ResponseBody" class="tsd-kind-icon">Response<wbr/>Body</a></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><a href="modules.html#RouteHandler" class="tsd-kind-icon">Route<wbr/>Handler</a></li><li class="tsd-kind-type-alias"><a href="modules.html#clientErrorCode" class="tsd-kind-icon">client<wbr/>Error<wbr/>Code</a></li><li class="tsd-kind-type-alias"><a href="modules.html#infoStatusCode" class="tsd-kind-icon">info<wbr/>Status<wbr/>Code</a></li><li class="tsd-kind-type-alias"><a href="modules.html#redirectStatusCode" class="tsd-kind-icon">redirect<wbr/>Status<wbr/>Code</a></li><li class="tsd-kind-type-alias"><a href="modules.html#serverErrorCode" class="tsd-kind-icon">server<wbr/>Error<wbr/>Code</a></li><li class="tsd-kind-type-alias"><a href="modules.html#successStatusCode" class="tsd-kind-icon">success<wbr/>Status<wbr/>Code</a></li><li class="tsd-kind-type-alias"><a href="modules.html#validHttpStatusCode" class="tsd-kind-icon">valid<wbr/>Http<wbr/>Status<wbr/>Code</a></li><li class="tsd-kind-variable"><a href="modules.html#clientErrorMessage" class="tsd-kind-icon">client<wbr/>Error<wbr/>Message</a></li><li class="tsd-kind-variable"><a href="modules.html#infoMessage" class="tsd-kind-icon">info<wbr/>Message</a></li><li class="tsd-kind-variable"><a href="modules.html#redirectMessage" class="tsd-kind-icon">redirect<wbr/>Message</a></li><li class="tsd-kind-variable"><a href="modules.html#serverErrorMessage" class="tsd-kind-icon">server<wbr/>Error<wbr/>Message</a></li><li class="tsd-kind-variable"><a href="modules.html#statusMessage" class="tsd-kind-icon">status<wbr/>Message</a></li><li class="tsd-kind-variable"><a href="modules.html#successMessage" class="tsd-kind-icon">success<wbr/>Message</a></li><li class="tsd-kind-function"><a href="modules.html#acceptRanges" class="tsd-kind-icon">accept<wbr/>Ranges</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#composer" class="tsd-kind-icon">composer</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#condition" class="tsd-kind-icon">condition</a></li><li class="tsd-kind-function"><a href="modules.html#contentDisposition" class="tsd-kind-icon">content<wbr/>Disposition</a></li><li class="tsd-kind-function"><a href="modules.html#contentEncoding" class="tsd-kind-icon">content<wbr/>Encoding</a></li><li class="tsd-kind-function"><a href="modules.html#contentLanguage" class="tsd-kind-icon">content<wbr/>Language</a></li><li class="tsd-kind-function"><a href="modules.html#contentLength" class="tsd-kind-icon">content<wbr/>Length</a></li><li class="tsd-kind-function"><a href="modules.html#contentType" class="tsd-kind-icon">content<wbr/>Type</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#createExtRoute" class="tsd-kind-icon">create<wbr/>Ext<wbr/>Route</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#createExtendSwRt" class="tsd-kind-icon">create<wbr/>Extend<wbr/>Sw<wbr/>Rt</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#createExtendSwitcher" class="tsd-kind-icon">create<wbr/>Extend<wbr/>Switcher</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#createRoute" class="tsd-kind-icon">create<wbr/>Route</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#createSwRt" class="tsd-kind-icon">create<wbr/>Sw<wbr/>Rt</a></li><li class="tsd-kind-function tsd-has-type-parameter"><a href="modules.html#createSwitcher" class="tsd-kind-icon">create<wbr/>Switcher</a></li><li class="tsd-kind-function"><a href="modules.html#location" class="tsd-kind-icon">location</a></li><li class="tsd-kind-function"><a href="modules.html#serverHeader" class="tsd-kind-icon">server<wbr/>Header</a></li><li class="tsd-kind-function"><a href="modules.html#shim" class="tsd-kind-icon">shim</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li><li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="assets/main.js"></script></body></html>
