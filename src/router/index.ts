@@ -112,60 +112,71 @@ export function createExtendSwitcher<R, X>(...routes: ExtendRoute<R, X>[]) {
 
 /**
  * Create a switcher and routes connect to it at the same time.
- * Use next function return from it to add route, and use switcher 
+ * Use route function return from it to add route, and use switcher 
  * in the object.
  * For example, you can use it like this:
  * 
  * ```js
  * const { switcher } = createSwRt()
- *     .next('/user/<username>/<age>', (p, q) => `User ${p.username} is ${p.age}`)
- *     .next('/user/<username>/hello', (p, q) => `hello, ${p.username}`)
+ *     .route('/user/<username>/<age>', (p, q) => `User ${p.username} is ${p.age}`)
+ *     .route('/user/<username>/hello', (p, q) => `hello, ${p.username}`)
  * 
  * const reuslt = switcher(url)
  * ```
  * 
- * @returns a next function and switcher function.
+ * @returns a route function and switcher function.
  */
 export function createSwRt<R>() {
     let routes: Route<R>[] = [];
-    const switcher: Route<R> = createSwitcher(...routes);
-    const next = <P extends string>(pattern: P, handler: RouteHandler<P, R>) => {
+    const route = <P extends string>(pattern: P, handler: RouteHandler<P, R>) => {
         routes = [...routes, createRoute(pattern, handler)];
         return {
-            next, switcher
+            route, switcher: createSwitcher(...routes)
         };
     };
-    return { next, switcher };
+    return { route, switcher: createSwitcher(...routes) };
 }
 
 /**
  * Create a switcher and extended routes connect to it at the same time.
- * Use next function return from it to add route, and use switcher 
+ * Use route function return from it to add route, and use switcher 
  * in the object.
  * For example, you can use it like this:
  * 
  * ```ts
  * const { switcher } = createExtendSwRt<string, Request>()
- *     .next('/user/<username>/<age>', (p, q, x) => `User ${p.username} is ${p.age}, request from ${x.ip}`)
- *     .next('/user/<username>/hello', (p, q, x) => `hello, ${p.username}, request from ${x.ip}`)
+ *     .route('/user/<username>/<age>', (p, q, x) => `User ${p.username} is ${p.age}, request from ${x.ip}`)
+ *     .route('/user/<username>/hello', (p, q, x) => `hello, ${p.username}, request from ${x.ip}`)
  * 
  * const reuslt = switcher(url)
  * ```
  * 
- * @returns a next function and switcher function.
+ * @returns a route function and switcher function.
  */
 export function createExtendSwRt<R, X>() {
     let routes: ExtendRoute<R, X>[] = [];
-    const switcher: ExtendRoute<R, X> = createExtendSwitcher(...routes);
-    const next = <P extends string>(pattern: P, handler: ExtendRouteHandler<P, X, R>) => {
+    const route = <P extends string>(pattern: P, handler: ExtendRouteHandler<P, X, R>) => {
         routes = [...routes, createExtRoute(pattern, handler)];
         return {
-            next, switcher
+            route, switcher: createExtendSwitcher(...routes)
         };
     };
     return {
-        next, switcher
+        route, switcher: createExtendSwitcher(...routes)
     };
+}
+
+export function condition<T>(reality: string) {
+    let result: T | null = null;
+    function match(condition: string | string[] | RegExp, callback: (condition: string) => T) {
+        if (condition instanceof RegExp && reality.match(condition)) result = callback(reality);
+        if (condition instanceof Array && condition.includes(reality)) result = callback(reality);
+        if (condition === reality) result = callback(reality);
+        return {
+            match, result
+        };
+    }
+    return { match, result };
 }
 
 function createRegExp<P extends string>(pattern: P) {
