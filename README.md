@@ -85,7 +85,7 @@ const reqHandler = shim(async req => {
 
 路由在Anelsonia中的概念是，当用户访问的路径符合某一个规则的时候，则执行对应的函数，并获得函数的返回值。要创建一个路由，使用`createRoute`函数来实现。
 
-`createRoute`中可以传入两个参数，第一个是路由匹配模式`pattern`，格式像这样：`/user/<username>/<age>/`，这样，就可以匹配到类似于`/user/freesia/16/`这样的路径。具有未知层级的路径匹配时，位置的部分必须放在最后，下面是例子：
+`createRoute`中可以传入两个参数，第一个是路由匹配模式`pattern`，格式像这样：`/user/<username>/<age>/`，这样，就可以匹配到类似于`/user/freesia/16/`这样的路径。具有未知层级的路径匹配时，未知的部分必须放在最后，下面是例子：
 
 对于路径：`/user/qihexiang/freesia/documents/index.md/`
 
@@ -124,19 +124,33 @@ Switcher最终得到的函数和Route实际上是一样的，因此可以逐级�
 
 在实际使用中，`handler`往往还需要其他参数的输入，你可以这样来获得额外参数：
 
-```js
+```ts
 import apiRouteHandler from "./controller/api"
 import DB from "./data/IO"
-import respond from "anelsonia2/respond"
-const db = new IO();
+const db = new DB();
 
-function main(req) {
+function main(req: Request) {
     const result = await createRoute("/api/<options>", ({options}, queries) => apiRouteHandler(options, queries, {req, db}))
     return result
 }
 ```
 
-但如果我们想将路径和控制器绑定之后再接收参数的话，就无法做到了。因此，本库中提供了额外的函数：`createExtRoute`。它的使用与`createRoute`基本相同，差异在于它的`handler`可以接受一个额外的自定义类型参数；返回的路由匹配时也可以接收一个对应的参数。
+但如果我们想将路径和控制器绑定之后再接收参数的话，就无法做到了。因此，本库中提供了额外的函数：`createExtRoute`。它的使用与`createRoute`基本相同，差异在于它的`handler`可以接受一个额外的自定义类型参数；返回的路由匹配时也可以接收一个对应的参数。例如上面的例子会变成：
+
+```ts
+// controller/api.ts
+export const apiRoute = createExtendRoute('/api/<options>', ({options}, queries, {req: Request, db: DB}) => {...})
+
+// main.ts
+import { apiRoute } from "./controller/api"
+import DB from "./data/IO"
+const db = new DB();
+
+function main(req: Request) {
+    const result = await apiRoute(req.url, {req, db})
+    return result
+}
+```
 
 若有多个这样的扩展路由进行聚合时，可以使用`createExtendSwitcher`来创建交换机。
 
@@ -169,7 +183,8 @@ async function main(req) {
 ```js
 const { result } = condition(req.method)
     .match('GET', () => getSw(req.url))
-    .match(['POST','PUT'], () => uploadSw(req.url, req));
+    .match(['POST','PUT'], () => uploadSw(req.url, req))
+    .match(/^(OPTION|TRACE)$/, (method) => debugSw(req.url, method))
 ```
 
 例如，这个例子分流的依据是`req.method`，我们将`GET`请求分为一组，`POST`和`PUT`请求分为一组。调用链中，`match`的一个参数是字符串或字符串数组，当字符串和分流依据相等，或数组中存在匹配的字符串时，或给定的正则表达式与分流依据匹配时，会执行后续的`handler`，所有注册的`handler`应该有相同的返回类型或符合`condition<T>`描述的泛型。解构出的`result`是`handler`的返回值。
