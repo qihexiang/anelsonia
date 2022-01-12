@@ -16,7 +16,7 @@ export function contentDisposition(download: boolean, filename?: string) {
     return { "Content-Disposition": `${download ? "attachment" : "inline"}${filename ? `; filename=${filename}` : ""}` };
 }
 
-type EncodingType = "gzip" | "compress" | "deflate" | "identity" | "br";
+export type EncodingType = "gzip" | "compress" | "deflate" | "identity" | "br";
 export function contentEncoding(encodingType: EncodingType) {
     return { "Content-Encoding": encodingType };
 }

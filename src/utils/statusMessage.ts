@@ -2,7 +2,7 @@ export const infoMessage = {
     100: "continue",
     101: "switching protocols",
     102: "processing"
-};
+} as const;
 
 export type infoStatusCode = keyof typeof infoMessage;
 
@@ -17,7 +17,7 @@ export const successMessage = {
     207: "multi-status",
     208: "already reported",
     226: "im used"
-};
+} as const;
 
 export type successStatusCode = keyof typeof successMessage;
 
@@ -30,7 +30,7 @@ export const redirectMessage = {
     305: "use proxy",
     307: "temporary redirect",
     308: "permanent redirect"
-};
+} as const;
 
 export type redirectStatusCode = keyof typeof redirectMessage;
 
@@ -61,7 +61,7 @@ export const clientErrorMessage = {
     428: "precondition required",
     429: "too many requests",
     431: "request header fields too large",
-};
+} as const;
 
 export type clientErrorCode = keyof typeof clientErrorMessage;
 
@@ -77,13 +77,13 @@ export const serverErrorMessage = {
     508: "loop detected",
     510: "not extended",
     511: "network authentication required"
-};
+} as const;
 
 export type serverErrorCode = keyof typeof serverErrorMessage;
 
 export const statusMessage = {
     ...infoMessage, ...successMessage, ...redirectMessage, ...clientErrorMessage, ...serverErrorMessage
-};
+} as const;
 
 export type validHttpStatusCode = keyof typeof statusMessage;
 export default statusMessage;
