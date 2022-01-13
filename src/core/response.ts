@@ -1,6 +1,17 @@
 import { OutgoingHttpHeaders } from "http";
-import { validHttpStatusCode, statusMessage } from "../utils";
-import { ResponseBody, ResponseProps } from "./types";
+import { statusMessage, validHttpStatusCode } from "./http";
+import Stream from "stream";
+
+export interface ResponseProps {
+    statusCode: validHttpStatusCode,
+    statusMessage: string,
+    body?: ResponseBody,
+    headers: OutgoingHttpHeaders;
+}
+
+export type ResponseBody = string | Buffer | Stream;
+
+export type AsyncResponse = ResponseProps | Promise<ResponseProps>;
 
 export class Respond implements ResponseProps {
     private _statusCode?: validHttpStatusCode = undefined;

@@ -2,7 +2,7 @@ import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
-import { ResponseProps } from "../response";
+import { ResponseProps } from "./response";
 
 export type AnelsoniaReq = IncomingMessage | Http2ServerRequest;
 type AnelsoniaRes = ServerResponse | Http2ServerResponse;
