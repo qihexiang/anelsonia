@@ -87,17 +87,24 @@ const reqHandler = shim(async req => {
 
 路由在Anelsonia中的概念是，当用户访问的路径符合某一个规则的时候，则执行对应的函数，并获得函数的返回值。要创建一个路由，使用`createRoute`函数来实现。
 
-`createRoute`中可以传入两个参数，第一个是路由匹配模式`pattern`，格式像这样：`/user/<username>/<age>/`，这样，就可以匹配到类似于`/user/freesia/16/`这样的路径。具有未知层级的路径匹配时，未知的部分必须放在最后，下面是例子：
+`createRoute`中可以传入两个参数，第一个是路由匹配模式`pattern`，格式像这样：`/user/<username>/<age>/`，这样，就可以匹配到类似于`/user/freesia/16/`这样的路径。
 
-对于路径：`/user/qihexiang/freesia/documents/index.md/`
+表明路径参数的形式有三种：
 
-- `/user/<username>/<filepath>/` 不能匹配上。
-- `/user/<username>/<filepath>` 能匹配上，`filepath`为`freesia/documents/index.md/`。
-- `/user/<username/<[filepath]>/` 能匹配上，`filepath`为`freesia/documents/index.md`。
+- `<T>`：非贪婪模式，匹配任意字符出现至少一次。
+- `<[T]>`：贪婪模式，匹配任意字符至少出现一次。
+- `[T]`：贪婪模式，匹配任意字符，也可以没有字符。
 
-当带有中括号时，匹配模式是贪婪的。如果路径中不应该包含未知层级的路径匹配，最好将`pattern`设置为第一种形式以拒绝非法请求。
+可以观看这个例子中，对`filepath`的捕获情况来理解：
 
-另一个参数自然是对应的函数`handler`，这个函数有2个参数，其一是根据`pattern`推导出的路由匹配参数`params`，例如上面的例子中，推导出的参数类型为`{username: string, age: string}`，所有的路由参数类型都是`string`，开发者应该根据实际的情况进行检查和类型转换。另一个参数是搜索参数`quries`，它的类型是`UrlSeachParams`，由于路由匹配并不检查搜索参数的合法性，因此并不进行类型标注，开发者在使用时应当注意到`quries.get`方法取回的值可能为`null`，这需要开发者自行谨慎处理。
+|模式/路径|`/user/hx/docs/index.md`|`/user/hx/docs/index.md/`|`/user/hx/`|
+|---|---|---|---|
+|`/user/<name>/<filepath>/`|`null`|`null`|`null`|
+|`/user/<name>/<filepath>`|`"docs/index.md"`|`"docs/index.md/"`|`null`|
+|`/user/<name>/<[filepath]>/`|`null`|`doc/index.md`|`null`|
+|`/user/<name>/[filepath]`|`"docs/index.md"`|`"docs/index.md/"`|`""`|
+
+另一个参数自然是对应的函数`handler`，这个函数有2个参数，其一是根据`pattern`推导出的路由匹配参数`params`，例如上面的例子中，推导出的参数类型为`{name: string, filepath: string}`，所有的路由参数类型都是`string`，开发者应该根据实际的情况进行检查和类型转换。另一个参数是搜索参数`quries`，它的类型是`UrlSeachParams`，由于路由匹配并不检查搜索参数的合法性，因此并不进行类型标注，开发者在使用时应当注意到`quries.get`方法取回的值可能为`null`，这需要开发者自行谨慎处理。
 
 下面是一个示例：
 
