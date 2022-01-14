@@ -101,7 +101,7 @@ const reqHandler = shim(async req => {
 |---|---|---|---|
 |`/user/<name>/<filepath>/`|`null`|`null`|`null`|
 |`/user/<name>/<filepath>`|`"docs/index.md"`|`"docs/index.md/"`|`null`|
-|`/user/<name>/<[filepath]>/`|`null`|`doc/index.md`|`null`|
+|`/user/<name>/<[filepath]>/`|`null`|`"doc/index.md"`|`null`|
 |`/user/<name>/[filepath]`|`"docs/index.md"`|`"docs/index.md/"`|`""`|
 
 另一个参数自然是对应的函数`handler`，这个函数有2个参数，其一是根据`pattern`推导出的路由匹配参数`params`，例如上面的例子中，推导出的参数类型为`{name: string, filepath: string}`，所有的路由参数类型都是`string`，开发者应该根据实际的情况进行检查和类型转换。另一个参数是搜索参数`quries`，它的类型是`UrlSeachParams`，由于路由匹配并不检查搜索参数的合法性，因此并不进行类型标注，开发者在使用时应当注意到`quries.get`方法取回的值可能为`null`，这需要开发者自行谨慎处理。
@@ -128,6 +128,8 @@ const result = switcher(url)
 ```
 
 Switcher最终得到的函数和Route实际上是一样的，因此可以逐级将多个Switcher也聚合起来。
+
+> 注意，由于`switcher`的实现使用了`??`运算符（判断匹配失败的依据是路由返回`null`），因此当你需要返回`null`或`undefined`时，必须将其包裹起来，例如`{ value: null }`。
 
 #### 额外参数
 
