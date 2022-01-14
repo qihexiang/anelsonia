@@ -19,39 +19,63 @@ export class Respond implements ResponseProps {
     private _body?: ResponseBody = undefined;
     private _headers: OutgoingHttpHeaders = {};
     /**
-     * Create a response with nothing. This will give you a 404 response.
+     * Create an empty response, default status code is 404.
      */
-    constructor();
+    static create(): Respond;
     /**
-     * Create a response with given response body, default status code would be 200.
+     * Create an empty response with given status code.
      * 
-     * @param body a string, buffer or a readable stream you'd like to respond.
+     * @param code http status code.
      */
-    constructor(body: ResponseBody);
+    static create(code: validHttpStatusCode): Respond;
     /**
-     * Create a response with given response body and specify a http status code
+     * Create a response with given body, default status code is 200.
      * 
-     * @param statusCode the http status code you want.
-     * @param body a string, buffer or a readable stream you'd like to respond.
+     * @param body a string, buffer or stream.
      */
-    constructor(statusCode: validHttpStatusCode, body: ResponseBody);
+    static create(body: ResponseBody): Respond;
     /**
-     * Create a response with given response body, specify a http status code and 
-     * set http headers.
+     * Create a response with given status code and body.
      * 
-     * @param statusCode the http status code you want.
-     * @param body a string, buffer or a readable stream you'd like to respond.
-     * @param headers the http headers you'd like to set.
+     * @param code http status code.
+     * @param body a string, buffer or stream.
      */
-    constructor(statusCode: validHttpStatusCode, body: ResponseBody, ...headers: Partial<OutgoingHttpHeaders>[]);
-    constructor(bodyOrCode?: ResponseBody | validHttpStatusCode, body?: ResponseBody, ...headers: Partial<OutgoingHttpHeaders>[]) {
-        if (body !== undefined) {
-            this._statusCode = bodyOrCode as validHttpStatusCode;
-            this._body = body;
-            if (headers) this._headers = headers.reduce((headers, nextHeaders) => ({ ...headers, ...nextHeaders }), this._headers);
-        } else if (bodyOrCode !== undefined) {
-            this._body = bodyOrCode as ResponseBody;
+    static create(code: validHttpStatusCode, body: ResponseBody): Respond;
+    /**
+     * Create a response with given status code and headers.
+     * 
+     * @param code http status code.
+     * @param headers http headers like `"Content-Type"`.
+     */
+    static create(code: validHttpStatusCode, headers: Partial<OutgoingHttpHeaders>): Respond;
+    /**
+     * Create a response with given body and headers, default status code is 200.
+     * 
+     * @param body a string, buffer or stream.
+     * @param headers http headers like `"Content-Type"`.
+     */
+    static create(body: ResponseBody, headers: Partial<OutgoingHttpHeaders>): Respond;
+    /**
+     * Create a response with given status code, body and http headers.
+     * 
+     * @param code http status code.
+     * @param body a string, buffer or stream.
+     * @param headers http headers like `"Content-Type"`.
+     */
+    static create(code: validHttpStatusCode, body: ResponseBody, headers: Partial<OutgoingHttpHeaders>): Respond;
+    static create(arg1?: validHttpStatusCode | ResponseBody, arg2?: ResponseBody | Partial<OutgoingHttpHeaders>, headers?: Partial<OutgoingHttpHeaders>): Respond {
+        const response = new Respond();
+        if (typeof arg1 === "number") {
+            response.setStatusCode(arg1);
+            if (typeof arg2 === "string" || arg2 instanceof Buffer || arg2 instanceof Stream) response.setBody(arg2);
+            else if (typeof arg2 === "object") response.setHeaders(arg2);
         }
+        if (typeof arg1 === "string" || arg1 instanceof Buffer || arg1 instanceof Stream) {
+            response.setBody(arg1);
+            if (typeof arg2 === "object") response.setHeaders(arg2 as Partial<OutgoingHttpHeaders>);
+        }
+        if (headers) response.setHeaders(headers);
+        return response;
     }
     /**
      * Set status code manually
