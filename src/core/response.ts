@@ -19,6 +19,41 @@ export class Respond implements ResponseProps {
     private _body?: ResponseBody = undefined;
     private _headers: OutgoingHttpHeaders = {};
     /**
+     * Create a response with nothing. This will give you a 404 response.
+     */
+    constructor();
+    /**
+     * Create a response with given response body, default status code would be 200.
+     * 
+     * @param body a string, buffer or a readable stream you'd like to respond.
+     */
+    constructor(body: ResponseBody);
+    /**
+     * Create a response with given response body and specify a http status code
+     * 
+     * @param statusCode the http status code you want.
+     * @param body a string, buffer or a readable stream you'd like to respond.
+     */
+    constructor(statusCode: validHttpStatusCode, body: ResponseBody);
+    /**
+     * Create a response with given response body, specify a http status code and 
+     * set http headers.
+     * 
+     * @param statusCode the http status code you want.
+     * @param body a string, buffer or a readable stream you'd like to respond.
+     * @param headers the http headers you'd like to set.
+     */
+    constructor(statusCode: validHttpStatusCode, body: ResponseBody, ...headers: Partial<OutgoingHttpHeaders>[]);
+    constructor(bodyOrCode?: ResponseBody | validHttpStatusCode, body?: ResponseBody, ...headers: Partial<OutgoingHttpHeaders>[]) {
+        if (body !== undefined) {
+            this._statusCode = bodyOrCode as validHttpStatusCode;
+            this._body = body;
+            if (headers) this._headers = headers.reduce((headers, nextHeaders) => ({ ...headers, ...nextHeaders }), this._headers);
+        } else if (bodyOrCode !== undefined) {
+            this._body = bodyOrCode as ResponseBody;
+        }
+    }
+    /**
      * Set status code manually
      * 
      * @param code a valid http status code
