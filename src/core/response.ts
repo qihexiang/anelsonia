@@ -147,3 +147,7 @@ export class Respond implements ResponseProps {
         return { ...this._headers };
     }
 }
+
+export const createRes = Respond.create
+
+export default createRes
