@@ -4,18 +4,18 @@ export function contentType(mediaType: string, charset?: string) {
     return { "Content-Type": `${getType(mediaType)}${charset ? `; charset=${charset.toUpperCase()}` : ""}` };
 }
 
-// /**
-//  * Specify a content length by a number
-//  * 
-//  * @param length the content-length you want to set. It must be an integer
-//  */
-// export function contentLength(length: number): { "Content-Length"?: number; };
-// /**
-//  * Using size of given string or Buffer as content length
-//  * 
-//  * @param content the content you'd like to response.
-//  */
-// export function contentLength(content: string | Buffer): { "Content-Length": number; };
+/**
+ * Specify a content length by a number
+ * 
+ * @param length the content-length you want to set. It must be an integer
+ */
+export function contentLength(length: number): { "Content-Length"?: number; };
+/**
+ * Using size of given string or Buffer as content length
+ * 
+ * @param content the content you'd like to response.
+ */
+export function contentLength(content: string | Buffer): { "Content-Length": number; };
 export function contentLength(input: number | string | Buffer): { "Content-Length"?: number; } {
     if (typeof input === "number") {
         const check = Number.isInteger(input);

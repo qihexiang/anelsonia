@@ -43,6 +43,8 @@ createServer(http2Options, reqHandler).listen(8081)
 
 上面我们已经构建了一个会返回`nice to meet you`消息的服务器了，但是手动构建一个返回对象是麻烦的，所以我们使用工具组提供的响应工具来构建它。
 
+#### Respond类
+
 ```typescript
 import { Respond } from "anelsonia2/response"
 
@@ -59,7 +61,7 @@ const reqHandler = shim(async req => {
 
 提供了四个`getter`来返回对应的值，它们实现了入口函数需要返回的`ResponseProps`：
 
-- statusCode: 有效的Http状态码
+- statusCode: 有效的HTTP状态码
 - statusMessage: 字符串类型的状态消息
 - body: 字符串或Buffer或可读流的响应主体
 - setHeaders: 响应头
@@ -78,6 +80,25 @@ const reqHandler = shim(async req => {
 3. 未设置状态码时和响应主体时，默认的状态码是404，设置了响应主体后，默认的状态码是200
 4. 未设置状态消息时，它的值会从状态码中推断出来。
 5. 未设置响应主体时，它的值和状态消息相同，响应头会被加入`{"content-type": "text/plain"}`。
+
+#### Respond::create和createRes
+
+当然，更多的时候我们希望用一个函数就能够构建好`ResponseProps`，此处也提供了对`Respond`类的额外创建方法：`Respond.create()`函数，它也使用`createRes`的名称导出，且是`anelsonia2/core/response`的默认导出。该函数提供了6个重载，请参见API文档中的相关内容：<https://qihexiang.github.io/anelsonia/classes/Respond.html#create>
+
+该函数提供的多种重载能让人较为舒适地创建`Respond`。
+
+> API文档无法自动地为createRes转发函数注释文档，但是在IDE中一般会正常显示。
+
+例子：
+
+```js
+createRes() // 404 response
+createRes("hello, world") // response body
+createRes(500) // status code
+create(302, "/login") // status code and body
+create(200, {"Server": "anelsonia2"}) // status code and headers
+createRes(206, partialStream, headers) // status code, body and headers
+```
 
 ### 路由
 
@@ -141,7 +162,7 @@ import DB from "./data/IO"
 const db = new DB();
 
 function main(req: Request) {
-    const result = await createRoute("/api/<options>", ({options}, queries) => apiRouteHandler(options, queries, {req, db}))
+    const result = await createRoute("/api/<options>", ({options}, queries) => apiRouteHandler(options, queries, {req, db}))(req.url)
     return result
 }
 ```
@@ -158,7 +179,7 @@ import DB from "./data/IO"
 const db = new DB();
 
 function main(req: Request) {
-    const result = await apiRoute(req.url, {req, db})
+    const route = await apiRoute(req.url, {req, db})
     return result
 }
 ```
