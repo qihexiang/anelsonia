@@ -105,7 +105,7 @@
 <tr>
 <td><code>/user/&lt;name&gt;/&lt;[filepath]&gt;/</code></td>
 <td><code>null</code></td>
-<td><code>doc/index.md</code></td>
+<td><code>&quot;doc/index.md&quot;</code></td>
 <td><code>null</code></td>
 </tr>
 <tr>
@@ -131,6 +131,9 @@
 <pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">switcher</span><span class="hl-1"> = </span><span class="hl-3">createSwitcher</span><span class="hl-1">(</span><span class="hl-6">route1</span><span class="hl-1">, </span><span class="hl-6">route2</span><span class="hl-1">, </span><span class="hl-6">route3</span><span class="hl-1">, </span><span class="hl-6">route4</span><span class="hl-1">, </span><span class="hl-6">route5</span><span class="hl-1">, </span><span class="hl-6">route6</span><span class="hl-1">)</span><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">result</span><span class="hl-1"> = </span><span class="hl-3">switcher</span><span class="hl-1">(</span><span class="hl-6">url</span><span class="hl-1">)</span>
 </code></pre>
 <p>Switcher最终得到的函数和Route实际上是一样的，因此可以逐级将多个Switcher也聚合起来。</p>
+<blockquote>
+<p>注意，由于<code>switcher</code>的实现使用了<code>??</code>运算符（判断匹配失败的依据是路由返回<code>null</code>），因此当你需要返回<code>null</code>或<code>undefined</code>时，必须将其包裹起来，例如<code>{ value: null }</code>。</p>
+</blockquote>
 
 <a href="#额外参数" id="额外参数" style="color: inherit; text-decoration: none;">
   <h4>额外参数</h4>
