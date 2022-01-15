@@ -22,7 +22,7 @@ npm install anelsonia2
 需要使用`shim`来将入口函数`EntryPoint`转换为`createServer`或`createSecureServer`的处理器函数的函数，这个函数在`anelsonia2/core`中。
 
 ```typescript
-import { shim } from "anelsonia2/core"
+import { shim } from "anelsonia2"
 import { createServer } from "http"
 import { createSecureServer } from "http2"
 
@@ -46,7 +46,7 @@ createServer(http2Options, reqHandler).listen(8081)
 #### Respond类
 
 ```typescript
-import { Respond } from "anelsonia2/response"
+import { shim, Respond } from "anelsonia2"
 
 const reqHandler = shim(async req => {
     return new Responsd()
@@ -83,7 +83,7 @@ const reqHandler = shim(async req => {
 
 #### Respond::create和createRes
 
-当然，更多的时候我们希望用一个函数就能够构建好`ResponseProps`，此处也提供了对`Respond`类的额外创建方法：`Respond.create()`函数，它也使用`createRes`的名称导出，且是`anelsonia2/core/response`的默认导出。该函数提供了6个重载，请参见API文档中的相关内容：<https://qihexiang.github.io/anelsonia/classes/Respond.html#create>
+当然，更多的时候我们希望用一个函数就能够构建好`ResponseProps`，此处也提供了对`Respond`类的额外创建方法：`Respond.create()`函数，它也使用`createRes`的名称导出，且是`anelsonia2/core/response`的默认导出。该函数提供了7个重载，请参见API文档中的相关内容：<https://qihexiang.github.io/anelsonia/classes/Respond.html#create>
 
 该函数提供的多种重载能让人较为舒适地创建`Respond`。
 
@@ -92,11 +92,14 @@ const reqHandler = shim(async req => {
 例子：
 
 ```js
+import { createRes } from "anelsonia2"
+
 createRes() // 404 response
 createRes("hello, world") // response body
 createRes(500) // status code
 create(302, "/login") // status code and body
 create(200, {"Server": "anelsonia2"}) // status code and headers
+create("hello, world", {"Content-Type": "text/plain charset=UTF-8"}) // body and headers
 createRes(206, partialStream, headers) // status code, body and headers
 ```
 
@@ -130,6 +133,8 @@ createRes(206, partialStream, headers) // status code, body and headers
 下面是一个示例：
 
 ```js
+import { createRoute } from "anelsonia2" 
+
 const route = createRoute('/user/<username>/<filepath>', async ({username, filepath}, queries) 
     => JSON.stringify(await readDir(username, filepath)))
 const result = await route(url)
@@ -144,6 +149,7 @@ const result = await route(url)
 方式如下：
 
 ```js
+import { createSwitcher } from "anelsonia2"
 const switcher = createSwitcher(route1, route2, route3, route4, route5, route6)
 const result = switcher(url)
 ```
@@ -193,6 +199,8 @@ function main(req: Request) {
 例子如下，有若干已经定义好的`handler`，其中一些返回是异步的（`Promise`）。
 
 ```js
+import { createSwRt } from "anelsonia2"
+
 async function main(req) {
     const { switcher } = createSwRt()
         .route("/user/<username>/<rest>", infoHandler)
@@ -213,6 +221,8 @@ async function main(req) {
 上述的路由匹配模式只能支持URL的路径匹配，但实际上我们还会根据一些具体的情况，例如请求的方法、可枚举的具体路径参数等进行请求分流，这些情况一般需要精确匹配字符串。这使用上面的函数并不容易实现，或者显得更加麻烦，因此提供了一个`condition`函数，以链试调用的方式来实现类似与switch语法的功能，可以看作是一个带有返回值的switch块。
 
 ```js
+import { condition } from "anelsonia2"
+
 const { result } = condition(req.method)
     .match('GET', () => getSw(req.url))
     .match(['POST','PUT'], () => uploadSw(req.url, req))
