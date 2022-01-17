@@ -235,6 +235,67 @@ const { result } = condition(req.method)
 
 ### 工具组件
 
-#### Http状态码
+#### composeFn函数组合器
 
-查询状态码对应的状态消息，是`Respond`推断未设置的类型消息，限制statusCode范围的依据的依据。一般应该用不着。
+提供了一个用于组合函数的组合函数`composFn`。举例说明：
+
+```ts
+import { composeFn } from "anelsonia2";
+
+const { fn } = composeFn((x: number) => x + 1)
+    .next(x => Math.pow(x, 2))
+    .next(x => `The final value is ${x}`);
+
+console.log(fn(2)); // The final value is 9
+```
+
+执行的顺序是显而易见的，前一个函数的计算结果是后一个函数的入参。
+
+你使用的IDE可能会提醒你，这个函数还有一个额外的重载，你可以在`composeFn`中填入两个参数：
+
+```ts
+import { composeFn } from "anelsonia2";
+
+const { fn } = composeFn(x => Math.pow(x, 2), (x: number) => x + 1)
+    .next(x => `The final value is ${x}`);
+
+console.log(fn(2)); // The final value is 9
+```
+
+你可以注意到第二个函数需要类型标注而第一个并不需要，这是因为`composeFn`的第一个参数是第二个执行的函数，第二个参数是第一个执行的函数。这个怪异的设计是为了`composeFn`实现的简便设计的，这个重载也仅仅是为了内部使用，在一般情况下，你不应该使用它。
+
+#### createWrapper生成包装器
+
+Koa和Express等框架都提供了洋葱模型，它们在一些情景下非常有用，例如记录处理请求花费的时间。我也提供了一个类似的方式来包裹请求处理逻辑，这就是`createWrapper`函数。以时间记录和全局禁用`Keep-Alive`属性为例：
+
+```ts
+import { createWrapper } from "anelsonia2";
+
+const timeMeasure = createWrapper<AnelsoniaReq, Date, AsyncResponse>(
+    () => new Date(),
+    async (start, res, req) => {
+        console.log(`${start.toLocaleString()} ${req.method} ${req.url} ${(await res).statusCode} ${new Date().getTime() - start.getTime()}ms`);
+        return res;
+    }
+);
+
+const disableKeepAlive = createWrapper<AnelsoniaReq, void, Promise<Respond | ResponseProps>>(
+    () => { },
+    async (_, res) => {
+        const response = await res;
+        if (response instanceof Respond) response.setHeaders({ "Keep-Alive": "false" });
+        else response.headers = { ...response.headers, "Keep-Alive": "false" };
+        return response;
+    }
+);
+
+createServer(
+    shim(
+        timeMeasure(
+            disableKeepAlive(
+                main
+            )
+        )
+    )
+).listen(8000)
+```

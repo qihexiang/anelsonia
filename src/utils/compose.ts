@@ -8,7 +8,7 @@ export interface Composer<T, R> {
  * 
  * @param nextFn a function that receive one value of type T and return a value of type R.
  */
-export function composer<T, R>(firstFn: (t: T) => R): Composer<T, R>;
+export function composeFn<T, R>(firstFn: (t: T) => R): Composer<T, R>;
 /**
  * This overload is designed for internal using, two parameters are the next function
  * and the first function. If you'd like to compose just 2 functions it's no problem using
@@ -20,8 +20,8 @@ export function composer<T, R>(firstFn: (t: T) => R): Composer<T, R>;
  * @param nextFn the function to be called later, receives T and return R
  * @param lastFn the function to be called earlier, receives P and return T
  */
-export function composer<T, R, P>(nextFn: (t: T) => R, lastFn: (p: P) => T): Composer<P, R>;
-export function composer<T, R, P>(nextFn: (t: T) => R, lastFn?: ((p: P) => T) | undefined) {
+export function composeFn<T, R, P>(nextFn: (t: T) => R, lastFn: (p: P) => T): Composer<P, R>;
+export function composeFn<T, R, P>(nextFn: (t: T) => R, lastFn?: ((p: P) => T) | undefined) {
     if (lastFn === undefined) {
         /**
          * Add another function which receive parameter of type R and return a value of type V.
@@ -32,7 +32,7 @@ export function composer<T, R, P>(nextFn: (t: T) => R, lastFn?: ((p: P) => T) | 
          * @returns an object implements Composer<T,V>, T is the first function's parameter type,
          * V is current function's return type, or next function's parameter type.
          */
-        const next = <V>(anotherFn: (t: R) => V) => composer(anotherFn, nextFn);
+        const next = <V>(anotherFn: (t: R) => V) => composeFn(anotherFn, nextFn);
         return {
             fn: nextFn, next
         };
@@ -47,7 +47,7 @@ export function composer<T, R, P>(nextFn: (t: T) => R, lastFn?: ((p: P) => T) | 
      * @returns an object implements Composer<T,V>, T is the first function's parameter type,
      * V is current function's return type, or next function's parameter type.
      */
-    const next = <V>(anotherFn: (r: R) => V) => composer(anotherFn, fn);
+    const next = <V>(anotherFn: (r: R) => V) => composeFn(anotherFn, fn);
     return {
         fn, next
     };
