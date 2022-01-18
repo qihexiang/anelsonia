@@ -266,79 +266,28 @@ console.log(fn(2)); // The final value is 9
 
 #### createWrapper生成包装器
 
-Koa和Express等框架都提供了洋葱模型，它们在一些情景下非常有用，例如记录处理请求花费的时间。我也提供了一个类似的方式来包裹请求处理逻辑，这就是`createWrapper`函数。以时间记录和全局禁用`Keep-Alive`属性为例：
+使用createWrapper可以创建函数的包装器，被包装器包装的函数会在原始函数执行前后进行一些额外的操作，这些操作并不影响原始函数的输入输出。（若要修改原始函数的输入输出，你应该自行创建函数包装）
+
+例子：
 
 ```ts
-import { createWrapper } from "anelsonia2";
-
-const timeMeasure = createWrapper<AnelsoniaReq, Date, AsyncResponse>(
-    () => new Date(),
-    async (start, res, req) => {
-        console.log(`${start.toLocaleString()} ${req.method} ${req.url} ${(await res).statusCode} ${new Date().getTime() - start.getTime()}ms`);
-        return res;
-    }
-);
-
-const disableKeepAlive = createWrapper<AnelsoniaReq, void, AsyncResponse>(
-    () => { },
-    async (_, res) => {
-        const response = await res;
-        if (response instanceof Respond) response.setHeaders({ "Keep-Alive": "false" });
-        else response.headers = { ...response.headers, "Keep-Alive": "false" };
-        return response;
+const timeMeasure = createWrapper<HttpReq, AsyncResponse>(
+    req => {
+        const start = new Date();
+        return async res => console.log(`${start.toLocaleString()} ${req.method} ${req.url} \
+        ${(await res).statusCode} ${new Date().getTime() - start.getTime()}ms`);
     }
 );
 
 createServer(
-    shim(
+    shimHTTP(
         timeMeasure(
-            disableKeepAlive(
-                main
-            )
+            main
         )
     )
-).listen(8000)
+).listen(8000);
 ```
 
-最后这一段代码即对入口函数`main`的包裹。如果你的包裹器很多，你可以尝试使用`composeFn`来连接他们，来避免被苏联间谍偷走大量的右括号：
+`createWrapper`接受一个参数`hook`函数，该函数以原始参数的入参为入参在原始函数执行前执行，它应该返回另一个函数，被返回的函数在原始函数执行后执行，它以原始函数的输出为输入。
 
-```ts
-const { fn: wrapper } = composeFn(disableKeepAlive)
-    .next(timeMeasure)
-    // shim和createServer函数也可以一并放进来
-    .next(shim)
-    .next(createServer)
-
-wrapper(main).listen(8000)
-```
-
-此外，受到useEffect API的启发，也可以这样创建wrapper：
-
-```ts
-const timeMeasure = createWrapper<AnelsoniaReq, AsyncResponse>(
-    (req) => {
-        const start = new Date();
-        return async (res) => {
-            console.log(`${start.toLocaleString()} ${req.method} ${req.url} ${(await res).statusCode} ${new Date().getTime() - start.getTime()}ms`);
-            return res;
-        };
-    }
-);
-
-const disableKeepAlive = createWrapper<AnelsoniaReq, AsyncResponse>(
-    () => async (res) => {
-        const response = await res;
-        if (response instanceof Respond) response.setHeaders({ "Keep-Alive": "false" });
-        else response.headers = { ...response.headers, "Keep-Alive": "false" };
-        return response;
-    }
-);
-```
-
-此处不再需要中间变量的类型，前置执行的hook返回了后置执行的hook，你可以在闭包中直接使用前置hook的计算结果以及前置hook的入参，后置hook的参数只剩下了被包裹函数的执行结果。
-
-> 我应该使用`createWrapper`吗？
-> 
-> 在实践中，我们可能会发现，直接编写一个包裹函数的函数比使用createWrapper更加容易（不必填写复杂的泛型类型，不需要手动将前置操作的计算结果打包return）。对于一些特别简单、只使用一次的行为，直接将逻辑写入到要被包装的函数中也并无不可。
->
-> createWrapper只是一个辅助工具，可以帮助开发者进行代码组织，他并不是实现包裹的唯一方式。
+> 当被包裹的函数若返回一个对象，你可能可以使用对象包含的方法来改变对象内的内容，从而改变被包裹函数的返回值，但是请记住，这个方法并不在设计之内，它可能带来不确定的行为。
