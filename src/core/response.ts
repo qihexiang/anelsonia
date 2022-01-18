@@ -2,11 +2,15 @@ import { OutgoingHttpHeaders } from "http";
 import { statusMessage, validHttpStatusCode } from "./http";
 import Stream from "stream";
 
+export type Headers = {
+    [propName: string]: string | number | string[];
+};
+
 export interface ResponseProps {
     statusCode: validHttpStatusCode,
     statusMessage: string,
     body?: ResponseBody,
-    headers: OutgoingHttpHeaders;
+    headers: Headers;
 }
 
 export type ResponseBody = string | Buffer | Stream;
@@ -17,7 +21,7 @@ export class Respond implements ResponseProps {
     private _statusCode?: validHttpStatusCode = undefined;
     private _statusMessage?: string = undefined;
     private _body?: ResponseBody = undefined;
-    private _headers: OutgoingHttpHeaders = {};
+    private _headers: Headers = {};
     /**
      * Create an empty response, default status code is 404.
      */
@@ -47,14 +51,14 @@ export class Respond implements ResponseProps {
      * @param code http status code.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(code: validHttpStatusCode, headers: Partial<OutgoingHttpHeaders>): Respond;
+    static create(code: validHttpStatusCode, headers: Headers): Respond;
     /**
      * Create a response with given body and headers, default status code is 200.
      * 
      * @param body a string, buffer or stream.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(body: ResponseBody, headers: Partial<OutgoingHttpHeaders>): Respond;
+    static create(body: ResponseBody, headers: Headers): Respond;
     /**
      * Create a response with given status code, body and http headers.
      * 
@@ -62,8 +66,8 @@ export class Respond implements ResponseProps {
      * @param body a string, buffer or stream.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(code: validHttpStatusCode, body: ResponseBody, headers: Partial<OutgoingHttpHeaders>): Respond;
-    static create(arg1?: validHttpStatusCode | ResponseBody, arg2?: ResponseBody | Partial<OutgoingHttpHeaders>, headers?: Partial<OutgoingHttpHeaders>): Respond {
+    static create(code: validHttpStatusCode, body: ResponseBody, headers: Headers): Respond;
+    static create(arg1?: validHttpStatusCode | ResponseBody, arg2?: ResponseBody | Headers, headers?: Headers): Respond {
         const response = new Respond();
         if (typeof arg1 === "number") {
             response.setStatusCode(arg1);
@@ -72,7 +76,7 @@ export class Respond implements ResponseProps {
         }
         if (typeof arg1 === "string" || arg1 instanceof Buffer || arg1 instanceof Stream) {
             response.setBody(arg1);
-            if (typeof arg2 === "object") response.setHeaders(arg2 as Partial<OutgoingHttpHeaders>);
+            if (typeof arg2 === "object") response.setHeaders(arg2 as Headers);
         }
         if (headers) response.setHeaders(headers);
         return response;
@@ -139,15 +143,15 @@ export class Respond implements ResponseProps {
      * @param headers HTTP headers.
      * @returns this instance it self.
      */
-    setHeaders(...headers: Partial<OutgoingHttpHeaders>[]): Respond {
+    setHeaders(...headers: Headers[]): Respond {
         this._headers = { ...this._headers, ...headers.reduce((pre, cur) => ({ ...pre, ...cur }), {}) };
         return this;
     }
-    get headers(): OutgoingHttpHeaders {
-        return { ...this._headers };
+    get headers(): Headers {
+        return this._headers;
     }
 }
 
-export const createRes = Respond.create
+export const createRes = Respond.create;
 
-export default createRes
+export default createRes;

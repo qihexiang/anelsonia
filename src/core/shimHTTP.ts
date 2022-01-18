@@ -2,14 +2,14 @@ import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
-import { ResponseProps } from "./response";
+import { ResponseProps, AsyncResponse } from "./response";
 
-export type AnelsoniaReq = IncomingMessage | Http2ServerRequest;
-export type AnelsoniaRes = ServerResponse | Http2ServerResponse;
-export type ReqHandler = (req: AnelsoniaReq, res: AnelsoniaRes) => void;
-export type EntryPoint = (req: AnelsoniaReq) => ResponseProps | Promise<ResponseProps>;
+export type HttpReq = IncomingMessage | Http2ServerRequest;
+export type HttpRes = ServerResponse | Http2ServerResponse;
+export type ReqHandler = (req: HttpReq, res: HttpRes) => void;
+type EntryPoint = (req: HttpReq) => AsyncResponse;
 
-export function shim(entry: EntryPoint): ReqHandler {
+export function shimHTTP(entry: EntryPoint): ReqHandler {
     return async (req, res) => {
         const { statusCode, statusMessage, body, headers } = await entry(req);
         if (res instanceof IncomingMessage) res.writeHead(statusCode, statusMessage, headers);
