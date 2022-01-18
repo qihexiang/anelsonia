@@ -312,6 +312,31 @@ const { fn: wrapper } = composeFn(disableKeepAlive)
 wrapper(main).listen(8000)
 ```
 
+此外，受到useEffect API的启发，也可以这样创建wrapper：
+
+```ts
+const timeMeasure = createWrapper<AnelsoniaReq, AsyncResponse>(
+    (req) => {
+        const start = new Date();
+        return async (res) => {
+            console.log(`${start.toLocaleString()} ${req.method} ${req.url} ${(await res).statusCode} ${new Date().getTime() - start.getTime()}ms`);
+            return res;
+        };
+    }
+);
+
+const disableKeepAlive = createWrapper<AnelsoniaReq, AsyncResponse>(
+    () => async (res) => {
+        const response = await res;
+        if (response instanceof Respond) response.setHeaders({ "Keep-Alive": "false" });
+        else response.headers = { ...response.headers, "Keep-Alive": "false" };
+        return response;
+    }
+);
+```
+
+此处不再需要中间变量的类型，前置执行的hook返回了后置执行的hook，你可以在闭包中直接使用前置hook的计算结果以及前置hook的入参，后置hook的参数只剩下了被包裹函数的执行结果。
+
 > 我应该使用`createWrapper`吗？
 > 
 > 在实践中，我们可能会发现，直接编写一个包裹函数的函数比使用createWrapper更加容易（不必填写复杂的泛型类型，不需要手动将前置操作的计算结果打包return）。对于一些特别简单、只使用一次的行为，直接将逻辑写入到要被包装的函数中也并无不可。
