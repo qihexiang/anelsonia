@@ -279,7 +279,7 @@ const timeMeasure = createWrapper<AnelsoniaReq, Date, AsyncResponse>(
     }
 );
 
-const disableKeepAlive = createWrapper<AnelsoniaReq, void, Promise<Respond | ResponseProps>>(
+const disableKeepAlive = createWrapper<AnelsoniaReq, void, AsyncResponse>(
     () => { },
     async (_, res) => {
         const response = await res;
