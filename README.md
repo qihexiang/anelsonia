@@ -299,3 +299,21 @@ createServer(
     )
 ).listen(8000)
 ```
+
+最后这一段代码即对入口函数`main`的包裹。如果你的包裹器很多，你可以尝试使用`composeFn`来连接他们，来避免被苏联间谍偷走大量的右括号：
+
+```ts
+const { fn: wrapper } = composeFn(disableKeepAlive)
+    .next(timeMeasure)
+    // shim和createServer函数也可以一并放进来
+    .next(shim)
+    .next(createServer)
+
+wrapper(main).listen(8000)
+```
+
+> 我应该使用`createWrapper`吗？
+> 
+> 在实践中，我们可能会发现，直接编写一个包裹函数的函数比使用createWrapper更加容易（不必填写复杂的泛型类型，不需要手动将前置操作的计算结果打包return）。对于一些特别简单、只使用一次的行为，直接将逻辑写入到要被包装的函数中也并无不可。
+>
+> createWrapper只是一个辅助工具，可以帮助开发者进行代码组织，他并不是实现包裹的唯一方式。
