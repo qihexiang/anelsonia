@@ -52,3 +52,5 @@ export function composeFn<T, R, P>(nextFn: (t: T) => R, lastFn?: ((p: P) => T) |
         fn, next
     };
 }
+
+export default composeFn

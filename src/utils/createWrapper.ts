@@ -15,3 +15,5 @@ export function createWrapper<P, R>(hook: (p: P) => (r: Readonly<R>) => void): (
         return r;
     };
 }
+
+export default createWrapper;

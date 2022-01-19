@@ -291,3 +291,28 @@ createServer(
 `createWrapper`接受一个参数`hook`函数，该函数以原始参数的入参为入参在原始函数执行前执行，它应该返回另一个函数，被返回的函数在原始函数执行后执行，它以原始函数的输出为输入。
 
 > 当被包裹的函数若返回一个对象，你可能可以使用对象包含的方法来改变对象内的内容，从而改变被包裹函数的返回值，但是请记住，这个方法并不在设计之内，它可能带来不确定的行为。
+
+
+#### createHooks
+
+`createHooks`和`createWrapper`类似，区别在于它的前置hook可以改变原始函数的入参，后置hook会改变原始函数的结果。
+
+其中一个例子是，为所有的请求改变`Keep-Alive`的时长：
+
+```ts
+import { createHooks } from "anelsonia2";
+
+const keepAlive = (timeout: number) => createHooks<HttpReq, AsyncResponse>(
+    req => [req, async res => {
+        const response = await res;
+        if (response instanceof Respond) response.setHeaders({ "Keep-Alive": `timeout=${timeout}` });
+        else response.headers = { ...response.headers, "Keep-Alive": `timeout=${timeout}` };
+        return response;
+    }]
+);
+```
+
+`createHooks`的`hook`参数接收原始函数的参数，并返回一个二元组：
+
+- 第一个元素是要用于原始函数的输入，如果不需要修改，就直接返回输入参数即可；
+- 第二个元素是后置hook，它接受原始函数的，并加以操作后返回相同类型的值。
