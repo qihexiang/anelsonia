@@ -7,12 +7,12 @@
  * return value
  * @returns a hooker.
  */
- export function createHooks<P, R>(hook: (p: P) => [P, (r: R, p: P) => R]): (fn: (p: P) => R) => (p: P) => R {
-    return fn => preP => {
-        const [p, after] = hook(preP);
-        const r = fn(p);
-        return after(r, p);
+export function createHooks<F extends (...args: any[]) => any>(hook: (...args: Parameters<F>) => [Parameters<F>, (r: ReturnType<F>) => ReturnType<F>]): (fn: (...args: Parameters<F>) => ReturnType<F>) => (...args: Parameters<F>) => ReturnType<F> {
+    return fn => (...args) => {
+        const [p, after] = hook(...args);
+        const r = fn(...p);
+        return after(r);
     };
 }
 
-export default createHooks
+export default createHooks;
