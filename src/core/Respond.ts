@@ -1,4 +1,5 @@
 import { statusMessage, validHttpStatusCode } from "./http";
+import MaybePromise from "../utils/MaybePromise"
 import Stream from "stream";
 
 export type Headers = {
@@ -14,7 +15,7 @@ export interface ResponseProps {
 
 export type ResponseBody = string | Buffer | Stream;
 
-export type AsyncResponse = ResponseProps | Promise<ResponseProps>;
+export type AsyncResponse = MaybePromise<ResponseProps>;
 
 export class Respond implements ResponseProps {
     private _statusCode?: validHttpStatusCode = undefined;
