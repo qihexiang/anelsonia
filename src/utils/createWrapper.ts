@@ -1,18 +1,19 @@
 /**
- * Create a hook executed before wrapped function and return a hook
- * executed after wrapped function. Wrapper would not change the 
- * input and output of the original function
+ * Create hooks for a function, which you can change argument passed
+ * to original function in before hook, and change the return value
+ * of original function.
  * 
- * @param hook a function that receive wrapped function's parameter
- * and executed before it, then return a hook function executed after
- * the wrapped function. 
+ * @param hook a hook function execute before original function,
+ * and modify input parameter to original function, and return a
+ * hook function execute after original function to modify the 
+ * return value
+ * @returns a hooker.
  */
-export function createWrapper<F extends (...args: any) => any>(hook: (...args: Parameters<F>) => (r: Readonly<ReturnType<F>>) => void): (fn: (...args: Parameters<F>) => ReturnType<F>) => (...args: Parameters<F>) => ReturnType<F> {
-    return fn => (...p) => {
-        const hookAfter = hook(...p);
+export function createWrapper<O extends (...args: any[]) => any, N extends (...args: any[]) => any = O>(hook: (...args: Parameters<N>) => [Parameters<O>, (r: ReturnType<O>) => ReturnType<N>]): (fn: (...args: Parameters<O>) => ReturnType<O>) => (...args: Parameters<N>) => ReturnType<N> {
+    return fn => (...args) => {
+        const [p, after] = hook(...args);
         const r = fn(...p);
-        hookAfter(r);
-        return r;
+        return after(r);
     };
 }
 
