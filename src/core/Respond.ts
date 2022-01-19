@@ -1,4 +1,4 @@
-import { statusMessage, validHttpStatusCode } from "anelsonia2/src/core/http";
+import { statusMessage, validHttpStatusCode } from "./http";
 import Stream from "stream";
 
 export type Headers = {
