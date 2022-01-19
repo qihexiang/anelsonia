@@ -1,3 +1,4 @@
+import MaybePromise from "./MaybePromise";
 /**
  * Create hooks for a function, which you can change argument passed
  * to original function in before hook, and change the return value
@@ -9,11 +10,11 @@
  * return value
  * @returns a hooker.
  */
-export function createWrapper<O extends (...args: any[]) => any, N extends (...args: any[]) => any = O>(hook: (...args: Parameters<N>) => [Parameters<O>, (r: ReturnType<O>) => ReturnType<N>]): (fn: (...args: Parameters<O>) => ReturnType<O>) => (...args: Parameters<N>) => ReturnType<N> {
+export function createWrapper<O extends (...args: any[]) => any, N extends (...args: any[]) => any = O>(hook: (...args: Parameters<N>) => [MaybePromise<Parameters<O>>, (r: ReturnType<O>) => ReturnType<N>]): (fn: (...args: Parameters<O>) => ReturnType<O>) => (...args: Parameters<N>) => MaybePromise<ReturnType<N>> {
     return fn => (...args) => {
         const [p, after] = hook(...args);
-        const r = fn(...p);
-        return after(r);
+        if (p instanceof Promise) return p.then(p => after(fn(...p)));
+        return after(fn(...p));
     };
 }
 

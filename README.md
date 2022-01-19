@@ -264,18 +264,21 @@ console.log(fn(2)); // The final value is 9
 
 你可以注意到第二个函数需要类型标注而第一个并不需要，这是因为`composeFn`的第一个参数是第二个执行的函数，第二个参数是第一个执行的函数。这个怪异的设计是为了`composeFn`实现的简便设计的，这个重载也仅仅是为了内部使用，在一般情况下，你不应该使用它。
 
-#### createWrapper生成包装器
+#### createEffect附加钩子
 
-使用createWrapper可以创建函数的包装器，被包装器包装的函数会在原始函数执行前后进行一些额外的操作，这些操作并不影响原始函数的输入输出。（若要修改原始函数的输入输出，你应该自行创建函数包装）
+使用`createEffect<F>`可以创建函数的包装器，被包装器包装的函数会在原始函数执行前后进行一些额外的操作，这些操作并不影响原始函数的输入输出。其泛型类型`F`是要包裹的函数的类型，例如`(req: HttpReq) => AsyncResponse`，如果要包裹函数在定义域内，直接使用`typeof functionName`获得类型即可。
 
 例子：
 
 ```ts
-const timeMeasure = createWrapper<HttpReq, AsyncResponse>(
+const timeMeasure = createEffect<typeof main>(
     req => {
         const start = new Date();
-        return async res => console.log(`${start.toLocaleString()} ${req.method} ${req.url} \
-        ${(await res).statusCode} ${new Date().getTime() - start.getTime()}ms`);
+        return async res => {
+            console.log(
+                `${start.toLocaleString()} ${req.method} ${req.url} ${(await res).statusCode} ${new Date().getTime() - start.getTime()}ms`
+            );
+        };
     }
 );
 
@@ -293,17 +296,19 @@ createServer(
 > 当被包裹的函数若返回一个对象，你可能可以使用对象包含的方法来改变对象内的内容，从而改变被包裹函数的返回值，但是请记住，这个方法并不在设计之内，它可能带来不确定的行为。
 
 
-#### createHooks
+#### createWrapper
 
-`createHooks`和`createWrapper`类似，区别在于它的前置hook可以改变原始函数的入参，后置hook会改变原始函数的结果。
+`createWrapper`和`createEffect`类似，区别在于它的前置hook可以改变原始函数的入参，后置hook会改变原始函数的结果。
 
-其中一个例子是，为所有的请求改变`Keep-Alive`的时长：
+`createWrapper<O, N>`有两个泛型参数，参数`O`是原始函数的类型，参数`N`是包装后目标函数的类型，`N`的默认值是`O`。
+
+其中一个例子是，为所有的请求改变`Keep-Alive`的时长为1s：
 
 ```ts
 import { createHooks } from "anelsonia2";
 
-const keepAlive = (timeout: number) => createHooks<HttpReq, AsyncResponse>(
-    req => [req, async res => {
+const keepAlive = (timeout: number) => createHooks<typeof main>(
+    req => [[req], async res => {
         const response = await res;
         if (response instanceof Respond) response.setHeaders({ "Keep-Alive": `timeout=${timeout}` });
         else response.headers = { ...response.headers, "Keep-Alive": `timeout=${timeout}` };
@@ -312,7 +317,38 @@ const keepAlive = (timeout: number) => createHooks<HttpReq, AsyncResponse>(
 );
 ```
 
-`createHooks`的`hook`参数接收原始函数的参数，并返回一个二元组：
+`createWrapper`的`hook`参数接收目标函数需要的参数，返回一个二元组：
 
-- 第一个元素是要用于原始函数的输入，如果不需要修改，就直接返回输入参数即可；
-- 第二个元素是后置hook，它接受原始函数的，并加以操作后返回相同类型的值。
+- 第一个元素是原始函数的参数，用数组的形式提供；
+- 第二个元素是一个函数，在原始函数执行后，接受其返回值执行，并返回目标函数的返回值。
+
+如果目标函数和原始函数类型一致，则无需声明泛型`N`的具体类型，若不是，则需要单独声明：
+
+```ts
+const square = createWrapper<typeof Math.pow, (x: number) => string>(
+    x => [[x, 2], String]
+)(Math.pow);
+
+const result = square(2);
+
+console.log(typeof result, result); // -> string 4
+```
+
+若原始函数需要的一些输入值需要异步取得，但是原始函数的入参并非Promise类型，可以在前置hook中使用`Promise.all`方法来处理，例如：
+
+```ts
+import { readdir } from "fs/promises";
+
+function stringArray(list: string[], limit: number) {
+    return JSON.stringify(list.slice(0, limit));
+}
+
+const wrapped = createWrapper<typeof stringArray, () => string>(
+    () => {
+        const list = readdir("./");
+        return [Promise.all([list, 10]), r => r];
+    }
+);
+```
+
+`Promise.all`会返回一个由参数组成的`Promise`包裹数组，`createWrapper`内部会等待其resolve后再执行原始函数。需要注意的是，当你使用了异步量时，目标函数的返回值也会是异步的`Promise`结果，和`N`泛型类型并不完全一致。
