@@ -1,5 +1,5 @@
 import { Context } from "koa";
-import { AsyncResponse } from "anelsonia2/src/core/Respond";
+import { AsyncResponse } from "./Respond";
 
 type KoaEntryPoint = (ctx: Context) => AsyncResponse;
 
