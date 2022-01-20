@@ -233,9 +233,7 @@ const { result } = condition(req.method)
 
 > 注意，由于此处做了变量解构，不能在`condition`前直接使用`await`来处理异步的`result`，你需要在之后使用`result`是写作`await result`。
 
-### 工具组件
-
-#### composeFn函数组合器
+### composeFn函数组合器
 
 提供了一个用于组合函数的组合函数`composFn`。举例说明：
 
@@ -264,11 +262,28 @@ console.log(fn(2)); // The final value is 9
 
 你可以注意到第二个函数需要类型标注而第一个并不需要，这是因为`composeFn`的第一个参数是第二个执行的函数，第二个参数是第一个执行的函数。这个怪异的设计是为了`composeFn`实现的简便设计的，这个重载也仅仅是为了内部使用，在一般情况下，你不应该使用它。
 
-#### createEffect附加钩子
+### createEffect附加钩子
 
-使用`createEffect<F>`可以创建函数的包装器，被包装器包装的函数会在原始函数执行前后进行一些额外的操作，这些操作并不影响原始函数的输入输出。其泛型类型`F`是要包裹的函数的类型，例如`(req: HttpReq) => AsyncResponse`，如果要包裹函数在定义域内，直接使用`typeof functionName`获得类型即可。
+在Koa和Express中，洋葱模型和中间件是非常重要的概念，其作用在于提供了简便的请求前处理和后处理方式。作为一个函数库，Anelsonia2不能直接提供这样的功能，但是提供了一种创建函数包装的方式。
 
-例子：
+第一种方式是`createEffect`，它用于在函数执行前后产生副作用。`createEffect`创建的包裹不会改变原始函数的输入输出。例如，我们有一个这样的核心逻辑函数：
+
+```ts
+const main = async (req: HttpReq, body?: Buffer) => {
+    const { switcher } = createSwRt<AsyncResponse>()
+        .route("/hello/<yourname>/", helloWorld)
+        .route("/list/[dirpath]", ls)
+        .route("/download/[filepath]", (p, q) => download(p, q, req))
+        .route("/data/", () => {
+            console.log(body?.toString());
+            return createRes(200);
+        });
+    const response = await switcher(req.url ?? "/") ?? createRes(404, "No route matched.");
+    return response;
+};
+```
+
+要输出一个请求处理用时：
 
 ```ts
 const timeMeasure = createEffect<typeof main>(
@@ -282,27 +297,24 @@ const timeMeasure = createEffect<typeof main>(
     }
 );
 
-createServer(
-    shimHTTP(
-        timeMeasure(
-            main
-        )
-    )
-).listen(8000);
+const newFn = timeMeasure(main)
 ```
 
-`createWrapper`接受一个参数`hook`函数，该函数以原始参数的入参为入参在原始函数执行前执行，它应该返回另一个函数，被返回的函数在原始函数执行后执行，它以原始函数的输出为输入。
+`newFn`就是包装后的函数。
 
-> 当被包裹的函数若返回一个对象，你可能可以使用对象包含的方法来改变对象内的内容，从而改变被包裹函数的返回值，但是请记住，这个方法并不在设计之内，它可能带来不确定的行为。
+我们在`createEffect`时，制定了被包裹函数的类型作为实例化泛型，然后传入了hook参数，这个函数在被包裹函数执行前运行，称为`beforeEffect`，返回一个函数，在被包裹函数执行后执行，称为`afterEffect`。
 
+`beforeEffect`必须是同步的（返回一个可以立即执行的函数），而`afterEffect`可以是异步的。
 
-#### createWrapper
+> `createEffect`设计上不让两个Effect函数修改输入输出，但是基于动态语言的特性，其实你可以做到这一点，但这是不推荐的。`createWrapper`函数是解决这一问题的正解。
 
-`createWrapper`和`createEffect`类似，区别在于它的前置hook可以改变原始函数的入参，后置hook会改变原始函数的结果。
+### createWrapper
 
-`createWrapper<O, N>`有两个泛型参数，参数`O`是原始函数的类型，参数`N`是包装后目标函数的类型，`N`的默认值是`O`。
+`createWrapper`和`createEffect`类似，区别在于它的`beforeHook`可以改变原始函数的入参，`afterHook`会改变原始函数的结果。
 
-其中一个例子是，为所有的请求改变`Keep-Alive`的时长为1s：
+`createWrapper<O, T>`有两个泛型参数，参数`O`是原始函数的类型，参数`N`是包装后目标函数的类型，`T`的默认值是`O`。
+
+其中一个例子是，为所有的请求改变`Keep-Alive`的时长：
 
 ```ts
 import { createHooks } from "anelsonia2";
@@ -334,21 +346,9 @@ const result = square(2);
 console.log(typeof result, result); // -> string 4
 ```
 
-若原始函数需要的一些输入值需要异步取得，但是原始函数的入参并非Promise类型，可以在前置hook中使用`Promise.all`方法来处理，例如：
+在实际使用中，同步和异步是很重要的，我们以函数返回值是否为`Promise`对象来区分函数是否是异步函数。在createWrapper中，输入的共有三个函数：beforeHook，afterHook和原始函数。当其中任意一个函数为异步函数时，目标函数就是异步函数。
 
-```ts
-import { readdir } from "fs/promises";
+在`createWrapper<O, T>`中，`T`泛型的默认值是`O`，这对于多数情况是适用的，但是在存在异步的情况下，我们可能必须声明`T`的具体类型：
 
-function stringArray(list: string[], limit: number) {
-    return JSON.stringify(list.slice(0, limit));
-}
-
-const wrapped = createWrapper<typeof stringArray, () => string>(
-    () => {
-        const list = readdir("./");
-        return [Promise.all([list, 10]), r => r];
-    }
-);
-```
-
-`Promise.all`会返回一个由参数组成的`Promise`包裹数组，`createWrapper`内部会等待其resolve后再执行原始函数。需要注意的是，当你使用了异步量时，目标函数的返回值也会是异步的`Promise`结果，和`N`泛型类型并不完全一致。
+- 原始函数同步，beforeHook异步，最终目标函数为异步函数，需要明确类型；
+- 原始函数同步，afterHook异步，最终目标为异步函数，需要明确类型。

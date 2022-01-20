@@ -1,19 +1,59 @@
 import MaybePromise from "./MaybePromise";
+
+type Fn = (...args: any[]) => any;
+type AsyncFn = (...args: any[]) => Promise<any>;
+
 /**
- * Create hooks for a function, which you can change argument passed
- * to original function in before hook, and change the return value
- * of original function.
+ * Add hooks to a synchronous original function, while the beforeHook is
+ * synchrous too. The default type of target function is the same as 
+ * original function.
  * 
- * @param hook a hook function execute before original function,
- * and modify input parameter to original function, and return a
- * hook function execute after original function to modify the 
- * return value
- * @returns a hooker.
+ * @param hook a synchronous function executed before original function,
+ * returns parameters and a hook executed after the original function.
  */
-export function createWrapper<O extends (...args: any[]) => any, N extends (...args: any[]) => any = O>(hook: (...args: Parameters<N>) => [MaybePromise<Parameters<O>>, (r: ReturnType<O>) => ReturnType<N>]): (fn: (...args: Parameters<O>) => ReturnType<O>) => (...args: Parameters<N>) => MaybePromise<ReturnType<N>> {
+export function createWrapper<O extends Fn, T extends (Fn | AsyncFn) = O>(
+    hook: (...args: Parameters<T>) => [Parameters<O>, (r: ReturnType<O>) => ReturnType<T>]
+): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
+/**
+ * Add hooks to a synchronous original function, while the beforeHook is
+ * asynchronous. The target function is a asynchronous function, which is
+ * different from the original one, so you need to declare it. 
+ * 
+ * @param hook an asynchronous function executed before original function,
+ * returns parameters and a hook executed after the original function.
+ */
+export function createWrapper<O extends Fn, T extends AsyncFn>(
+    hook: (...args: Parameters<T>) => Promise<[Parameters<O>, (r: ReturnType<O>) => ReturnType<T>]>
+): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
+/**
+ * Add hooks to an asynchronous original function, while the beforeHook is
+ * asynchronous too. The default type of target function is the same as the
+ * original function.
+ *
+ * @param hook an asynchronous function executed before original function,
+ * returns parameters and a hook executed after the original function.
+ */
+export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
+    hook: (...args: Parameters<T>) => Promise<[Parameters<O>, (r: ReturnType<O>) => ReturnType<T>]>
+): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
+/**
+ * Add hooks to an asynchronous original function, while the beforeHook is
+ * synchronous. The default type of target function is the same as the
+ * original function.
+ * 
+ * @param hook an asynchronous function executed before original function,
+ * returns parameters and a hook executed after the original function.
+ */
+export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
+    hook: (...args: Parameters<T>) => [Parameters<O>, (r: ReturnType<O>) => ReturnType<T>]
+): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
+export function createWrapper<O extends (Fn | AsyncFn), T extends (Fn | AsyncFn) = O>(
+    hook: (...args: Parameters<T>) => MaybePromise<[Parameters<O>, (r: ReturnType<O>) => ReturnType<T>]>
+): (fn: O) => (...args: Parameters<T>) => ReturnType<T> {
     return fn => (...args) => {
-        const [p, after] = hook(...args);
-        if (p instanceof Promise) return p.then(p => after(fn(...p)));
+        const t = hook(...args);
+        if (t instanceof Promise) return t.then(([p, after]) => after(fn(...p))) as ReturnType<T>;
+        const [p, after] = t;
         return after(fn(...p));
     };
 }
