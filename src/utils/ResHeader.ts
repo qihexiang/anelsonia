@@ -55,8 +55,11 @@ export abstract class ResHeader {
         return { "Content-Encoding": encodingType };
     }
 
-    static contentLanguage(lang: string, variant?: string) {
-        return { "Content-Language": `${lang.toLowerCase()}${variant ? `-${variant.toUpperCase()}` : ""}` };
+    static contentLanguage<L extends string>(lang: L): { "Content-Language": `${Lowercase<L>}`; };
+    static contentLanguage<L extends string, V extends string>(lang: L, variant: V): { "Content-Language": `${Lowercase<L>}-${Uppercase<V>}`; };
+    static contentLanguage<L extends string, V extends string>(lang: L, variant?: V): { "Content-Language": `${Lowercase<L>}` | `${Lowercase<L>}-${Uppercase<V>}`; } {
+        if (variant === undefined) return { "Content-Language": `${lang.toLowerCase() as Lowercase<L>}` };
+        return { "Content-Language": `${lang.toLowerCase() as Lowercase<L>}-${variant.toUpperCase() as Uppercase<V>}` };
     }
 
     static serverHeader(product: string = "anelsonia2") { return { "Server": product }; }
