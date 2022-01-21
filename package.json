@@ -1,6 +1,6 @@
 {
   "name": "anelsonia2",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "FP style Node.js web framework.",
   "main": "index.js",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
