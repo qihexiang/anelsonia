@@ -1,0 +1,10 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": "./src",
+    "sort": [
+        "source-order", "static-first"
+    ],
+    "name": "Anelsonia2",
+    "includeVersion": true,
+    "categorizeByGroup": true
+}

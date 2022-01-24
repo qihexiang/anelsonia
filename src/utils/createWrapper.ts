@@ -1,7 +1,7 @@
 import MaybePromise from "./MaybePromise";
 
-type Fn = (...args: any[]) => any;
-type AsyncFn = (...args: any[]) => Promise<any>;
+export type Fn = (...args: any[]) => any;
+export type AsyncFn = (...args: any[]) => Promise<any>;
 
 /**
  * Add hooks to a synchronous original function, while the beforeHook is

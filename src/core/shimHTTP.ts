@@ -7,7 +7,7 @@ import { AsyncResponse } from "./Respond";
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;
 export type ReqHandler = (req: HttpReq, res: HttpRes) => void;
-type EntryPoint = (req: HttpReq) => AsyncResponse;
+export type EntryPoint = (req: HttpReq) => AsyncResponse;
 
 export function shimHTTP(entry: EntryPoint): ReqHandler {
     return async (req, res) => {

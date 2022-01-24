@@ -2,10 +2,6 @@ import { statusMessage, validHttpStatusCode } from "./http";
 import MaybePromise from "../utils/MaybePromise"
 import Stream from "stream";
 
-export type Headers = {
-    [propName: string]: string | number | string[];
-};
-
 export interface ResponseProps {
     statusCode: validHttpStatusCode,
     statusMessage: string,
@@ -153,5 +149,9 @@ export class Respond implements ResponseProps {
 }
 
 export const createRes = Respond.create;
+
+export type Headers = {
+    [propName: string]: string | number | string[];
+};
 
 export default createRes;

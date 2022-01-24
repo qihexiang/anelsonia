@@ -1,7 +1,7 @@
 import { Context } from "koa";
 import { AsyncResponse } from "./Respond";
 
-type KoaEntryPoint = (ctx: Context) => AsyncResponse;
+export type KoaEntryPoint = (ctx: Context) => AsyncResponse;
 
 export function shimKoa(entry: KoaEntryPoint): (ctx: Context) => void {
     return async ctx => {
