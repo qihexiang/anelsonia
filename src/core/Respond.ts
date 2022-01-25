@@ -1,12 +1,12 @@
 import { statusMessage, validHttpStatusCode } from "./http";
-import MaybePromise from "../utils/MaybePromise"
+import MaybePromise from "../utils/MaybePromise";
 import Stream from "stream";
 
 export interface ResponseProps {
     statusCode: validHttpStatusCode,
     statusMessage: string,
     body?: ResponseBody,
-    headers: Headers;
+    headers: HeaderObject;
 }
 
 export type ResponseBody = string | Buffer | Stream;
@@ -17,7 +17,7 @@ export class Respond implements ResponseProps {
     private _statusCode?: validHttpStatusCode = undefined;
     private _statusMessage?: string = undefined;
     private _body?: ResponseBody = undefined;
-    private _headers: Headers = {};
+    private _headers: HeaderObject = {};
     /**
      * Create an empty response, default status code is 404.
      */
@@ -47,14 +47,14 @@ export class Respond implements ResponseProps {
      * @param code http status code.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(code: validHttpStatusCode, headers: Headers): Respond;
+    static create(code: validHttpStatusCode, headers: HeaderObject): Respond;
     /**
      * Create a response with given body and headers, default status code is 200.
      * 
      * @param body a string, buffer or stream.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(body: ResponseBody, headers: Headers): Respond;
+    static create(body: ResponseBody, headers: HeaderObject): Respond;
     /**
      * Create a response with given status code, body and http headers.
      * 
@@ -62,8 +62,8 @@ export class Respond implements ResponseProps {
      * @param body a string, buffer or stream.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(code: validHttpStatusCode, body: ResponseBody, headers: Headers): Respond;
-    static create(arg1?: validHttpStatusCode | ResponseBody, arg2?: ResponseBody | Headers, headers?: Headers): Respond {
+    static create(code: validHttpStatusCode, body: ResponseBody, headers: HeaderObject): Respond;
+    static create(arg1?: validHttpStatusCode | ResponseBody, arg2?: ResponseBody | HeaderObject, headers?: HeaderObject): Respond {
         const response = new Respond();
         if (typeof arg1 === "number") {
             response.setStatusCode(arg1);
@@ -72,7 +72,7 @@ export class Respond implements ResponseProps {
         }
         if (typeof arg1 === "string" || arg1 instanceof Buffer || arg1 instanceof Stream) {
             response.setBody(arg1);
-            if (typeof arg2 === "object") response.setHeaders(arg2 as Headers);
+            if (typeof arg2 === "object") response.setHeaders(arg2 as HeaderObject);
         }
         if (headers) response.setHeaders(headers);
         return response;
@@ -121,37 +121,68 @@ export class Respond implements ResponseProps {
         return this._body;
     }
     /**
-     * Set headers of response. You can call this method many times, and it will
-     * merge them all.
+     * Add a header in key-value mode, for example: `res.setHeader("Keep-Alive": "timeout=5")`
      * 
-     * For example:
+     * @param headerName the name of the HTTP response header 
+     * @param value the value of the http response header
+     */
+    setHeaders(headerName: string, value: HeaderValue): Respond;
+    /**
+     * Add one or more headers in array style, like:
      * 
-     * ```js
-     * res.setHeaders({"Content-Type": "application/json"}).setHeaders({"Access-Control-Allow-Origin": "*"})
-     * 
-     * res.setHeaders({"Content-Type": "application/json"}, {"Access-Control-Allow-Origin": "*"})
-     * 
-     * res.setHeaders({"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"})
+     * ```ts
+     * response.setHeaders(
+     *     ["Keep-Alive": "timeout=5"],
+     *     ["Content-Type": "text/plain; charset=UTF-8"]
+     * )
      * ```
      * 
-     * are all equal. Properties later to be received would cover the earlier one with the same key.
-     * 
-     * @param headers HTTP headers.
-     * @returns this instance it self.
+     * @param headers Array-Style http response headers.
      */
-    setHeaders(...headers: Headers[]): Respond {
+    setHeaders(...headers: HeaderArray[]): Respond;
+    /**
+     * Add one or more headers to the response, like:
+     * 
+     * ```ts
+     * response.setHeaders({"Keep-Alive": "timeout=5"}, {"Content-Type": "text/plain; charset=UTF-8"})
+     * // which equals to
+     * response.setHeaders({"Keep-Alive": "timeout=5", "Content-Type": "text/plain; charset=UTF-8"})
+     * ```
+     * 
+     * @param headers Object-style http response headers.
+     */
+    setHeaders(...headers: HeaderObject[]): Respond;
+    /**
+     * Add one or more headers to the response, you can use both 
+     * array-style and object-style headers.
+     * 
+     * @param headers Array-style or Object-style response headers.
+     */
+    setHeaders(...headers: HeaderCollection[]): Respond;
+    setHeaders(arg1: string | HeaderCollection, arg2?: HeaderValue | HeaderCollection, ...rest: HeaderCollection[]): Respond {
+        if (typeof arg1 === "string") {
+            this._headers = { ...this._headers, [arg1]: arg2 as HeaderValue };
+            return this;
+        }
+        const headers = ([arg1, arg2 as HeaderCollection, ...rest]).map(h => h instanceof Array ? { [h[0]]: h[1] } : h);
         this._headers = { ...this._headers, ...headers.reduce((pre, cur) => ({ ...pre, ...cur }), {}) };
         return this;
     }
-    get headers(): Headers {
+    get headers(): HeaderObject {
         return this._headers;
     }
 }
 
 export const createRes = Respond.create;
 
-export type Headers = {
-    [propName: string]: string | number | string[];
+export type HeaderValue = string | string[] | number;
+
+export type HeaderObject = {
+    [propName: string]: HeaderValue;
 };
+
+export type HeaderArray = [string, HeaderValue];
+
+export type HeaderCollection = HeaderArray | HeaderObject;
 
 export default createRes;
