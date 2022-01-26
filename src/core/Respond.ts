@@ -47,14 +47,14 @@ export class Respond implements ResponseProps {
      * @param code http status code.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(code: validHttpStatusCode, headers: HeaderObject): Respond;
+    static create(code: validHttpStatusCode, headers: HeaderCollection): Respond;
     /**
      * Create a response with given body and headers, default status code is 200.
      * 
      * @param body a string, buffer or stream.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(body: ResponseBody, headers: HeaderObject): Respond;
+    static create(body: ResponseBody, headers: HeaderCollection): Respond;
     /**
      * Create a response with given status code, body and http headers.
      * 
@@ -62,8 +62,8 @@ export class Respond implements ResponseProps {
      * @param body a string, buffer or stream.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(code: validHttpStatusCode, body: ResponseBody, headers: HeaderObject): Respond;
-    static create(arg1?: validHttpStatusCode | ResponseBody, arg2?: ResponseBody | HeaderObject, headers?: HeaderObject): Respond {
+    static create(code: validHttpStatusCode, body: ResponseBody, headers: HeaderCollection): Respond;
+    static create(arg1?: validHttpStatusCode | ResponseBody, arg2?: ResponseBody | HeaderCollection, headers?: HeaderCollection): Respond {
         const response = new Respond();
         if (typeof arg1 === "number") {
             response.setStatusCode(arg1);
@@ -72,7 +72,7 @@ export class Respond implements ResponseProps {
         }
         if (typeof arg1 === "string" || arg1 instanceof Buffer || arg1 instanceof Stream) {
             response.setBody(arg1);
-            if (typeof arg2 === "object") response.setHeaders(arg2 as HeaderObject);
+            if (typeof arg2 === "object") response.setHeaders(arg2 as HeaderCollection);
         }
         if (headers) response.setHeaders(headers);
         return response;
