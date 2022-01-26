@@ -132,8 +132,8 @@ export class Respond implements ResponseProps {
      * 
      * ```ts
      * response.setHeaders(
-     *     ["Keep-Alive": "timeout=5"],
-     *     ["Content-Type": "text/plain; charset=UTF-8"]
+     *     ["Keep-Alive", "timeout=5"],
+     *     ["Content-Type", "text/plain; charset=UTF-8"]
      * )
      * ```
      * 
