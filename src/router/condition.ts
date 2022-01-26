@@ -11,13 +11,14 @@ export interface Condition<T, R extends string> {
 export function condition<R extends string>(reality: R): ConditionInit<R> {
     return {
         /**
-         * Give a pattern to match.
+         * Give the first pattern to match.
          * 
          * @param pattern a string, string array or a regexp that can match the reality value.
          * @param handler a handler which can deal with the reality value
          * @returns an object that provides match, withDefault and getValue method.
          */
-        match: <T>(pattern: R | R[] | RegExp, handler: (reality: R) => T) => {
+        match: (pattern, handler) => {
+            type T = ReturnType<typeof handler>;
             let result: T | null = null;
             if (pattern instanceof RegExp && pattern.exec(reality)) result = handler(reality);
             if (pattern instanceof Array && pattern.includes(reality)) result = handler(reality);
