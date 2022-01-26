@@ -1,4 +1,4 @@
-interface ConditionInit<R extends string> {
+export interface ConditionInit<R extends string> {
     match: <T>(pattern: R | R[] | RegExp, handler: (reality: R) => T) => Condition<T, R>;
 }
 
