@@ -61,7 +61,7 @@ export function contentLanguage<L extends string, V extends string>(lang: L, var
     return { "Content-Language": `${lang.toLowerCase() as Lowercase<L>}-${variant.toUpperCase() as Uppercase<V>}` };
 }
 
-export function serverHeader(product: string = "anelsonia2") { return { "Server": product }; }
+export function serverHeader(product: string = "freesia") { return { "Server": product }; }
 
 export function location(url: string) { return { "Location": url }; }
 

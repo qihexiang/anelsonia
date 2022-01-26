@@ -1,15 +1,15 @@
 {
-  "name": "anelsonia2",
+  "name": "freesia",
   "version": "0.7.1",
   "description": "FP style Node.js web framework.",
   "main": "index.js",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
   "license": "MPL-2.0",
   "private": false,
-  "homepage": "https://qihexiang.github.io/anelsonia",
+  "homepage": "https://qihexiang.github.io/freesia",
   "repository": {
     "type": "git",
-    "url": "https://github.com/qihexiang/anelsonia.git"
+    "url": "https://github.com/qihexiang/freesia.git"
   },
   "devDependencies": {
     "@types/destroy": "^1.0.0",
