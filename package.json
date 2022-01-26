@@ -1,7 +1,7 @@
 {
   "name": "freesia",
   "version": "0.7.1",
-  "description": "FP style Node.js web framework.",
+  "description": "A TypeScript library for building web servers.",
   "main": "index.js",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
   "license": "MPL-2.0",
