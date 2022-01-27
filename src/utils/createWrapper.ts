@@ -1,10 +1,11 @@
-import MaybePromise, {TPromise} from "./MaybePromise";
+import MaybePromise, { TPromise } from "./MaybePromise";
 
 export type Fn = (...args: any[]) => any;
 export type AsyncFn = (...args: any[]) => Promise<any>;
 
 export type BeforeHookArray<O extends (Fn | AsyncFn), T extends (Fn | AsyncFn)>
-    = [Parameters<O>, (r: ReturnType<O>) => ReturnType<T>] | [Parameters<O>];
+    = [Parameters<O>, (r: ReturnType<O>) => ReturnType<T>] | [Parameters<O>] |
+    [null, () => ReturnType<T>];
 
 export function echo<T>(value: T): T { return value; }
 
@@ -58,8 +59,12 @@ export function createWrapper<O extends (Fn | AsyncFn), T extends (Fn | AsyncFn)
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T> {
     return fn => (...args) => {
         const t = hook(...args);
-        if (t instanceof Promise) return t.then(([p, after]) => (after ?? echo)(fn(...p))) as ReturnType<T>;
+        if (t instanceof Promise) return t.then(([p, after]) => {
+            if (p === null) return (after as () => ReturnType<T>)();
+            return (after ?? echo)(fn(...p));
+        });
         const [p, after] = t;
+        if (p === null) return (after as () => ReturnType<T>)();
         return (after ?? echo)(fn(...p));
     };
 }
