@@ -3,7 +3,7 @@ export type EncodingType = "gzip" | "compress" | "deflate" | "identity" | "br";
 
 
 export function contentType(mediaType: string, charset?: string) {
-    return { "Content-Type": `${getType(mediaType)}${charset ? `; charset=${charset.toUpperCase()}` : ""}` };
+    return { "Content-Type": `${getType(mediaType) ?? "application/octect-stream"}${charset ? `; charset=${charset.toUpperCase()}` : ""}` };
 }
 
 /**
