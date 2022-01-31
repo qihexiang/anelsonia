@@ -13,55 +13,70 @@ export type EntryPoint = (req: HttpReq) => AsyncResponse;
 const reqSyms = new AsyncLocalStorage<{}>();
 
 /**
- * Create a context for request with a default value.
+ * Create a bridge to pass values to a deeply called function, for example,
+ * main -> fileRouter -> uploadRouter -> patchRoute -> patchHandler -> patchService, 
+ * you create a buffer from request stream in main, but you just need it in patchService and
+ * don't want to thread through the parameters one-by-one, you can do like this:
  * 
- * @param defaultValue The default value of the context
- * @returns [initCtx, useCtx, dropCtx]
+ * ```ts
+ * // main.ts
+ * export const [pushValue, getValue, dropValue] = createBridge<Buffer>();
+ * 
+ * export const main = async (req: HttpReq) => {
+ *     const body = await rawBody(req);
+ *     pushValue(body);
+ *     ...
+ *     const response = fileRouter()
+ *     ...
+ *     dropValue(body);
+ *     return response;
+ * }
+ * 
+ * // patchService.ts
+ * import { getValue } from "../main"
+ * 
+ * export const patchService = () => {
+ *     const body = getValue();
+ *     ...
+ * }
+ * ```
+ * 
+ * @returns [pushValue, getValue, dropValue]
  */
-export const createCtx = <T>(defaultValue: T): [
-    (initValue?: T) => void, () => Readonly<T>, () => void
-] => {
-    const context = new WeakMap<{}, T>();
+export const createBridge = <T>(): [(value: T) => void, () => T, () => void] => {
     const getSym = () => {
-        const sym = reqSyms.getStore();
-        if (sym === undefined) throw new Error("Failed to get symbol of this request");
-        return sym;
+        const result = reqSyms.getStore();
+        if (result === undefined) throw new Error("Can't get symbol of this request.");
+        return result;
     };
-    const isInitized = (sym: {}) => { if (!context.has(sym)) throw new Error("Context not initialized or dropped."); };
-
-    return [
-        /**
-         * Initialize context for this request.
-         * 
-         * @param initValue the value you'd like to set, if it's
-         * undefined, context will initialized with default value.
-         */
-        (initValue?: T) => {
-            const sym = getSym();
-            if (context.has(sym)) throw new Error("Can't initialize a context twice.");
-            if (initValue === undefined) context.set(sym, defaultValue);
-            else context.set(sym, initValue);
-        },
-        /**
-         * Get context of this request.
-         * 
-         * @returns context
-         */
-        () => {
-            const sym = getSym();
-            isInitized(sym);
-            const result = context.get(sym) ?? defaultValue;
-            return result;
-        },
-        /**
-         * Drop context of request after using it.
-         */ 
-        () => {
-            const sym = getSym();
-            isInitized(sym);
-            context.delete(sym);
-        }
-    ];
+    const values = new WeakMap<{}, T>();
+    /**
+     * Push a value to this bridge.
+     * 
+     * @param value the value you'd like to use in deeply called function
+     */
+    const pushValue = (value: T) => {
+        const sym = getSym();
+        if (values.has(sym)) throw new Error("Value of this request is already on bridge.");
+        values.set(sym, value);
+    };
+    /**
+     * Execute this function to get value from the bridge.
+     * 
+     * @returns the value you pushed to the bridge.
+     */
+    const getValue = () => {
+        const value = values.get(getSym());
+        if (value === undefined) throw new Error("No value of this request is on bridge.");
+        return value
+    };
+    /**
+     * Drop the value manually after using it.
+     */
+    const dropValue = () => {
+        if (!values.delete(getSym())) throw new Error("No value of this request is on bridge.");
+    };
+    return [pushValue, getValue, dropValue];
 };
 
 export function shimHTTP(entry: EntryPoint): ReqHandler {
