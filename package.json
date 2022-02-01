@@ -21,16 +21,11 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@types/koa": "^2.13.4",
     "@types/node": "^14.14.37",
     "destroy": "^1.0.4",
     "mime": "^2.5.2"
   },
   "scripts": {
     "build": "tsc && typedoc"
-  },
-  "peerDependencies": {
-    "@types/koa": "^2.13.4",
-    "koa": "^2.13.4"
   }
 }
