@@ -74,6 +74,7 @@ const response = createRes(200, message)
         contentDisposition(true, "helloWorld.txt")
     );
 ```
+
 ## 路由
 
 由于函数式的设计，这个库并不包含像express那样的`app.get(pattern, handler)`风格的路由，而是通过工具函数来实现请求路径的区分的。
@@ -167,7 +168,7 @@ function main(req: Request) {
 
 利用`createRoute`和`createSwitcher`，我们可以在分离的多个地方对路由规则进行定义，但与此同时，也会有人更倾向与将路径匹配模式集中定义于一处，此时重复使用`createRoute`和`createSwitcher`就显得十分麻烦。Freesia提供了一个额外的函数`createSwRt`来实现这个功能，他提供一个链试调用来创建一个交换机及其对应的路由。
 
-例子如下，有若干已经定义好的`handler`，其中一些返回是异步的（`Promise`）。
+例子如下，有若干已经定义好的`handler`，它们返回的值类型相互匹配（例如`Promise<ResponseProps>`）。
 
 ```js
 import { createSwRt } from "freesia"
@@ -178,10 +179,17 @@ async function main(req) {
         .route("/view/<rest>", viewHandler)
         .route("/d/<username>/<filepath>", downloadHandler)
         .route("/b/<username>/<[filepath]>/", browseHandler)
-    const response = (await switcher(req.url)) ?? new Respond().setStatus(404)
-    return response
+        .fallback(async url => createRes(404, `No route matched ${url}`))
+    return switcher(url)
 }
 ```
+
+`route`和`fallback`函数会检查`handler`的返回类型是否一致，一致性的依据是第一个被调用的`route`方法的传入参数，如果要手动指定返回类型，例如有的`handler`返回异步结果，有的返回同步结果，则应该在第一次调用`route`时明确泛型类型，`.route<Promise<ResponseProps>>|ResponseProps>`。后续的`route`函数和第一个`route`并不是同一个函数，他们没有泛型参数。
+
+> 请务必不要通过导出`createSwRt`的执行结果来在多个文件中注册路由：  
+> 第一次返回的`route`方法实际上会返回一个全新的对象，多次调用并不能将多个路由注册到一个交换机上，而是产生多个交换机；  
+> 之后的`route`方法可以在多处调用并注册路由到同一个交换机，但是注册的顺序取决于模块导入导出的逻辑，这会使得路由顺序和你设想的不一致；  
+> `fallback`方法并不会更新闭包，除非你使用它的返回值，否则这个注册是无效的。
 
 每次链式调用中的`route`函数和`createRoute`函数参数类型一致，返回中解析出的`switcher`和`createSwitcher`的类型是一致的。
 
@@ -204,7 +212,7 @@ const { result } = condition(req.method)
 
 > 注意，由于此处做了变量解构，不能在`condition`前直接使用`await`来处理异步的`result`，你需要在之后使用`result`是写作`await result`。
 
-## 闪光弹
+## 闪光弹和useRequest
 
 编写代码时一个常见的问题是，在某个函数中生成的某个值可能会在多层间接调用的另一个函数中使用，使用函数传值的方式进行传递会非常麻烦。我们会希望有一种方式能够将一些变量进行“广播”，使得之后任意层次调用的函数都可以访问到这个值。
 
@@ -212,8 +220,8 @@ Freesia提供了类似React上下文的功能（和请求绑定）。用`createF
 
 它可以接受0或1个参数，若有参数，是一个对象，包含两项属性：
 
-- `mutable`：若为`true`，则观测得到的值不是只读的；
-- `reassign`：若为`true`，可以多次使用light函数重新给闪光弹赋值。
+- `mutable`：若为`true`，则观测得到的值不是只读的，如果你要使用闪光弹传递一个ORM对象，它应该设置为true；
+- `reassign`：若为`true`，可以多次使用light函数重新给闪光弹赋值，一般没有理由这么做。
 - 不输入参数时，上述属性默认为`false`
 
 它返回三个函数：
@@ -255,6 +263,8 @@ export const uploadService = (filepath: string) => {
 > - `createFlare`不是完全独立的函数，它返回的三个函数都只能在`shimHTTP`的直接或间接调用中执行，否则会抛出错误
 > - 静态分析时`light`，`observe`和`extinguish`并不能判断要获取的值是否处于有效期，因此这三个函数会在不符合执行条件的情况下抛出错误。（而不是返回`undefined`或`null`）
 > - `extinguish`函数不是必须执行的，`createFlare`内部使用的是`WeakMap`实现的，不必担心内存溢出的问题。
+
+在Freesia中，最常使用的一个对象可能是入口函数传入的`req`变量，因此提供了`useRequest`函数来随时获得这个值，你不需要将其层层传递下去。
 
 ## 包装器
 

@@ -132,9 +132,13 @@
   <h4>同时创建路由和交换机</h4>
 </a>
 <p>利用<code>createRoute</code>和<code>createSwitcher</code>，我们可以在分离的多个地方对路由规则进行定义，但与此同时，也会有人更倾向与将路径匹配模式集中定义于一处，此时重复使用<code>createRoute</code>和<code>createSwitcher</code>就显得十分麻烦。Freesia提供了一个额外的函数<code>createSwRt</code>来实现这个功能，他提供一个链试调用来创建一个交换机及其对应的路由。</p>
-<p>例子如下，有若干已经定义好的<code>handler</code>，其中一些返回是异步的（<code>Promise</code>）。</p>
-<pre><code class="language-js"><span class="hl-8">import</span><span class="hl-1"> { </span><span class="hl-5">createSwRt</span><span class="hl-1"> } </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-4">&quot;freesia&quot;</span><br/><br/><span class="hl-0">async</span><span class="hl-1"> </span><span class="hl-0">function</span><span class="hl-1"> </span><span class="hl-3">main</span><span class="hl-1">(</span><span class="hl-5">req</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-0">const</span><span class="hl-1"> { </span><span class="hl-2">switcher</span><span class="hl-1"> } = </span><span class="hl-3">createSwRt</span><span class="hl-1">()</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/user/&lt;username&gt;/&lt;rest&gt;&quot;</span><span class="hl-1">, </span><span class="hl-5">infoHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/view/&lt;rest&gt;&quot;</span><span class="hl-1">, </span><span class="hl-5">viewHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/d/&lt;username&gt;/&lt;filepath&gt;&quot;</span><span class="hl-1">, </span><span class="hl-5">downloadHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/b/&lt;username&gt;/&lt;[filepath]&gt;/&quot;</span><span class="hl-1">, </span><span class="hl-5">browseHandler</span><span class="hl-1">)</span><br/><span class="hl-1">    </span><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">response</span><span class="hl-1"> = (</span><span class="hl-8">await</span><span class="hl-1"> </span><span class="hl-3">switcher</span><span class="hl-1">(</span><span class="hl-5">req</span><span class="hl-1">.</span><span class="hl-5">url</span><span class="hl-1">)) ?? </span><span class="hl-0">new</span><span class="hl-1"> </span><span class="hl-3">Respond</span><span class="hl-1">().</span><span class="hl-3">setStatus</span><span class="hl-1">(</span><span class="hl-9">404</span><span class="hl-1">)</span><br/><span class="hl-1">    </span><span class="hl-8">return</span><span class="hl-1"> </span><span class="hl-5">response</span><br/><span class="hl-1">}</span>
+<p>例子如下，有若干已经定义好的<code>handler</code>，它们返回的值类型相互匹配（例如<code>Promise&lt;ResponseProps&gt;</code>）。</p>
+<pre><code class="language-js"><span class="hl-8">import</span><span class="hl-1"> { </span><span class="hl-5">createSwRt</span><span class="hl-1"> } </span><span class="hl-8">from</span><span class="hl-1"> </span><span class="hl-4">&quot;freesia&quot;</span><br/><br/><span class="hl-0">async</span><span class="hl-1"> </span><span class="hl-0">function</span><span class="hl-1"> </span><span class="hl-3">main</span><span class="hl-1">(</span><span class="hl-5">req</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-0">const</span><span class="hl-1"> { </span><span class="hl-2">switcher</span><span class="hl-1"> } = </span><span class="hl-3">createSwRt</span><span class="hl-1">()</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/user/&lt;username&gt;/&lt;rest&gt;&quot;</span><span class="hl-1">, </span><span class="hl-5">infoHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/view/&lt;rest&gt;&quot;</span><span class="hl-1">, </span><span class="hl-5">viewHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/d/&lt;username&gt;/&lt;filepath&gt;&quot;</span><span class="hl-1">, </span><span class="hl-5">downloadHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">route</span><span class="hl-1">(</span><span class="hl-4">&quot;/b/&lt;username&gt;/&lt;[filepath]&gt;/&quot;</span><span class="hl-1">, </span><span class="hl-5">browseHandler</span><span class="hl-1">)</span><br/><span class="hl-1">        .</span><span class="hl-3">fallback</span><span class="hl-1">(</span><span class="hl-0">async</span><span class="hl-1"> </span><span class="hl-5">url</span><span class="hl-1"> </span><span class="hl-0">=&gt;</span><span class="hl-1"> </span><span class="hl-3">createRes</span><span class="hl-1">(</span><span class="hl-9">404</span><span class="hl-1">, </span><span class="hl-4">`No route matched </span><span class="hl-0">${</span><span class="hl-5">url</span><span class="hl-0">}</span><span class="hl-4">`</span><span class="hl-1">))</span><br/><span class="hl-1">    </span><span class="hl-8">return</span><span class="hl-1"> </span><span class="hl-3">switcher</span><span class="hl-1">(</span><span class="hl-5">url</span><span class="hl-1">)</span><br/><span class="hl-1">}</span>
 </code></pre>
+<p><code>route</code>和<code>fallback</code>函数会检查<code>handler</code>的返回类型是否一致，一致性的依据是第一个被调用的<code>route</code>方法的传入参数，如果要手动指定返回类型，例如有的<code>handler</code>返回异步结果，有的返回同步结果，则应该在第一次调用<code>route</code>时明确泛型类型，<code>.route&lt;Promise&lt;ResponseProps&gt;&gt;|ResponseProps&gt;</code>。后续的<code>route</code>函数和第一个<code>route</code>并不是同一个函数，他们没有泛型参数。</p>
+<blockquote>
+<p>请务必不要通过导出<code>createSwRt</code>的执行结果来在多个文件中注册路由：<br>第一次返回的<code>route</code>方法实际上会返回一个全新的对象，多次调用并不能将多个路由注册到一个交换机上，而是产生多个交换机；<br>之后的<code>route</code>方法可以在多处调用并注册路由到同一个交换机，但是注册的顺序取决于模块导入导出的逻辑，这会使得路由顺序和你设想的不一致；<br><code>fallback</code>方法并不会更新闭包，除非你使用它的返回值，否则这个注册是无效的。</p>
+</blockquote>
 <p>每次链式调用中的<code>route</code>函数和<code>createRoute</code>函数参数类型一致，返回中解析出的<code>switcher</code>和<code>createSwitcher</code>的类型是一致的。</p>
 <p>另外，提供了一个<code>createExtendSwRt</code>函数，使用方法基本一致。</p>
 
@@ -149,15 +153,15 @@
 <p>注意，由于此处做了变量解构，不能在<code>condition</code>前直接使用<code>await</code>来处理异步的<code>result</code>，你需要在之后使用<code>result</code>是写作<code>await result</code>。</p>
 </blockquote>
 
-<a href="#闪光弹" id="闪光弹" style="color: inherit; text-decoration: none;">
-  <h2>闪光弹</h2>
+<a href="#闪光弹和userequest" id="闪光弹和userequest" style="color: inherit; text-decoration: none;">
+  <h2>闪光弹和useRequest</h2>
 </a>
 <p>编写代码时一个常见的问题是，在某个函数中生成的某个值可能会在多层间接调用的另一个函数中使用，使用函数传值的方式进行传递会非常麻烦。我们会希望有一种方式能够将一些变量进行“广播”，使得之后任意层次调用的函数都可以访问到这个值。</p>
 <p>Freesia提供了类似React上下文的功能（和请求绑定）。用<code>createFlare</code>函数来创建闪光弹，</p>
 <p>它可以接受0或1个参数，若有参数，是一个对象，包含两项属性：</p>
 <ul>
-<li><code>mutable</code>：若为<code>true</code>，则观测得到的值不是只读的；</li>
-<li><code>reassign</code>：若为<code>true</code>，可以多次使用light函数重新给闪光弹赋值。</li>
+<li><code>mutable</code>：若为<code>true</code>，则观测得到的值不是只读的，如果你要使用闪光弹传递一个ORM对象，它应该设置为true；</li>
+<li><code>reassign</code>：若为<code>true</code>，可以多次使用light函数重新给闪光弹赋值，一般没有理由这么做。</li>
 <li>不输入参数时，上述属性默认为<code>false</code></li>
 </ul>
 <p>它返回三个函数：</p>
@@ -179,6 +183,7 @@
 <li><code>extinguish</code>函数不是必须执行的，<code>createFlare</code>内部使用的是<code>WeakMap</code>实现的，不必担心内存溢出的问题。</li>
 </ul>
 </blockquote>
+<p>在Freesia中，最常使用的一个对象可能是入口函数传入的<code>req</code>变量，因此提供了<code>useRequest</code>函数来随时获得这个值，你不需要将其层层传递下去。</p>
 
 <a href="#包装器" id="包装器" style="color: inherit; text-decoration: none;">
   <h2>包装器</h2>
