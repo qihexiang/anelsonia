@@ -202,15 +202,16 @@ async function main(req) {
 ```js
 import { condition } from "freesia"
 
-const { result } = condition(req.method)
+const result = condition(req.method)
     .match('GET', () => getSw(req.url))
     .match(['POST','PUT'], () => uploadSw(req.url, req))
     .match(/^(OPTION|TRACE)$/, (method) => debugSw(req.url, method))
+    .getValue()
 ```
 
 例如，这个例子分流的依据是`req.method`，我们将`GET`请求分为一组，`POST`和`PUT`请求分为一组。调用链中，`match`的一个参数是字符串或字符串数组，当字符串和分流依据相等，或数组中存在匹配的字符串时，或给定的正则表达式与分流依据匹配时，会执行后续的`handler`，所有注册的`handler`应该有相同的返回类型或符合`condition<T>`描述的泛型。解构出的`result`是`handler`的返回值。
 
-> 注意，由于此处做了变量解构，不能在`condition`前直接使用`await`来处理异步的`result`，你需要在之后使用`result`是写作`await result`。
+获得返回值有两种方法：`getValue`和`withDefault`，后者接受一个回调函数，来根据输入的值返回一个值。
 
 ## 闪光弹和useRequest
 

@@ -48,18 +48,31 @@ export const createFlare: CreateFlare = <T>(options = {
         return result;
     };
     const values = new WeakMap<{}, T>();
+    /**
+     * Assign or re-assign a value to this flare
+     * 
+     * @param value the value you want to assign to flare
+     */
     const light = (value: T) => {
         const req = getReq();
-        if (!reassign && values.has(req)) throw new Error("Value of this request is already on bridge.");
+        if (!reassign && values.has(req)) throw new Error("Already has a value and not re-assignable.");
         values.set(req, value);
     };
+    /**
+     * Get value from the flare.
+     * 
+     * @returns the value assgined to the flare
+     */
     const observe = () => {
         const value = values.get(getReq());
-        if (value === undefined) throw new Error("No value of this request is on bridge.");
+        if (value === undefined) throw new Error("No value has been assigned to this flare.");
         return value;
     };
+    /**
+     * Remove the value from the flare.
+     */
     const extinguish = () => {
-        if (!values.delete(getReq())) throw new Error("No value of this request is on bridge.");
+        if (!values.delete(getReq())) throw new Error("No value assigned to this flare found.");
     };
     return [light, observe, extinguish];
 };
