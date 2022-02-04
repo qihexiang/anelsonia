@@ -1,8 +1,8 @@
 import { RouteParam } from "./params";
 
-export type RouteHandler<P extends string, R> = (params: RouteParam<P>, queries: URLSearchParams) => R;
+export type RouteHandler<P extends string, R> = (params: RouteParam<P>) => R;
 export type Route<R> = (url: string) => R | null;
-export type ExtendRouteHandler<P extends string, X, R> = (params: RouteParam<P>, queries: URLSearchParams, extra: X) => R;
+export type ExtendRouteHandler<P extends string, X, R> = (params: RouteParam<P>, extra: X) => R;
 export type ExtendRoute<R, X> = (url: string, extra: X) => R | null;
 
 /**
@@ -20,15 +20,12 @@ export type ExtendRoute<R, X> = (url: string, extra: X) => R | null;
  * string matched the pattern, call the handler and return its 
  * result, otherwise return null.
  */
- export function createRoute<P extends string, R>(pattern: P, handler: RouteHandler<P, R>): Route<R> {
+export function createRoute<P extends string, R>(pattern: P, handler: RouteHandler<P, R>): Route<R> {
     const re = createRegExp(pattern);
     return (url: string) => {
-        const { pathname, searchParams } = new URL('http://localhost' + (url.indexOf("/") === 0 ? "" : "/") + url);
-        const matched = re.exec(pathname);
+        const matched = re.exec(url);
         if (matched) {
-            return handler(
-                matched.groups as RouteParam<P>, searchParams
-            );
+            return handler(matched.groups as RouteParam<P>);
         }
         return null;
     };
@@ -53,11 +50,10 @@ export type ExtendRoute<R, X> = (url: string, extra: X) => R | null;
 export function createExtendRoute<P extends string, X, R>(pattern: P, handler: ExtendRouteHandler<P, X, R>): ExtendRoute<R, X> {
     const re = createRegExp(pattern);
     return (url: string, extra: X) => {
-        const { pathname, searchParams } = new URL('http://localhost' + (url.indexOf("/") === 0 ? "" : "/") + url);
-        const matched = re.exec(pathname);
+        const matched = re.exec(url);
         if (matched) {
             return handler(
-                matched.groups as RouteParam<P>, searchParams, extra
+                matched.groups as RouteParam<P>, extra
             );
         }
         return null;

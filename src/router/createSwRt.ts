@@ -113,7 +113,7 @@ export function createExtendSwRt(): ExtendRouteChainInit {
          */
         route: (pattern, handler) => {
             type R = ReturnType<typeof handler>;
-            type X = Parameters<typeof handler>[2];
+            type X = Parameters<typeof handler>[1];
             let routes = [createExtendRoute(pattern, handler)];
             /**
              * Handler the request when no routes matched 

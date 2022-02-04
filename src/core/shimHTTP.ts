@@ -23,6 +23,40 @@ export const useRequest = () => {
     return req;
 };
 
+/**
+ * Get host, path and query object from the request.
+ */
+export function useURL(): { host: string, path: string, query: URLSearchParams }
+/**
+ * Get request path from the request.
+ * 
+ * @param prop path
+ */
+export function useURL(prop: "path"): string
+/**
+ * Get hostname from the request.
+ * 
+ * @param prop host
+ */
+export function useURL(prop: "host"): string
+/**
+ * Get the search params from the ruquest.
+ * 
+ * @param prop query
+ */
+export function useURL(prop: "query"): URLSearchParams
+export function useURL(prop?: "path" | "host" | "query") {
+    const req = requests.getStore();
+    if (req === undefined) throw new Error("Can't get request, is this function called by main function?");
+    const host = req.headers.host ?? "localhost"
+    if (prop === "host") return host
+    const path = req.url ?? "/"
+    if (prop === "path") return path
+    const url = new URL(path, `http://${host}`)
+    if (prop === "query") return url.searchParams
+    return { host, path, query: url.searchParams }
+}
+
 interface CreateFlare {
     <T>(): [(value: T) => void, () => Readonly<T>, () => void];
     <T>(options: { mutable: true, reassign: boolean; }): [(value: T) => void, () => T, () => void];
