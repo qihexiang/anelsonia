@@ -3,6 +3,7 @@ import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
+import { Route } from "..";
 import { AsyncResponse } from "./Respond";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
@@ -45,7 +46,13 @@ export function useURL(prop: "host"): string
  * @param prop query
  */
 export function useURL(prop: "query"): URLSearchParams
-export function useURL(prop?: "path" | "host" | "query") {
+/**
+ * Get the route result from the router
+ * 
+ * @param prop the router you want to use
+ */
+export function useURL<T>(prop: Route<T>): T
+export function useURL<T>(prop?: "path" | "host" | "query" | Route<T>) {
     const req = requests.getStore();
     if (req === undefined) throw new Error("Can't get request, is this function called by main function?");
     const host = req.headers.host ?? "localhost"
@@ -54,7 +61,8 @@ export function useURL(prop?: "path" | "host" | "query") {
     if (prop === "path") return path
     const url = new URL(path, `http://${host}`)
     if (prop === "query") return url.searchParams
-    return { host, path, query: url.searchParams }
+    if (prop === undefined) return { host, path, query: url.searchParams }
+    return prop(path)
 }
 
 interface CreateFlare {
