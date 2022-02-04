@@ -100,14 +100,14 @@ const response = createRes(200, message)
 |`/user/<name>/<[filepath]>/`|`null`|`"doc/index.md"`|`null`|
 |`/user/<name>/[filepath]`|`"docs/index.md"`|`"docs/index.md/"`|`""`|
 
-另一个参数自然是对应的函数`handler`，这个函数有2个参数，其一是根据`pattern`推导出的路由匹配参数`params`，例如上面的例子中，推导出的参数类型为`{name: string, filepath: string}`，所有的路由参数类型都是`string`，开发者应该根据实际的情况进行检查和类型转换。另一个参数是搜索参数`quries`，它的类型是`UrlSeachParams`，由于路由匹配并不检查搜索参数的合法性，因此并不进行类型标注，开发者在使用时应当注意到`quries.get`方法取回的值可能为`null`，这需要开发者自行谨慎处理。
+另一个参数自然是对应的函数`handler`，这个函数的参数是根据`pattern`推导出的路由匹配参数`params`，例如上面的例子中，推导出的参数类型为`{name: string, filepath: string}`，所有的路由参数类型都是`string`，开发者应该根据实际的情况进行检查和类型转换。
 
 下面是一个示例：
 
 ```js
 import { createRoute } from "freesia" 
 
-const route = createRoute('/user/<username>/<filepath>', async ({username, filepath}, queries) 
+const route = createRoute('/user/<username>/<filepath>', async ({username, filepath}) 
     => JSON.stringify(await readDir(username, filepath)))
 const result = await route(url)
 ```
@@ -140,7 +140,7 @@ import DB from "./data/IO"
 const db = new DB();
 
 function main(req: Request) {
-    const result = await createRoute("/api/<options>", ({options}, queries) => apiRouteHandler(options, queries, {req, db}))(req.url)
+    const result = await createRoute("/api/<options>", ({options}) => apiRouteHandler(options, {req, db}))(req.url)
     return result
 }
 ```
@@ -149,7 +149,7 @@ function main(req: Request) {
 
 ```ts
 // controller/api.ts
-export const apiRoute = createExtendRoute('/api/<options>', ({options}, queries, {req: Request, db: DB}) => {...})
+export const apiRoute = createExtendRoute('/api/<options>', ({options}, {req: Request, db: DB}) => {...})
 
 // main.ts
 import { apiRoute } from "./controller/api"
@@ -212,6 +212,18 @@ const result = condition(req.method)
 例如，这个例子分流的依据是`req.method`，我们将`GET`请求分为一组，`POST`和`PUT`请求分为一组。调用链中，`match`的一个参数是字符串或字符串数组，当字符串和分流依据相等，或数组中存在匹配的字符串时，或给定的正则表达式与分流依据匹配时，会执行后续的`handler`，所有注册的`handler`应该有相同的返回类型或符合`condition<T>`描述的泛型。解构出的`result`是`handler`的返回值。
 
 获得返回值有两种方法：`getValue`和`withDefault`，后者接受一个回调函数，来根据输入的值返回一个值。
+
+### useURL
+
+`useURL`函数可以在`shimHTTP`的回调函数的任意层次调用中获得这个请求的路径信息，使用方法为：
+
+```ts
+useURL() // 返回host（主机名）、path（访问路径）、query（搜索参数的searchParams）
+useURL("host") // 返回host
+useURL("path") // 返回path
+useURL("query") // 返回query
+useURL(router) // Route<T>的路由，返回路由匹配结果。
+```
 
 ## 闪光弹和useRequest
 
