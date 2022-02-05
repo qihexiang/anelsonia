@@ -1,4 +1,4 @@
-import MaybePromise, { TPromise } from "./MaybePromise";
+import MaybePromise from "./MaybePromise";
 
 export type Fn = (...args: any[]) => any;
 export type AsyncFn = (...args: any[]) => Promise<any>;
@@ -30,7 +30,7 @@ export function createWrapper<O extends Fn, T extends (Fn | AsyncFn) = O>(
  * returns parameters and a hook executed after the original function.
  */
 export function createWrapper<O extends Fn, T extends AsyncFn>(
-    hook: (...args: Parameters<T>) => TPromise<BeforeHookArray<O, T>>
+    hook: (...args: Parameters<T>) => Promise<BeforeHookArray<O, T>>
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * Add hooks to an asynchronous original function, while the beforeHook is
@@ -41,7 +41,7 @@ export function createWrapper<O extends Fn, T extends AsyncFn>(
  * returns parameters and a hook executed after the original function.
  */
 export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
-    hook: (...args: Parameters<T>) => TPromise<BeforeHookArray<O, T>>
+    hook: (...args: Parameters<T>) => Promise<BeforeHookArray<O, T>>
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * Add hooks to an asynchronous original function, while the beforeHook is
