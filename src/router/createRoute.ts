@@ -70,7 +70,7 @@ export function createExtendRoute<P extends string, X, R>(
 function createRegExp<P extends string>(pattern: P) {
   const parsedPattern = pattern
     .replace(/<.+?>/g, "(?$&.+?)")
-    .replace(/\]\>\.\+\?/g, "]>.+")
+    .replace(/\]>\.\+\?/g, "]>.+")
     .replace(/<\[/g, "<")
     .replace(/\]>/, ">")
     .replace(/\[.+?\]/g, "(?$&.*)")

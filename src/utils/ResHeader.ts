@@ -94,7 +94,7 @@ export function contentLanguage<L extends string, V extends string>(
   };
 }
 
-export function serverHeader(product: string = "freesia") {
+export function serverHeader(product = "freesia") {
   return { Server: product };
 }
 

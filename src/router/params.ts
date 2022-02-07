@@ -10,8 +10,8 @@ export type RouteParam<U extends string> = U extends RoutePattern<
   infer R
 >
   ? L extends ParamFlag<infer T>
-    ? { [propName in T | keyof RouteParam<R>]: string }
-    : { [propName in keyof RouteParam<R>]: string }
+  ? Record<T | keyof RouteParam<R>, string>
+  : Record<keyof RouteParam<R>, string>
   : U extends ParamFlag<infer T>
-  ? { [propName in T]: string }
-  : {};
+  ? Record<T, string>
+  : unknown;
