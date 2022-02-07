@@ -1,4 +1,4 @@
 docs/
 src/
-.json
-.yaml
+*.json
+*.yaml
