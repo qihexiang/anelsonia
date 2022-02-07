@@ -33,6 +33,7 @@
   },
   "scripts": {
     "build": "tsc && typedoc",
-    "pretty": "prettier --write ./src"
+    "check": "eslint ./src",
+    "lint": "eslint --fix ./src"
   }
 }
