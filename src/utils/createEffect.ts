@@ -8,17 +8,24 @@
  * with side effect.
  */
 export function createEffect<F extends (...args: any[]) => any>(
-  hook: (...args: Parameters<F>) => (r: Readonly<ReturnType<F>>) => void
+    hook: (...args: Parameters<F>) => (r: Readonly<ReturnType<F>>) => void
 ): (
-  fn: (...args: Parameters<F>) => ReturnType<F>
+    fn: (...args: Parameters<F>) => ReturnType<F>
 ) => (...args: Parameters<F>) => ReturnType<F> {
-  return (fn) =>
-    (...p) => {
-      const hookAfter = hook(...p);
-      const r = fn(...p);
-      hookAfter(r);
-      return r;
-    };
+    return (fn) =>
+        (...p) => {
+            const hookAfter = hook(...p);
+            const r = fn(...p);
+            hookAfter(r);
+            return r;
+        };
+}
+
+export function addEffect<F extends (...args: any[]) => any>(
+    fn: F,
+    hook: (...args: Parameters<F>) => (r: Readonly<ReturnType<F>>) => void
+) {
+    return createEffect(hook)(fn);
 }
 
 export default createEffect;
