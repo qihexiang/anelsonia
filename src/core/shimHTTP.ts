@@ -19,21 +19,21 @@ const requests = new AsyncLocalStorage<HttpReq>();
  * @returns `HttpReq` object
  */
 export const useRequest = () => {
-  const req = requests.getStore();
-  if (req === undefined)
-    throw new Error(
-      "Can't get request, is this function called by main function?"
-    );
-  return req;
+    const req = requests.getStore();
+    if (req === undefined)
+        throw new Error(
+            "Can't get request, is this function called by main function?"
+        );
+    return req;
 };
 
 /**
  * Get host, path and query object from the request.
  */
 export function useURL(): {
-  host: string;
-  path: string;
-  query: URLSearchParams;
+    host: string;
+    path: string;
+    query: URLSearchParams;
 };
 /**
  * Get request path from the request.
@@ -60,33 +60,33 @@ export function useURL(prop: "query"): URLSearchParams;
  */
 export function useURL<T>(prop: (url: string) => T): T;
 export function useURL<T>(prop?: "path" | "host" | "query" | Route<T>) {
-  const req = requests.getStore();
-  if (req === undefined)
-    throw new Error(
-      "Can't get request, is this function called by main function?"
-    );
-  const host = req.headers.host ?? "localhost";
-  if (prop === "host") return host;
-  const path = req.url ?? "/";
-  if (prop === "path") return path;
-  const url = new URL(path, `http://${host}`);
-  if (prop === "query") return url.searchParams;
-  if (prop === undefined) return { host, path, query: url.searchParams };
-  return prop(path);
+    const req = requests.getStore();
+    if (req === undefined)
+        throw new Error(
+            "Can't get request, is this function called by main function?"
+        );
+    const host = req.headers.host ?? "localhost";
+    if (prop === "host") return host;
+    const path = req.url ?? "/";
+    if (prop === "path") return path;
+    const url = new URL(path, `http://${host}`);
+    if (prop === "query") return url.searchParams;
+    if (prop === undefined) return { host, path, query: url.searchParams };
+    return prop(path);
 }
 
 interface CreateFlare {
-  <T>(): [(value: T) => void, () => Readonly<T>, () => void];
-  <T>(options: { mutable: true; reassign: boolean }): [
-    (value: T) => void,
-    () => T,
-    () => void
-  ];
-  <T>(options: { mutable: false; reassign: boolean }): [
-    (value: T) => Readonly<void>,
-    () => T,
-    () => void
-  ];
+    <T>(): [(value: T) => void, () => Readonly<T>, () => void];
+    <T>(options: { mutable: true; reassign: boolean }): [
+        (value: T) => void,
+        () => T,
+        () => void
+    ];
+    <T>(options: { mutable: false; reassign: boolean }): [
+        (value: T) => Readonly<void>,
+        () => T,
+        () => void
+    ];
 }
 
 /**
@@ -99,49 +99,49 @@ interface CreateFlare {
  * - `extinguish` remove the value from the flare
  */
 export const createFlare: CreateFlare = <T>(
-  options = {
-    mutable: false,
-    reassign: false,
-  }
+    options = {
+        mutable: false,
+        reassign: false,
+    }
 ) => {
-  const { reassign } = options;
-  const getReq = () => {
-    const result = requests.getStore();
-    if (result === undefined)
-      throw new Error("Can't get symbol of this request.");
-    return result;
-  };
-  const values = new WeakMap<HttpReq, T>();
-  /**
-   * Assign or re-assign a value to this flare
-   *
-   * @param value the value you want to assign to flare
-   */
-  const light = (value: T) => {
-    const req = getReq();
-    if (!reassign && values.has(req))
-      throw new Error("Already has a value and not re-assignable.");
-    values.set(req, value);
-  };
-  /**
-   * Get value from the flare.
-   *
-   * @returns the value assgined to the flare
-   */
-  const observe = () => {
-    const value = values.get(getReq());
-    if (value === undefined)
-      throw new Error("No value has been assigned to this flare.");
-    return value;
-  };
-  /**
-   * Remove the value from the flare.
-   */
-  const extinguish = () => {
-    if (!values.delete(getReq()))
-      throw new Error("No value assigned to this flare found.");
-  };
-  return [light, observe, extinguish];
+    const { reassign } = options;
+    const getReq = () => {
+        const result = requests.getStore();
+        if (result === undefined)
+            throw new Error("Can't get symbol of this request.");
+        return result;
+    };
+    const values = new WeakMap<HttpReq, T>();
+    /**
+     * Assign or re-assign a value to this flare
+     *
+     * @param value the value you want to assign to flare
+     */
+    const light = (value: T) => {
+        const req = getReq();
+        if (!reassign && values.has(req))
+            throw new Error("Already has a value and not re-assignable.");
+        values.set(req, value);
+    };
+    /**
+     * Get value from the flare.
+     *
+     * @returns the value assgined to the flare
+     */
+    const observe = () => {
+        const value = values.get(getReq());
+        if (value === undefined)
+            throw new Error("No value has been assigned to this flare.");
+        return value;
+    };
+    /**
+     * Remove the value from the flare.
+     */
+    const extinguish = () => {
+        if (!values.delete(getReq()))
+            throw new Error("No value assigned to this flare found.");
+    };
+    return [light, observe, extinguish];
 };
 
 /**
@@ -152,32 +152,33 @@ export const createFlare: CreateFlare = <T>(
  * @returns a handler function for Node.js `http`、`https`、`http2` modules
  */
 export function shimHTTP(
-  entry: EntryPoint,
-  errHandler?: (err: any) => void
+    entry: EntryPoint,
+    errHandler?: (err: any) => void
 ): ReqHandler {
-  return async (req, res) => {
-    requests.run(req, async () => {
-      try {
-        const { statusCode, statusMessage, body, headers } = await entry(req);
-        if (res instanceof IncomingMessage)
-          res.writeHead(statusCode, statusMessage, headers);
-        res.writeHead(statusCode, headers);
-        if (body instanceof Stream) {
-          body.pipe(res);
-          body.on("error", (err) => {
-            if (errHandler !== undefined) errHandler(err);
-            res.end();
-          });
-          res.on("finish", () => {
-            destroy(body);
-          });
-        } else {
-          body ? res.end(body as Buffer | string) : res.end();
-        }
-      } catch (err) {
-        if (errHandler !== undefined) errHandler(err);
-        res.end();
-      }
-    });
-  };
+    return async (req, res) => {
+        requests.run(req, async () => {
+            try {
+                const { statusCode, statusMessage, body, headers } =
+                    await entry(req);
+                if (res instanceof IncomingMessage)
+                    res.writeHead(statusCode, statusMessage, headers);
+                res.writeHead(statusCode, headers);
+                if (body instanceof Stream) {
+                    body.pipe(res);
+                    body.on("error", (err) => {
+                        if (errHandler !== undefined) errHandler(err);
+                        res.end();
+                    });
+                    res.on("finish", () => {
+                        destroy(body);
+                    });
+                } else {
+                    body ? res.end(body as Buffer | string) : res.end();
+                }
+            } catch (err) {
+                if (errHandler !== undefined) errHandler(err);
+                res.end();
+            }
+        });
+    };
 }

@@ -2,11 +2,11 @@ import { getType } from "mime";
 export type EncodingType = "gzip" | "compress" | "deflate" | "identity" | "br";
 
 export function contentType(mediaType: string, charset?: string) {
-  return {
-    "Content-Type": `${getType(mediaType) ?? "application/octect-stream"}${
-      charset ? `; charset=${charset.toUpperCase()}` : ""
-    }`,
-  };
+    return {
+        "Content-Type": `${getType(mediaType) ?? "application/octect-stream"}${
+            charset ? `; charset=${charset.toUpperCase()}` : ""
+        }`,
+    };
 }
 
 /**
@@ -21,23 +21,23 @@ export function contentLength(length: number): { "Content-Length"?: number };
  * @param content the content you'd like to response.
  */
 export function contentLength(content: string | Buffer): {
-  "Content-Length": number;
+    "Content-Length": number;
 };
 export function contentLength(input: number | string | Buffer): {
-  "Content-Length"?: number;
+    "Content-Length"?: number;
 } {
-  if (typeof input === "number") {
-    const check = Number.isInteger(input);
-    if (!check) console.log(`Content-Length should be an integer`);
-    return check ? { "Content-Length": input } : {};
-  }
-  if (typeof input === "string") {
-    return { "Content-Length": input.length };
-  }
-  if (input instanceof Buffer) {
-    return { "Content-Length": input.length };
-  }
-  return {};
+    if (typeof input === "number") {
+        const check = Number.isInteger(input);
+        if (!check) console.log(`Content-Length should be an integer`);
+        return check ? { "Content-Length": input } : {};
+    }
+    if (typeof input === "string") {
+        return { "Content-Length": input.length };
+    }
+    if (input instanceof Buffer) {
+        return { "Content-Length": input.length };
+    }
+    return {};
 }
 
 /**
@@ -46,7 +46,7 @@ export function contentLength(input: number | string | Buffer): {
  * @param download false, this is not a download content
  */
 export function contentDisposition(download: false): {
-  "Content-Disposition": string;
+    "Content-Disposition": string;
 };
 /**
  * Is this response a download response?
@@ -55,53 +55,53 @@ export function contentDisposition(download: false): {
  * @param filename the filename of download content
  */
 export function contentDisposition(
-  download: true,
-  filename?: string
+    download: true,
+    filename?: string
 ): { "Content-Disposition": string };
 export function contentDisposition(download: boolean, filename?: string) {
-  return {
-    "Content-Disposition": `${download ? "attachment" : "inline"}${
-      filename ? `; filename=${filename}` : ""
-    }`,
-  };
+    return {
+        "Content-Disposition": `${download ? "attachment" : "inline"}${
+            filename ? `; filename=${filename}` : ""
+        }`,
+    };
 }
 
 export function contentEncoding(encodingType: EncodingType): {
-  "Content-Encoding": EncodingType;
+    "Content-Encoding": EncodingType;
 } {
-  return { "Content-Encoding": encodingType };
+    return { "Content-Encoding": encodingType };
 }
 
 export function contentLanguage<L extends string>(
-  lang: L
+    lang: L
 ): { "Content-Language": `${Lowercase<L>}` };
 export function contentLanguage<L extends string, V extends string>(
-  lang: L,
-  variant: V
+    lang: L,
+    variant: V
 ): { "Content-Language": `${Lowercase<L>}-${Uppercase<V>}` };
 export function contentLanguage<L extends string, V extends string>(
-  lang: L,
-  variant?: V
+    lang: L,
+    variant?: V
 ): {
-  "Content-Language": `${Lowercase<L>}` | `${Lowercase<L>}-${Uppercase<V>}`;
+    "Content-Language": `${Lowercase<L>}` | `${Lowercase<L>}-${Uppercase<V>}`;
 } {
-  if (variant === undefined)
-    return { "Content-Language": `${lang.toLowerCase() as Lowercase<L>}` };
-  return {
-    "Content-Language": `${lang.toLowerCase() as Lowercase<L>}-${
-      variant.toUpperCase() as Uppercase<V>
-    }`,
-  };
+    if (variant === undefined)
+        return { "Content-Language": `${lang.toLowerCase() as Lowercase<L>}` };
+    return {
+        "Content-Language": `${lang.toLowerCase() as Lowercase<L>}-${
+            variant.toUpperCase() as Uppercase<V>
+        }`,
+    };
 }
 
 export function serverHeader(product = "freesia") {
-  return { Server: product };
+    return { Server: product };
 }
 
 export function location(url: string) {
-  return { Location: url };
+    return { Location: url };
 }
 
 export function acceptRanges(range: string) {
-  return { "Accept-Ranges": range };
+    return { "Accept-Ranges": range };
 }

@@ -14,11 +14,11 @@ import { Route, ExtendRoute } from "./createRoute";
  * result, otherwise return null.
  */
 export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
-  return (url: string): R | null =>
-    routes.reduce<R | null>(
-      (lastRouted, nextRoute) => lastRouted ?? nextRoute(url),
-      null
-    );
+    return (url: string): R | null =>
+        routes.reduce<R | null>(
+            (lastRouted, nextRoute) => lastRouted ?? nextRoute(url),
+            null
+        );
 }
 
 /**
@@ -36,11 +36,11 @@ export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
  * null.
  */
 export function createExtendSwitcher<R, X>(
-  ...routes: ExtendRoute<R, X>[]
+    ...routes: ExtendRoute<R, X>[]
 ): ExtendRoute<R, X> {
-  return (url: string, extra: X): R | null =>
-    routes.reduce<R | null>(
-      (lastRouted, nextRoute) => lastRouted ?? nextRoute(url, extra),
-      null
-    );
+    return (url: string, extra: X): R | null =>
+        routes.reduce<R | null>(
+            (lastRouted, nextRoute) => lastRouted ?? nextRoute(url, extra),
+            null
+        );
 }

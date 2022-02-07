@@ -3,8 +3,8 @@ import { RouteParam } from "./params";
 export type RouteHandler<P extends string, R> = (params: RouteParam<P>) => R;
 export type Route<R> = (url: string) => R | null;
 export type ExtendRouteHandler<P extends string, X, R> = (
-  params: RouteParam<P>,
-  extra: X
+    params: RouteParam<P>,
+    extra: X
 ) => R;
 export type ExtendRoute<R, X> = (url: string, extra: X) => R | null;
 
@@ -24,17 +24,17 @@ export type ExtendRoute<R, X> = (url: string, extra: X) => R | null;
  * result, otherwise return null.
  */
 export function createRoute<P extends string, R>(
-  pattern: P,
-  handler: RouteHandler<P, R>
+    pattern: P,
+    handler: RouteHandler<P, R>
 ): Route<R> {
-  const re = createRegExp(pattern);
-  return (url: string) => {
-    const matched = re.exec(url);
-    if (matched) {
-      return handler(matched.groups as RouteParam<P>);
-    }
-    return null;
-  };
+    const re = createRegExp(pattern);
+    return (url: string) => {
+        const matched = re.exec(url);
+        if (matched) {
+            return handler(matched.groups as RouteParam<P>);
+        }
+        return null;
+    };
 }
 
 /**
@@ -54,27 +54,27 @@ export function createRoute<P extends string, R>(
  * null.
  */
 export function createExtendRoute<P extends string, X, R>(
-  pattern: P,
-  handler: ExtendRouteHandler<P, X, R>
+    pattern: P,
+    handler: ExtendRouteHandler<P, X, R>
 ): ExtendRoute<R, X> {
-  const re = createRegExp(pattern);
-  return (url: string, extra: X) => {
-    const matched = re.exec(url);
-    if (matched) {
-      return handler(matched.groups as RouteParam<P>, extra);
-    }
-    return null;
-  };
+    const re = createRegExp(pattern);
+    return (url: string, extra: X) => {
+        const matched = re.exec(url);
+        if (matched) {
+            return handler(matched.groups as RouteParam<P>, extra);
+        }
+        return null;
+    };
 }
 
 function createRegExp<P extends string>(pattern: P) {
-  const parsedPattern = pattern
-    .replace(/<.+?>/g, "(?$&.+?)")
-    .replace(/\]>\.\+\?/g, "]>.+")
-    .replace(/<\[/g, "<")
-    .replace(/\]>/, ">")
-    .replace(/\[.+?\]/g, "(?$&.*)")
-    .replace("[", "<")
-    .replace("]", ">");
-  return new RegExp(`^${parsedPattern}$`);
+    const parsedPattern = pattern
+        .replace(/<.+?>/g, "(?$&.+?)")
+        .replace(/\]>\.\+\?/g, "]>.+")
+        .replace(/<\[/g, "<")
+        .replace(/\]>/, ">")
+        .replace(/\[.+?\]/g, "(?$&.*)")
+        .replace("[", "<")
+        .replace("]", ">");
+    return new RegExp(`^${parsedPattern}$`);
 }
