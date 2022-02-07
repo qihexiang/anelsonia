@@ -1,8 +1,8 @@
 {
   "name": "freesia",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "description": "A TypeScript library for building web servers.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
   "license": "MPL-2.0",
   "private": false,
