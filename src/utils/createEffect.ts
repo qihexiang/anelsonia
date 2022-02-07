@@ -7,7 +7,7 @@
  * @returns a wrapper that can wrap the orignal function to another function
  * with side effect.
  */
-export function createEffect<F extends (...args: any) => any>(
+export function createEffect<F extends (...args: any[]) => any>(
   hook: (...args: Parameters<F>) => (r: Readonly<ReturnType<F>>) => void
 ): (
   fn: (...args: Parameters<F>) => ReturnType<F>
