@@ -1,4 +1,4 @@
 docs/
 src/
-typedoc.json
-tsconfig.json
+.json
+.yaml
