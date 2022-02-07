@@ -14,6 +14,7 @@
   "devDependencies": {
     "@types/destroy": "^1.0.0",
     "@types/mime": "^2.0.3",
+    "prettier": "^2.5.1",
     "raw-body": "^2.4.2",
     "ts-node": "^10.4.0",
     "ts-node-dev": "^1.1.8",
@@ -26,6 +27,7 @@
     "mime": "^2.5.2"
   },
   "scripts": {
-    "build": "tsc && typedoc"
+    "build": "tsc && typedoc",
+    "pretty": "prettier --write ./src"
   }
 }

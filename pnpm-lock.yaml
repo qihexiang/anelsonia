@@ -6,6 +6,7 @@ specifiers:
   '@types/node': ^14.14.37
   destroy: ^1.0.4
   mime: ^2.5.2
+  prettier: ^2.5.1
   raw-body: ^2.4.2
   ts-node: ^10.4.0
   ts-node-dev: ^1.1.8
@@ -20,6 +21,7 @@ dependencies:
 devDependencies:
   '@types/destroy': 1.0.0
   '@types/mime': 2.0.3
+  prettier: 2.5.1
   raw-body: 2.4.2
   ts-node: 10.4.0_c7aa03196a4d62e8dc844e3ce73ee619
   ts-node-dev: 1.1.8_typescript@4.5.5
@@ -346,6 +348,12 @@ packages:
   /picomatch/2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
+    dev: true
+
+  /prettier/2.5.1:
+    resolution: {integrity: sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /raw-body/2.4.2:

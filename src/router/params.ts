@@ -5,10 +5,13 @@
  */
 export type ParamFlag<T extends string> = `[${T}]` | `<[${T}]>` | `<${T}>`;
 export type RoutePattern<L extends string, R extends string> = `${L}/${R}`;
-export type RouteParam<U extends string> = U extends RoutePattern<infer L, infer R>
-    ? (L extends ParamFlag<infer T>
-        ? { [propName in (T | keyof RouteParam<R>)]: string }
-        : { [propName in keyof RouteParam<R>]: string })
-    : (U extends ParamFlag<infer T>
-        ? { [propName in T]: string }
-        : {});
+export type RouteParam<U extends string> = U extends RoutePattern<
+  infer L,
+  infer R
+>
+  ? L extends ParamFlag<infer T>
+    ? { [propName in T | keyof RouteParam<R>]: string }
+    : { [propName in keyof RouteParam<R>]: string }
+  : U extends ParamFlag<infer T>
+  ? { [propName in T]: string }
+  : {};
