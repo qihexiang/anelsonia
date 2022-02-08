@@ -1,3 +1,6 @@
+import createRes from "../core/Respond";
+import { contentLength, contentType } from "./ResHeader";
+
 export interface HasToJSON {
     toJSON: () => BasicJSONTypes | JsonArray | JsonObject;
 }
@@ -7,3 +10,17 @@ export type JsonObject = {
 };
 export type JsonArray = JsonType[];
 export type JsonType = JsonObject | JsonArray | BasicJSONTypes | HasToJSON;
+
+/**
+ * Return something can be defined as json.
+ *
+ * @param json the json content you'd like to send.
+ * @returns Respond with json content
+ */
+export const resJson = (json: JsonType) => {
+    const body = JSON.stringify(json);
+    return createRes(body).setHeaders(
+        contentType("json", "utf-8"),
+        contentLength(body)
+    );
+};
