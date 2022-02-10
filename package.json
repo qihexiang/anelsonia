@@ -1,6 +1,6 @@
 {
   "name": "freesia",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "A TypeScript library for building web servers.",
   "main": "dist/index.js",
   "author": "Hexiang Qi<qihexiang@outlook.com>",
