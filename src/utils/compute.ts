@@ -22,12 +22,12 @@ export const compute = <T>(initValue: T): Computation<T> => {
 
 export default compute;
 
-interface Lazy<F extends () => any> {
+export interface Lazy<F extends () => any> {
     map: <N>(nextFn: (r: ReturnType<F>) => N) => Lazy<() => N>;
     get value(): ReturnType<F>;
 }
 
-const lazy = <F extends () => any>(fn: F): Lazy<F> => {
+export const lazy = <F extends () => any>(fn: F): Lazy<F> => {
     return {
         map: (nextFn) =>
             lazy(
