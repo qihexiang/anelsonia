@@ -30,7 +30,8 @@
     "mime": "^2.5.2"
   },
   "scripts": {
-    "build": "tsc && typedoc",
+    "build": "tsc",
+    "doc": "typedoc ./src/index.ts",
     "check": "eslint ./src",
     "lint": "eslint --fix ./src",
     "prettier": "prettier --write ./src"
