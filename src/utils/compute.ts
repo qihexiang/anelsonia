@@ -1,7 +1,8 @@
 import { baseCompose } from ".";
 
 export interface Computation<T> {
-    map: <R>(fn: (t: T) => R) => Computation<R>;
+    readonly map: <R>(fn: (t: T) => R) => Computation<R>;
+    readonly ifNull: (nullHandler: () => NonNullable<T>) => Computation<NonNullable<T>>;
     get value(): T;
 }
 
@@ -14,6 +15,12 @@ export interface Computation<T> {
 export const compute = <T>(initValue: T): Computation<T> => {
     return {
         map: (fn) => compute(fn(initValue)),
+        ifNull: (nullHandler) =>
+            compute(
+                initValue === undefined || initValue === null
+                    ? nullHandler()
+                    : (initValue as NonNullable<T>)
+            ),
         get value() {
             return initValue;
         },
@@ -22,18 +29,24 @@ export const compute = <T>(initValue: T): Computation<T> => {
 
 export default compute;
 
-export interface Lazy<F extends () => any> {
-    map: <N>(nextFn: (r: ReturnType<F>) => N) => Lazy<() => N>;
-    get value(): ReturnType<F>;
+export interface Lazy<T> {
+    readonly map: <N>(nextFn: (r: T) => N) => Lazy<N>;
+    readonly ifNull: (fn: () => NonNullable<T>) => Lazy<NonNullable<T>>;
+    get value(): T;
 }
 
-export const lazy = <F extends () => any>(fn: F): Lazy<F> => {
+export const lazy = <T>(fn: () => T): Lazy<T> => {
     return {
         map: (nextFn) =>
+            lazy(baseCompose<void, T, ReturnType<typeof nextFn>>(fn, nextFn)),
+        ifNull: (nullHandler) =>
             lazy(
-                baseCompose<void, ReturnType<F>, ReturnType<typeof nextFn>>(
+                baseCompose<void, T, ReturnType<typeof nullHandler>>(
                     fn,
-                    nextFn
+                    (t: T) =>
+                        t === undefined || t === null
+                            ? nullHandler()
+                            : (t as NonNullable<T>)
                 )
             ),
         get value() {
@@ -42,6 +55,6 @@ export const lazy = <F extends () => any>(fn: F): Lazy<F> => {
     };
 };
 
-export const computeLazy = <T>(initValue: T): Lazy<() => T> => {
+export const computeLazy = <T>(initValue: T): Lazy<T> => {
     return lazy(() => initValue);
 };
