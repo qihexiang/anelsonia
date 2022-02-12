@@ -2,7 +2,9 @@ import { baseCompose } from ".";
 
 export interface Computation<T> {
     readonly map: <R>(fn: (t: T) => R) => Computation<R>;
-    readonly ifNull: (nullHandler: () => NonNullable<T>) => Computation<NonNullable<T>>;
+    readonly ifNull: (
+        nullHandler: () => NonNullable<T>
+    ) => Computation<NonNullable<T>>;
     get value(): T;
 }
 

@@ -5,8 +5,8 @@ export interface Composer<T, R> {
 
 export const baseCompose =
     <T, R, S>(a: (t: T) => R, b: (r: R) => S) =>
-        (t: T) =>
-            b(a(t));
+    (t: T) =>
+        b(a(t));
 
 /**
  * Create a function composition, and add first function.
