@@ -3,13 +3,13 @@ import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
+import { createRes, ResponseProps } from ".";
 import { Route } from "..";
-import { AsyncResponse } from "./Respond";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;
 export type ReqHandler = (req: HttpReq, res: HttpRes) => void;
-export type EntryPoint = (req: HttpReq) => AsyncResponse;
+export type EntryPoint = (req: HttpReq) => Promise<ResponseProps>;
 
 const requests = new AsyncLocalStorage<HttpReq>();
 
@@ -148,18 +148,35 @@ export const createFlare: CreateFlare = <T>(
  * Transform an entry function to Node.js HTTP request handler
  *
  * @param entry a function receives request object and return a reponse object.
- * @param errHandler handler for dealing with errors
+ * @param extraOptions {errHandler, maxTimeout}
+ * - errHandler is a function that can handler errors on request,
+ * - maxTimeout is the longest timeout for a response handling, unit is ms.
  * @returns a handler function for Node.js `http`、`https`、`http2` modules
  */
 export function shimHTTP(
     entry: EntryPoint,
-    errHandler?: (err: any) => void
+    extraOptions: {
+        errHandler?: (err: any) => void;
+        maxTimeout?: number;
+    }
 ): ReqHandler {
+    const { errHandler = (err: any) => console.error(err), maxTimeout = 30 } =
+        extraOptions;
+    if (!Number.isInteger(maxTimeout))
+        throw new Error("maxTimeout property must be an integer");
     return async (req, res) => {
         requests.run(req, async () => {
             try {
                 const { statusCode, statusMessage, body, headers } =
-                    await entry(req);
+                    await Promise.race([
+                        entry(req),
+                        new Promise<ResponseProps>((resolve) =>
+                            setTimeout(
+                                () => resolve(createRes(408)),
+                                maxTimeout
+                            )
+                        ),
+                    ]);
                 if (res instanceof IncomingMessage)
                     res.writeHead(statusCode, statusMessage, headers);
                 res.writeHead(statusCode, headers);
