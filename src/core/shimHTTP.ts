@@ -160,8 +160,10 @@ export function shimHTTP(
         maxTimeout?: number;
     }
 ): ReqHandler {
-    const { errHandler = (err: any) => console.error(err), maxTimeout = 30 * 1000 } =
-        extraOptions;
+    const {
+        errHandler = (err: any) => console.error(err),
+        maxTimeout = 30 * 1000,
+    } = extraOptions;
     if (!Number.isInteger(maxTimeout))
         throw new Error("maxTimeout property must be an integer");
     return async (req, res) => {
