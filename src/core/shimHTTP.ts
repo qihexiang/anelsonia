@@ -155,7 +155,7 @@ export const createFlare: CreateFlare = <T>(
  */
 export function shimHTTP(
     entry: EntryPoint,
-    extraOptions: {
+    extraOptions?: {
         errHandler?: (err: any) => void;
         maxTimeout?: number;
     }
@@ -163,7 +163,7 @@ export function shimHTTP(
     const {
         errHandler = (err: any) => console.error(err),
         maxTimeout = 30 * 1000,
-    } = extraOptions;
+    } = extraOptions ?? {};
     if (!Number.isInteger(maxTimeout))
         throw new Error("maxTimeout property must be an integer");
     return async (req, res) => {
