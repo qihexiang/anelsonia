@@ -25,9 +25,10 @@ export type ExtendRoute<R, X> = (url: string, extra: X) => R | null;
  */
 export function createRoute<P extends string, R>(
     pattern: P,
-    handler: RouteHandler<P, R>
+    handler: RouteHandler<P, R>,
+    flags?: string
 ): Route<R> {
-    const re = createRegExp(pattern);
+    const re = createRegExp(pattern, flags);
     return (url: string) => {
         const matched = re.exec(url);
         if (matched) {
@@ -55,9 +56,10 @@ export function createRoute<P extends string, R>(
  */
 export function createExtendRoute<P extends string, X, R>(
     pattern: P,
-    handler: ExtendRouteHandler<P, X, R>
+    handler: ExtendRouteHandler<P, X, R>,
+    flags?: string
 ): ExtendRoute<R, X> {
-    const re = createRegExp(pattern);
+    const re = createRegExp(pattern, flags);
     return (url: string, extra: X) => {
         const matched = re.exec(url);
         if (matched) {
@@ -67,7 +69,7 @@ export function createExtendRoute<P extends string, X, R>(
     };
 }
 
-function createRegExp<P extends string>(pattern: P) {
+function createRegExp<P extends string>(pattern: P, flags = "i") {
     const parsedPattern = pattern
         .replace(/<.+?>/g, "(?$&.+?)")
         .replace(/\]>\.\+\?/g, "]>.+")
@@ -76,5 +78,5 @@ function createRegExp<P extends string>(pattern: P) {
         .replace(/\[.+?\]/g, "(?$&.*)")
         .replace("[", "<")
         .replace("]", ">");
-    return new RegExp(`^${parsedPattern}$`);
+    return new RegExp(`^${parsedPattern}$`, flags);
 }
