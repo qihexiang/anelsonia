@@ -1,4 +1,5 @@
-import { baseCompose } from ".";
+import { baseCompose } from "./composeFn";
+import { isVoid } from "./isVoid";
 
 export interface Computation<T> {
     readonly map: <R>(fn: (t: T) => R) => Computation<R>;
@@ -20,13 +21,15 @@ export interface Computation<T> {
 export const compute = <T>(initValue: T): Computation<T> => {
     return {
         map: (fn) => compute(fn(initValue)),
-        mapSkipNull: (fn) => compute(
-            (initValue === undefined || initValue === null) ? initValue as Extract<T, (undefined | null)>
-                : fn(initValue as NonNullable<T>)
-        ),
+        mapSkipNull: (fn) =>
+            compute(
+                isVoid(initValue)
+                    ? (initValue as Extract<T, undefined | null>)
+                    : fn(initValue as NonNullable<T>)
+            ),
         ifNull: (nullHandler) =>
             compute(
-                initValue === undefined || initValue === null
+                isVoid(initValue)
                     ? nullHandler()
                     : (initValue as NonNullable<T>)
             ),
@@ -57,20 +60,18 @@ export const lazy = <T>(fn: () => T): Lazy<T> => {
                     void,
                     T,
                     ReturnType<typeof nextFn> | Extract<T, undefined | null>
-                >(fn, (t: T) => {
-                    if (t === undefined || t === null)
-                        return t as Extract<T, undefined | null>;
-                    return nextFn(t as NonNullable<T>);
-                })
+                >(fn, (t: T) =>
+                    isVoid(t)
+                        ? (t as Extract<T, undefined | null>)
+                        : nextFn(t as NonNullable<T>)
+                )
             ),
         ifNull: (nullHandler) =>
             lazy(
                 baseCompose<void, T, ReturnType<typeof nullHandler>>(
                     fn,
                     (t: T) =>
-                        t === undefined || t === null
-                            ? nullHandler()
-                            : (t as NonNullable<T>)
+                        isVoid(t) ? nullHandler() : (t as NonNullable<T>)
                 )
             ),
         get value() {

@@ -5,3 +5,4 @@ export * from "./ResHeader";
 export * from "./MaybePromise";
 export * from "./jsonType";
 export * from "./compute";
+export * from "./isVoid";
