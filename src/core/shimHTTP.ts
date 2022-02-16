@@ -31,10 +31,18 @@ export const useRequest = () => {
  * Get host, path and query object from the request.
  */
 export function useURL(): {
+    method: string;
     host: string;
     path: string;
     query: URLSearchParams;
 };
+
+/**
+ * Get request method.
+ * 
+ * @param prop method
+ */
+export function useURL(prop: "method"): string;
 /**
  * Get request path from the request.
  *
@@ -59,12 +67,14 @@ export function useURL(prop: "query"): URLSearchParams;
  * @param prop the router you want to use
  */
 export function useURL<T>(prop: (url: string) => T): T;
-export function useURL<T>(prop?: "path" | "host" | "query" | Route<T>) {
+export function useURL<T>(prop?: "path" | "host" | "query" | "method" | Route<T>) {
     const req = requests.getStore();
     if (req === undefined)
         throw new Error(
             "Can't get request, is this function called by main function?"
         );
+    const method = req.method ?? "GET";
+    if(prop === "method") return method
     const host = req.headers.host ?? "localhost";
     if (prop === "host") return host;
     const path = req.url ?? "/";
