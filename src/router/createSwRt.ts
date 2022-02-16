@@ -109,7 +109,16 @@ export function createSwRt(): RouteChainInit {
     };
 }
 
-createSwRt.route = createSwRt().route;
+export namespace createSwRt {
+    /**
+     * Add first route to the switcher.
+     *
+     * @param pattern a matching pattern
+     * @param handler a handler dealing with the route
+     * @returns a router chain.
+     */
+    export const route = createSwRt().route;
+}
 
 /**
  * Create a extended switcher and extended routes connect to it at the same time.
@@ -187,4 +196,13 @@ export function createExtendSwRt(): ExtendRouteChainInit {
     };
 }
 
-createExtendSwRt.route = createExtendSwRt().route;
+export namespace createExtendSwRt {
+    /**
+     * Add first extend route to the switcher.
+     *
+     * @param pattern a matching pattern
+     * @param handler a handler dealing with the route
+     * @returns a router chain.
+     */
+    export const route = createExtendSwRt().route;
+}
