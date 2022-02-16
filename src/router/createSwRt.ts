@@ -109,6 +109,8 @@ export function createSwRt(): RouteChainInit {
     };
 }
 
+createSwRt.route = createSwRt().route;
+
 /**
  * Create a extended switcher and extended routes connect to it at the same time.
  *
@@ -184,3 +186,5 @@ export function createExtendSwRt(): ExtendRouteChainInit {
         },
     };
 }
+
+createExtendSwRt.route = createExtendSwRt().route;
