@@ -34,6 +34,7 @@
     "doc": "typedoc ./src/index.ts",
     "check": "eslint ./src",
     "lint": "eslint --fix ./src",
-    "prettier": "prettier --write ./src"
+    "prettier": "prettier --write ./src",
+    "test": "echo $PATH"
   }
 }

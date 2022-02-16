@@ -6,7 +6,7 @@ export const isVoid = <T, V extends Void = undefined | null>(
     voidValues?: Voids<V>
 ): initValue is Extract<T, V> => {
     return (voidValues ?? ([undefined, null] as Voids<V>)).reduce(
-        (current, next) => current || (next as unknown) === initValue,
+        (current, next) => current || next === (initValue as unknown),
         false as boolean
     );
 };

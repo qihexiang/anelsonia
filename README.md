@@ -129,6 +129,13 @@ const result = switcher(url)
 Switcher最终得到的函数和Route实际上是一样的，因此可以逐级将多个Switcher也聚合起来。
 
 > 注意，由于`switcher`的实现使用了`??`运算符（判断匹配失败的依据是路由返回`null`），因此当你需要返回`null`或`undefined`时，必须将其包裹起来，例如`{ value: null }`。
+> 
+> 这个问题在你有多个可以匹配同一个路径的模式时尤为重要，例如下列两种模式：
+> 
+> - `/api/user/avatar`
+> - `/api/user/<otherInfo>`
+>
+> 都可以匹配到`/api/user/avatar`，如果第一个路由都返回`undefined`，则这两个路由回调都会被执行，尽管返回值是`undefined`，但函数中的副作用依然会发生。
 
 ### 额外参数
 
@@ -186,6 +193,8 @@ async function main(req) {
 
 `route`和`fallback`函数会检查`handler`的返回类型是否一致，一致性的依据是第一个被调用的`route`方法的传入参数，如果要手动指定返回类型，例如有的`handler`返回异步结果，有的返回同步结果，则应该在第一次调用`route`时明确泛型类型，`.route<Promise<ResponseProps>>|ResponseProps>`。后续的`route`函数和第一个`route`并不是同一个函数，他们没有泛型参数。
 
+> 自0.8.20版本起，你可以使用`createSwRt.route`来代替`createSwRt().route`，`createSwRt`保留后者仅为了和之前版本的代码兼容。
+
 > 请务必不要通过导出`createSwRt`的执行结果来在多个文件中注册路由：  
 > 第一次返回的`route`方法实际上会返回一个全新的对象，多次调用并不能将多个路由注册到一个交换机上，而是产生多个交换机；  
 > 之后的`route`方法可以在多处调用并注册路由到同一个交换机，但是注册的顺序取决于模块导入导出的逻辑，这会使得路由顺序和你设想的不一致；  
@@ -213,6 +222,24 @@ const result = condition(req.method)
 
 获得返回值有两种方法：`getValue`和`withDefault`，后者接受一个回调函数，来根据输入的值返回一个值。
 
+## 魔法函数
+
+魔法函数是一组依靠Node.js的`async_hooks`模块实现的函数，它们可以让你在调用链上的任意函数中获得之前过程中的到的值，而不必经过参数传递。
+
+### useRequest
+
+当一个请求进入时，Node.js会调用我们编写的主函数来处理这个请求，主函数可以接受到调用时传入的`req`参数。但有时我们会在一个极深的调用中使用他，例如：
+
+main（接受到`req`参数） -> fileOperateSwitcher -> uploadHandler -> privillegeChecker -> securityChecker -> uploadService（真正使用`req`的地方）
+
+在这个调用中，如果没有`useRequest`函数，我们需要在每个函数中都传第一次`req`参数，这是非常麻烦的。使用`useRequest`函数，我们可以不传递`req`，而是直接在`uploadService`中使用：
+
+```ts
+const req = useRequest();
+```
+
+需要注意的是，`req`作为一个流在调用链上不能被接收两次，例如你使用`getRawBody`在`securityChecker`中完全接收之后，就不能再在`uploadService`中接收它了。
+
 ### useURL
 
 `useURL`函数可以在`shimHTTP`的回调函数的任意层次调用中获得这个请求的路径信息，使用方法为：
@@ -225,15 +252,15 @@ useURL("query") // 返回query
 useURL(router) // Route<T>的路由，返回路由匹配结果。
 ```
 
-## 闪光弹和useRequest
+### createFlare
 
-编写代码时一个常见的问题是，在某个函数中生成的某个值可能会在多层间接调用的另一个函数中使用，使用函数传值的方式进行传递会非常麻烦。我们会希望有一种方式能够将一些变量进行“广播”，使得之后任意层次调用的函数都可以访问到这个值。
+除了在调用链上使用`req`或`url`信息，你还可以传递在调用过程中产生的任何值，使用`createFlare`函数来做到。
 
 Freesia提供了类似React上下文的功能（和请求绑定）。用`createFlare`函数来创建闪光弹，
 
 它可以接受0或1个参数，若有参数，是一个对象，包含两项属性：
 
-- `mutable`：若为`true`，则观测得到的值不是只读的，如果你要使用闪光弹传递一个ORM对象，它应该设置为true；
+- `mutable`：若为`true`，则观测得到的值不是只读的，如果你要使用闪光弹传递一个需要变化的ORM对象，它应该设置为true；
 - `reassign`：若为`true`，可以多次使用light函数重新给闪光弹赋值，一般没有理由这么做。
 - 不输入参数时，上述属性默认为`false`
 
@@ -252,7 +279,7 @@ Freesia提供了类似React上下文的功能（和请求绑定）。用`createF
 export const [light, observe, extinguish] = createFlare<Buffer>()
 
 const main = async req => {
-    const body = await rawBody(req);
+    const body = await getRawBody(req);
     light(body); // 从此向下的调用可以通过observe函数访问body
     ...
     const res = fileRoute(); // 不需要传递body
@@ -273,8 +300,8 @@ export const uploadService = (filepath: string) => {
 
 > 需要注意的以下几点：
 > 
-> - `createFlare`不是完全独立的函数，它返回的三个函数都只能在`shimHTTP`的直接或间接调用中执行，否则会抛出错误
-> - 静态分析时`light`，`observe`和`extinguish`并不能判断要获取的值是否处于有效期，因此这三个函数会在不符合执行条件的情况下抛出错误。（而不是返回`undefined`或`null`）
+> - `createFlare`不是完全独立的函数，它返回的三个函数都只能在`main`的直接或间接调用中执行，否则会抛出错误
+> - 静态分析时`light`，`observe`和`extinguish`并不能判断要获取的值是否处于有效期，因此这三个函数会在不符合执行条件的情况下抛出错误。（而不是返回`undefined`或`null`）。你应该尽量避免在`if`分支中使用`light`。
 > - `extinguish`函数不是必须执行的，`createFlare`内部使用的是`WeakMap`实现的，不必担心内存溢出的问题。
 
 在Freesia中，最常使用的一个对象可能是入口函数传入的`req`变量，因此提供了`useRequest`函数来随时获得这个值，你不需要将其层层传递下去。
