@@ -1,4 +1,4 @@
-import { Route, ExtendRoute } from "./createRoute";
+import { Route, RouteX } from "./createRoute";
 
 /**
  * Create a switcher connected to many routes.
@@ -35,9 +35,7 @@ export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
  * call the handler and return its result, otherwise return
  * null.
  */
-export function createExtendSwitcher<R, X>(
-    ...routes: ExtendRoute<R, X>[]
-): ExtendRoute<R, X> {
+export function createSwitcherX<R, X>(...routes: RouteX<R, X>[]): RouteX<R, X> {
     return (url: string, extra: X): R | null =>
         routes.reduce<R | null>(
             (lastRouted, nextRoute) => lastRouted ?? nextRoute(url, extra),

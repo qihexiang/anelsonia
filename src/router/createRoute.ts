@@ -2,11 +2,11 @@ import { RouteParam } from "./params";
 
 export type RouteHandler<P extends string, R> = (params: RouteParam<P>) => R;
 export type Route<R> = (url: string) => R | null;
-export type ExtendRouteHandler<P extends string, X, R> = (
+export type RouteHandlerX<P extends string, X, R> = (
     params: RouteParam<P>,
     extra: X
 ) => R;
-export type ExtendRoute<R, X> = (url: string, extra: X) => R | null;
+export type RouteX<R, X> = (url: string, extra: X) => R | null;
 
 /**
  * Create a route that request can get in.
@@ -54,11 +54,11 @@ export function createRoute<P extends string, R>(
  * call the handler and return its result, otherwise return
  * null.
  */
-export function createExtendRoute<P extends string, X, R>(
+export function createRouteX<P extends string, X, R>(
     pattern: P,
-    handler: ExtendRouteHandler<P, X, R>,
+    handler: RouteHandlerX<P, X, R>,
     flags?: string
-): ExtendRoute<R, X> {
+): RouteX<R, X> {
     const re = createRegExp(pattern, flags);
     return (url: string, extra: X) => {
         const matched = re.exec(url);
