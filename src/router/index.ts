@@ -3,3 +3,4 @@ export * from "./createRoute";
 export * from "./createSwitcher";
 export * from "./createSwRt";
 export * from "./condition";
+export * from "./methods";
