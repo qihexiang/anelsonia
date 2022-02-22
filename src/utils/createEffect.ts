@@ -1,3 +1,5 @@
+import { Fn } from "./createWrapper";
+
 /**
  * createEffect can add hooks execute before and after original function,
  * and hooks wouldn't change arguments and return value of original
@@ -18,6 +20,24 @@ export function createEffect<F extends (...args: any[]) => any>(
             const r = fn(...p);
             hookAfter(r);
             return r;
+        };
+}
+
+/**
+ * Create a effect for any function, the hook is not related to the
+ * parameters and return value of the origin function.
+ *
+ * @param hook a function include code executed before the original
+ * function and returns the code executed after the original function
+ * @returns a function that can wrap another function.
+ */
+export function createEffect4Any(hook: () => () => void) {
+    return <F extends Fn>(fn: F): ((...args: Parameters<F>) => ReturnType<F>) =>
+        (...args: Parameters<F>) => {
+            const hookAfter = hook();
+            const r = fn(...args);
+            hookAfter();
+            return r as ReturnType<F>;
         };
 }
 
