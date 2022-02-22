@@ -1,3 +1,4 @@
+export type Empty = Record<never, never>;
 /**
  * Pattern <T> matches with symbol +, which means there must be at least one character,
  * Pattern <[T]> matches with symbol + like pattern <T>, but it's greedy.
@@ -14,4 +15,4 @@ export type RouteParam<U extends string> = U extends RoutePattern<
         : Record<keyof RouteParam<R>, string>
     : U extends ParamFlag<infer T>
     ? Record<T, string>
-    : unknown;
+    : Empty;
