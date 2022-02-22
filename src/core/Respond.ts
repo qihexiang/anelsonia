@@ -1,10 +1,10 @@
-import { statusMessage, validHttpStatusCode } from "./http";
+import Status from "./Status";
 import MaybePromise from "../utils/MaybePromise";
 import Stream from "stream";
 
 export interface ResponseProps {
-    statusCode: validHttpStatusCode;
-    statusMessage: string;
+    statusCode: Status;
+    statusMessage?: string;
     body?: ResponseBody;
     headers: HeaderObject;
 }
@@ -14,7 +14,7 @@ export type ResponseBody = string | Buffer | Stream;
 export type AsyncResponse = MaybePromise<ResponseProps>;
 
 export class Respond implements ResponseProps {
-    private _statusCode?: validHttpStatusCode = undefined;
+    private _statusCode?: Status = undefined;
     private _statusMessage?: string = undefined;
     private _body?: ResponseBody = undefined;
     private _headers: HeaderObject = {};
@@ -27,7 +27,7 @@ export class Respond implements ResponseProps {
      *
      * @param code http status code.
      */
-    static create(code: validHttpStatusCode): Respond;
+    static create(code: Status): Respond;
     /**
      * Create a response with given body, default status code is 200.
      *
@@ -40,17 +40,14 @@ export class Respond implements ResponseProps {
      * @param code http status code.
      * @param body a string, buffer or stream.
      */
-    static create(code: validHttpStatusCode, body: ResponseBody): Respond;
+    static create(code: Status, body: ResponseBody): Respond;
     /**
      * Create a response with given status code and headers.
      *
      * @param code http status code.
      * @param headers http headers like `"Content-Type"`.
      */
-    static create(
-        code: validHttpStatusCode,
-        headers: HeaderCollection
-    ): Respond;
+    static create(code: Status, headers: HeaderCollection): Respond;
     /**
      * Create a response with given body and headers, default status code is 200.
      *
@@ -66,12 +63,12 @@ export class Respond implements ResponseProps {
      * @param headers http headers like `"Content-Type"`.
      */
     static create(
-        code: validHttpStatusCode,
+        code: Status,
         body: ResponseBody,
         headers: HeaderCollection
     ): Respond;
     static create(
-        arg1?: validHttpStatusCode | ResponseBody,
+        arg1?: Status | ResponseBody,
         arg2?: ResponseBody | HeaderCollection,
         headers?: HeaderCollection
     ): Respond {
@@ -104,11 +101,11 @@ export class Respond implements ResponseProps {
      * @param code a valid http status code
      * @returns this instance itself
      */
-    setStatusCode(code: validHttpStatusCode): Respond {
+    setStatusCode(code: Status): Respond {
         this._statusCode = code;
         return this;
     }
-    get statusCode(): validHttpStatusCode {
+    get statusCode(): Status {
         return this._statusCode ?? (this._body ? 200 : 404);
     }
     /**
@@ -123,8 +120,8 @@ export class Respond implements ResponseProps {
         this._statusMessage = message;
         return this;
     }
-    get statusMessage(): string {
-        return this._statusMessage ?? statusMessage[this.statusCode];
+    get statusMessage(): string | undefined {
+        return this._statusMessage;
     }
     /**
      * Set a response body, it can be a readable stream, a buffer or a string.

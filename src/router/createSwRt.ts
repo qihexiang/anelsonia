@@ -158,7 +158,9 @@ export function createSwRtX(): RouteChainInitX {
              * @param handler a handler receives url and return value
              * @returns object only contains the switcher
              */
-            const fallback: RouteChainFallbackX<NonNullable<R>, X> = (handler) => {
+            const fallback: RouteChainFallbackX<NonNullable<R>, X> = (
+                handler
+            ) => {
                 return {
                     switcher: (url, extra) =>
                         createSwitcherX(...routes)(url, extra) ??

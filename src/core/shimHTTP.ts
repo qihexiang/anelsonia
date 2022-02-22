@@ -3,8 +3,8 @@ import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
-import { createRes, ResponseProps } from ".";
-import { Route } from "..";
+import { ResponseProps } from "./Respond";
+import { Route } from "../router/createRoute";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;
@@ -173,17 +173,22 @@ export function shimHTTP(
         longestConnection?: number;
     }
 ): ReqHandler {
-    const {
-        errHandler,
-        longestConnection,
-    } = extraOptions ?? {};
+    const { errHandler, longestConnection } = extraOptions ?? {};
     return async (req, res) => {
         requests.run(req, async () => {
             let connectionTimer: NodeJS.Timeout;
-            if(longestConnection!==undefined) connectionTimer = setTimeout(() => res.end(), longestConnection)
+            if (longestConnection !== undefined)
+                connectionTimer = setTimeout(
+                    () => res.end(),
+                    longestConnection
+                );
             try {
-                const { statusCode, statusMessage, body, headers } = await entry(req)
-                if (res instanceof IncomingMessage)
+                const { statusCode, statusMessage, body, headers } =
+                    await entry(req);
+                if (
+                    res instanceof IncomingMessage &&
+                    statusMessage !== undefined
+                )
                     res.writeHead(statusCode, statusMessage, headers);
                 res.writeHead(statusCode, headers);
                 if (body instanceof Stream) {
@@ -193,11 +198,13 @@ export function shimHTTP(
                         res.end(() => clearTimeout(connectionTimer));
                     });
                     res.on("finish", () => {
-                        clearTimeout(connectionTimer)
+                        clearTimeout(connectionTimer);
                         destroy(body);
                     });
                 } else {
-                    body ? res.end(body as Buffer | string) : res.end(() => clearTimeout(connectionTimer));
+                    body
+                        ? res.end(body as Buffer | string)
+                        : res.end(() => clearTimeout(connectionTimer));
                 }
             } catch (err) {
                 if (errHandler !== undefined) errHandler(err);
