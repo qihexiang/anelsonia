@@ -152,11 +152,11 @@ function main(req: Request) {
 }
 ```
 
-但如果我们想将路径和控制器绑定之后再接收参数的话，就无法做到了。因此，本库中提供了额外的函数：`createExtendRoute`。它的使用与`createRoute`基本相同，差异在于它的`handler`可以接受一个额外的自定义类型参数；返回的路由匹配时也可以接收一个对应的参数。例如上面的例子会变成：
+但如果我们想将路径和控制器绑定之后再接收参数的话，就无法做到了。因此，本库中提供了额外的函数：`createRouteX`。它的使用与`createRoute`基本相同，差异在于它的`handler`可以接受一个额外的自定义类型参数；返回的路由匹配时也可以接收一个对应的参数。例如上面的例子会变成：
 
 ```ts
 // controller/api.ts
-export const apiRoute = createExtendRoute('/api/<options>', ({options}, {req: Request, db: DB}) => {...})
+export const apiRoute = createRouteX('/api/<options>', ({options}, {req: Request, db: DB}) => {...})
 
 // main.ts
 import { apiRoute } from "./controller/api"
@@ -169,7 +169,7 @@ function main(req: Request) {
 }
 ```
 
-若有多个这样的扩展路由进行聚合时，可以使用`createExtendSwitcher`来创建交换机。
+若有多个这样的扩展路由进行聚合时，可以使用`createSwitcherX`来创建交换机。
 
 #### 同时创建路由和交换机
 
@@ -202,7 +202,28 @@ async function main(req) {
 
 每次链式调用中的`route`函数和`createRoute`函数参数类型一致，返回中解析出的`switcher`和`createSwitcher`的类型是一致的。
 
-另外，提供了一个`createExtendSwRt`函数，使用方法基本一致。
+另外，提供了一个`createSwRtX`函数，来创建接受额外参数的路由和交换机，使用方法基本一致。
+
+### 方法限制
+
+上面介绍的路由并不对请求的请求方法进行检查，而在`handler`内部检查有时会变的麻烦，因此提供了`allowMethods`函数来解决这个问题（对于扩展路由，使用`allowMethodsX`代替）。
+
+```ts
+// 这个路由仅对GET方法有效，其他方法请求会返回null
+const rt = createRoute("/hello/<username>/", allowMethods(helloWorldHandler, ["GET"]))
+```
+
+`allowMethods`的地一个参数是原始的路由处理器，第二个参数是一个数组，将允许的请求方法放入其中。他将原始处理函数包装成一个可能返回null的形式。
+
+此外，提供了该函数的封装：
+
+- All 允许所有方法
+- Get 允许GET方法
+- Head 允许HEAD方法
+- Post 允许POST方法
+- ...
+- 命名的特征是方法名称的大写首字母形式
+- 对于扩展路由，在末尾加上X
 
 ### 简单匹配（Condition）
 
@@ -245,7 +266,8 @@ const req = useRequest();
 `useURL`函数可以在`shimHTTP`的回调函数的任意层次调用中获得这个请求的路径信息，使用方法为：
 
 ```ts
-useURL() // 返回host（主机名）、path（访问路径）、query（搜索参数的searchParams）
+useURL() // 返回host（主机名）、path（访问路径）、query（搜索参数的searchParams），method（请求方法）
+useURL("method") // 返回方法
 useURL("host") // 返回host
 useURL("path") // 返回path
 useURL("query") // 返回query
@@ -266,9 +288,9 @@ Freesia提供了类似React上下文的功能（和请求绑定）。用`createF
 
 它返回三个函数：
 
-- `light`：点燃闪光弹，这个函数调用之后，要被传递的值就可以通过`observe`函数访问了；
-- `observe`：观测闪光弹，执行这个函数可以得到要传递的值，它必须在`light`函数之后调用；
-- `extinguish`：熄灭闪光弹，执行这个函数之后，`observe`将不能再被使用
+- `assign`：赋值到flare，这个函数调用之后，要被传递的值就可以通过`observe`函数访问了；
+- `observe`：观测flare，执行这个函数可以得到要传递的值，它必须在`assign`函数之后调用；
+- `drop`：舍弃flare，执行这个函数之后，`observe`将不能再被使用
 
 > 这三个函数是通过数组返回的，你可以给他们取任意需要的名字。
 
@@ -276,15 +298,15 @@ Freesia提供了类似React上下文的功能（和请求绑定）。用`createF
 // 调用次序为：main -> fileRoute -> uploadRoute -> uploadHandler -> uploadService
 // 我们不想逐层传递request对像来获得上传的body，我们在main函数获得body后，将其用
 // main.ts
-export const [light, observe, extinguish] = createFlare<Buffer>()
+export const [assign, observe, drop] = createFlare<Buffer>()
 
 const main = async req => {
     const body = await getRawBody(req);
-    light(body); // 从此向下的调用可以通过observe函数访问body
+    assign(body); // 从此向下的调用可以通过observe函数访问body
     ...
     const res = fileRoute(); // 不需要传递body
     ...
-    extinguish(); // 从此向下的调用不能再通过observe访问body
+    drop(); // 从此向下的调用不能再通过observe访问body
     return res
 }
 
@@ -300,11 +322,9 @@ export const uploadService = (filepath: string) => {
 
 > 需要注意的以下几点：
 > 
-> - `createFlare`不是完全独立的函数，它返回的三个函数都只能在`main`的直接或间接调用中执行，否则会抛出错误
-> - 静态分析时`light`，`observe`和`extinguish`并不能判断要获取的值是否处于有效期，因此这三个函数会在不符合执行条件的情况下抛出错误。（而不是返回`undefined`或`null`）。你应该尽量避免在`if`分支中使用`light`。
-> - `extinguish`函数不是必须执行的，`createFlare`内部使用的是`WeakMap`实现的，不必担心内存溢出的问题。
-
-在Freesia中，最常使用的一个对象可能是入口函数传入的`req`变量，因此提供了`useRequest`函数来随时获得这个值，你不需要将其层层传递下去。
+> - `createFlare`是完全独立的函数，可以在任何时机执行，但它返回的三个函数都只能在`main`的直接或间接调用中执行，否则会抛出错误
+> - 静态分析时`assign`，`observe`和`drop`并不能判断要获取的值是否处于有效期，因此这三个函数会在不符合执行条件的情况下抛出错误。（而不是返回`undefined`或`null`）。你应该尽量避免在`if`分支中使用`assign`，正确的做法是`assign`一个可能为空的值，在使用时判断类型。
+> - `drop`函数不是必须执行的，`createFlare`内部使用的是`WeakMap`实现的，不必担心内存溢出的问题。
 
 ## 包装器
 
@@ -327,6 +347,29 @@ const timeMeasure = createEffect<typeof main>(
 export const mainWithTimeMeasure = timeMeasure(main)
 ```
 
+我们会注意到，其实这个例子中的副作用和函数本身是无关的，对于这样的副作用我们可以使用`createEffect4Any`来创建，并且用到任何类型的函数上，例如：
+
+```ts
+const timeMeasure = createEffect4Any(() => {
+  const start = new Date();
+  return () => {
+    console.log(`Use ${new Date().getTime() - start.getTime()}ms`);
+  };
+});
+
+const fibbonnaci = (index: number): number =>
+  !Number.isInteger(index) || index < 0
+    ? 0
+    : index === 0 || index === 1
+    ? 1
+    : fibbonnaci(index - 2) + fibbonnaci(index - 1);
+const getBuffer = (origin: string) => Buffer.from(origin);
+export const fibbonnaciWithTime = timeMeasure(fibbonnaci); // number => number
+export const getBufferWithTime = timeMeasure(getBuffer); // string => Buffer
+```
+
+包裹后的函数依然保持了原有的入参和返回类型。
+
 ### 函数包装
 
 另一种情况下，我们可能会使用外部逻辑修改原始函数的输入输出，甚至改变参数的输入类型，例如：
@@ -344,3 +387,39 @@ const bodyParser = createWrapper<(req: HttpReq) => AsyncResponse, typeof main>(
 )
 export const withBodyParser = bodyParser(main)
 ```
+
+## 函数工具
+
+### baseCompose和composeFn
+
+`baseCompose`可以将两个函数连接起来，例如：
+
+```ts
+const fn = baseCompose((x: number) => x + 1, x => Math.pow(x, 2))
+fn(1) // 返回值为4
+```
+
+`composeFn`可以连接更多的函数：
+
+```ts
+const { fn } = composeFn((x: number) => x + 1)
+  .next((x) => Math.pow(x, 2))
+  .next(fibbonnaci);
+```
+
+### compute和computeLazy
+
+`compute`和`computeLazy`提供一种链式调用的方法：
+
+```ts
+const credentialInfo = compute(tokenBuf)
+    .map(buf => buf.toString("utf-8"))
+    .map(parseToken)
+    .mapSkipNull(token => outDated(token) ? null : token)
+    .mapSkipNull(token => token.username)
+    .value
+```
+
+`map`调用接受一个函数处理传入的参数，然后返回一个新的对象，以进行下一次`map`。`mapSkipNull`是当前一次调用可能返回`null`或`undefined`时，只处理非空的结果，而将空置传递下去。此外还有一个`ifNull`调用，用于提供一个函数来将`null`或`undefined`替换为对应类型的非空值。
+
+`computeLazy`的使用方法与`compute`一致，区别在与`compute`在读取`value`前就执行了每一个函数，而`computeLazy`则只在访问`value`时执行所有函数，且每次访问都会执行一次。
