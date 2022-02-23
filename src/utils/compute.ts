@@ -6,9 +6,9 @@ export interface Computation<T> {
     readonly mapSkipNull: <R>(
         nextFn: (r: NonNullable<T>) => R
     ) => Computation<R | Extract<T, undefined | null>>;
-    readonly ifNull: (
-        nullHandler: () => NonNullable<T>
-    ) => Computation<NonNullable<T>>;
+    readonly ifNull: <R = NonNullable<T>>(
+        nullHandler: () => NonNullable<R>
+    ) => Computation<NonNullable<T> | R>;
     get value(): T;
 }
 
@@ -46,7 +46,7 @@ export interface Lazy<T> {
     readonly mapSkipNull: <N>(
         nextFn: (r: NonNullable<T>) => N
     ) => Lazy<N | Extract<T, undefined | null>>;
-    readonly ifNull: (fn: () => NonNullable<T>) => Lazy<NonNullable<T>>;
+    readonly ifNull: <R = NonNullable<T>>(fn: () => R) => Lazy<NonNullable<T> | R>;
     get value(): T;
 }
 
@@ -68,7 +68,7 @@ export const lazy = <T>(fn: () => T): Lazy<T> => {
             ),
         ifNull: (nullHandler) =>
             lazy(
-                baseCompose<void, T, ReturnType<typeof nullHandler>>(
+                baseCompose<void, T, ReturnType<typeof nullHandler> | NonNullable<T>>(
                     fn,
                     (t: T) =>
                         isVoid(t) ? nullHandler() : (t as NonNullable<T>)
