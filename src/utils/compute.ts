@@ -7,10 +7,10 @@ export interface Computation<T> {
     readonly mapSkipNull: <R>(
         nextFn: (r: NonNullable<T>) => R
     ) => Computation<R | Extract<T, undefined | null>>;
-    readonly aMap: <R>(fn: (t: Then<T>) => R) => Computation<Promise<R>>;
+    readonly aMap: <R>(fn: (t: Then<T>) => R) => Computation<Promise<Then<R>>>;
     readonly aMapSkipNull: <R>(
         fn: (t: NonNullable<Then<T>>) => R
-    ) => Computation<Promise<R | Extract<Then<T>, undefined | null>>>;
+    ) => Computation<Promise<Then<R> | Extract<Then<T>, undefined | null>>>;
     get value(): T;
 }
 
@@ -30,19 +30,27 @@ export const compute = <T>(initValue: T): Computation<T> => {
                     : fn(initValue as NonNullable<T>)
             ),
         aMap: (fn) => {
+            type R = ReturnType<typeof fn>;
             if (initValue instanceof Promise)
-                return compute(initValue.then((t: Then<T>) => fn(t)));
-            return compute(Promise.resolve(fn(initValue as Then<T>)));
+                return compute(
+                    initValue.then((t: Then<T>) => fn(t)) as Promise<Then<R>>
+                );
+            return compute(
+                Promise.resolve(fn(initValue as Then<T>)) as Promise<Then<R>>
+            );
         },
         aMapSkipNull: (fn) => {
+            type R = ReturnType<typeof fn>;
             if (initValue instanceof Promise)
                 return compute(
                     initValue.then((t: Then<T>) =>
                         isVoid(t) ? t : fn(t as NonNullable<Then<T>>)
-                    )
+                    ) as Promise<Then<R> | Extract<Then<T>, undefined | null>>
                 );
             return compute(
-                Promise.resolve(fn(initValue as NonNullable<Then<T>>))
+                Promise.resolve(
+                    fn(initValue as NonNullable<Then<T>>)
+                ) as Promise<Then<R>>
             );
         },
         get value() {
@@ -58,10 +66,12 @@ export interface Lazy<T> {
     readonly mapSkipNull: <N>(
         nextFn: (r: NonNullable<T>) => N
     ) => Lazy<N | Extract<T, undefined | null>>;
-    readonly aMap: <N>(nextFn: (t: Awaited<T>) => N) => Lazy<Promise<N>>;
+    readonly aMap: <N>(
+        nextFn: (t: Awaited<T>) => N
+    ) => Lazy<Promise<Awaited<N>>>;
     readonly aMapSkipNull: <N>(
         nextFn: (t: NonNullable<Awaited<T>>) => N
-    ) => Lazy<Promise<N | Extract<Awaited<T>, undefined | null>>>;
+    ) => Lazy<Promise<Awaited<N> | Extract<Awaited<T>, undefined | null>>>;
     get value(): T;
 }
 
@@ -83,11 +93,17 @@ export const lazy = <T>(fn: () => T): Lazy<T> => {
             ),
         aMap: (nextFn) =>
             lazy(
-                baseCompose<void, T, Promise<ReturnType<typeof nextFn>>>(
+                baseCompose<
+                    void,
+                    T,
+                    Promise<Awaited<ReturnType<typeof nextFn>>>
+                >(
                     fn,
-                    async (t: T) => {
+                    async (
+                        t: T
+                    ): Promise<Awaited<ReturnType<typeof nextFn>>> => {
                         const value = await t;
-                        return nextFn(value as Awaited<T>);
+                        return await nextFn(value as Awaited<T>);
                     }
                 )
             ),
@@ -97,14 +113,22 @@ export const lazy = <T>(fn: () => T): Lazy<T> => {
                     void,
                     T,
                     Promise<
-                        | ReturnType<typeof nextFn>
+                        | Awaited<ReturnType<typeof nextFn>>
                         | Extract<Awaited<T>, undefined | null>
                     >
-                >(fn, async (t: T) => {
-                    const value = await t;
-                    if (isVoid(value)) return value;
-                    return nextFn(value as NonNullable<Awaited<T>>);
-                })
+                >(
+                    fn,
+                    async (
+                        t: T
+                    ): Promise<
+                        | Awaited<ReturnType<typeof nextFn>>
+                        | Extract<Awaited<T>, undefined | null>
+                    > => {
+                        const value = await t;
+                        if (isVoid(value)) return value;
+                        return await nextFn(value as NonNullable<Awaited<T>>);
+                    }
+                )
             ),
         get value() {
             return fn();
