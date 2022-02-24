@@ -1,14 +1,14 @@
 import { baseCompose } from "./composeFn";
 import { isVoid } from "./isVoid";
+type Then<T> = T extends Promise<infer N> ? Then<N> : T;
 
 export interface Computation<T> {
     readonly map: <R>(fn: (t: T) => R) => Computation<R>;
     readonly mapSkipNull: <R>(
         nextFn: (r: NonNullable<T>) => R
     ) => Computation<R | Extract<T, undefined | null>>;
-    readonly ifNull: <R = NonNullable<T>>(
-        nullHandler: () => NonNullable<R>
-    ) => Computation<NonNullable<T> | R>;
+    readonly aMap: <R>(fn: (t: Then<T>) => R) => Computation<Promise<R>>;
+    readonly aMapSkipNull: <R>(fn: (t: NonNullable<Then<T>>) => R) => Computation<Promise<R | Extract<Then<T>, undefined | null>>>;
     get value(): T;
 }
 
@@ -27,12 +27,16 @@ export const compute = <T>(initValue: T): Computation<T> => {
                     ? (initValue as Extract<T, undefined | null>)
                     : fn(initValue as NonNullable<T>)
             ),
-        ifNull: (nullHandler) =>
-            compute(
-                isVoid(initValue)
-                    ? nullHandler()
-                    : (initValue as NonNullable<T>)
-            ),
+        aMap: (fn) => {
+            if (initValue instanceof Promise) return compute(initValue.then((t: Then<T>) => fn(t)));
+            return compute(Promise.resolve(fn(initValue as Then<T>)));
+        },
+        aMapSkipNull: (fn) => {
+            if (initValue instanceof Promise) return compute(
+                initValue.then((t: Then<T>) => isVoid(t) ? t : fn(t as NonNullable<Then<T>>))
+            );
+            return compute(Promise.resolve(fn(initValue as NonNullable<Then<T>>)));
+        },
         get value() {
             return initValue;
         },
@@ -46,7 +50,8 @@ export interface Lazy<T> {
     readonly mapSkipNull: <N>(
         nextFn: (r: NonNullable<T>) => N
     ) => Lazy<N | Extract<T, undefined | null>>;
-    readonly ifNull: <R = NonNullable<T>>(fn: () => R) => Lazy<NonNullable<T> | R>;
+    readonly aMap: <N>(nextFn: (t: Awaited<T>) => N) => Lazy<Promise<N>>;
+    readonly aMapSkipNull: <N>(nextFn: (t: NonNullable<Awaited<T>>) => N) => Lazy<Promise<N | Extract<Awaited<T>, undefined | null>>>;
     get value(): T;
 }
 
@@ -66,12 +71,24 @@ export const lazy = <T>(fn: () => T): Lazy<T> => {
                         : nextFn(t as NonNullable<T>)
                 )
             ),
-        ifNull: (nullHandler) =>
+        aMap: (nextFn) =>
             lazy(
-                baseCompose<void, T, ReturnType<typeof nullHandler> | NonNullable<T>>(
-                    fn,
-                    (t: T) =>
-                        isVoid(t) ? nullHandler() : (t as NonNullable<T>)
+                baseCompose<void, T, Promise<ReturnType<typeof nextFn>>>(
+                    fn, async (t: T) => {
+                        const value = await t;
+                        return nextFn(value as Awaited<T>);
+
+                    }
+                )
+            ),
+        aMapSkipNull: (nextFn) =>
+            lazy(
+                baseCompose<void, T, Promise<ReturnType<typeof nextFn> | Extract<Awaited<T>, undefined | null>>>(
+                    fn, async (t: T) => {
+                        const value = await t;
+                        if (isVoid(value)) return value;
+                        return nextFn(value as NonNullable<Awaited<T>>);
+                    }
                 )
             ),
         get value() {
