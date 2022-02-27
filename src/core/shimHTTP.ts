@@ -90,12 +90,12 @@ export function useURL<T>(
 
 interface CreateFlare {
     <T>(): [(value: T) => void, () => Readonly<T>, () => void];
-    <T>(options: { mutable: true; reassign: boolean }): [
+    <T>(options: { mutable: true; reassign: boolean; }): [
         (value: T) => void,
         () => T,
         () => void
     ];
-    <T>(options: { mutable: false; reassign: boolean }): [
+    <T>(options: { mutable: false; reassign: boolean; }): [
         (value: T) => Readonly<void>,
         () => T,
         () => void
@@ -161,9 +161,9 @@ export const createFlare: CreateFlare = <T>(
  * Transform an entry function to Node.js HTTP request handler
  *
  * @param entry a function receives request object and return a reponse object.
- * @param extraOptions {errHandler, maxTimeout}
+ * @param extraOptions {errHandler, longestConnection}
  * - errHandler is a function that can handler errors on request,
- * - maxTimeout is the longest timeout for a response handling, unit is ms.
+ * - longestConnection is the longest timeout for a response handling and transporting, unit is ms.
  * @returns a handler function for Node.js `http`、`https`、`http2` modules
  */
 export function shimHTTP(
