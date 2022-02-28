@@ -90,12 +90,12 @@ export function useURL<T>(
 
 interface CreateFlare {
     <T>(): [(value: T) => void, () => Readonly<T>, () => void];
-    <T>(options: { mutable: true; reassign: boolean }): [
+    <T>(options: { mutable: true; reassign: boolean; }): [
         (value: T) => void,
         () => T,
         () => void
     ];
-    <T>(options: { mutable: false; reassign: boolean }): [
+    <T>(options: { mutable: false; reassign: boolean; }): [
         (value: T) => void,
         () => Readonly<T>,
         () => void
@@ -176,7 +176,7 @@ export function shimHTTP(
     }
 ): ReqHandler {
     if (extraOptions?.noMagical === true)
-        return (req, res) => getResponser(req, res, entry, extraOptions);
+        return (req, res) => getResponser(req, res, entry, extraOptions)();
     else
         return (req, res) =>
             requests.run(
