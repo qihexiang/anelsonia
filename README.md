@@ -27,9 +27,72 @@ createServer(
 
 It was clear and fully typed.
 
-## main function and shimHTTP
+## Basic
 
-When using Freesia, there is nothing like `app` object in express or koa. You need to write the entry function to handle request by your self. It should receive a parameter in type `HttpReq` (it's the union type of http and http2 request type), and return an object of `ResponseProps` type in synchorous or asynchorous way. After that, you can use `shimHTTP` to transform it to a handler for `createServer` in `http` or `createSecureServer` in `http2`.
+When using Freesia, there is nothing like `app` object in express or koa. You need to write the entry function to handle request by your self. It should receive a parameter in type `HttpReq` (it's the union type of http and http2 request type), and return an object of `ResponseProps` type in asynchorous way. After that, you can use `shimHTTP` to transform it to a handler for `createServer` in `http` or `createSecureServer` in `http2`.
+
+### EntryPoint: main function
+
+`EntryPoint` is a type that describe a main function in `Freesia`, it is defined as:
+
+```ts
+type EntryPoint = (req: HttpReq) => Promise<ResponseProps>;
+```
+
+You need to implement a function of this type, to describe how you deal with a request.
+
+Process of this function and all function called by it (directly and indirectly) is a request handling process. Some special functions provided by freesia can be called only inside of this process.
+
+### ResponseProps and Respond
+
+`ResponseProps` is a interface of response object, it includes 4 properties:
+
+-   `statusCode` valid http status code
+-   `statusMessage` status message, can be set to `undefined`, and it's not work with HTTP/2
+-   `body` response body, can be a `string`, `Buffer` or a `Readable` stream, or `undefined`
+-   `headers` response headers, type of it is `Record<string, string | string[] | number>`
+
+It's difficult to create and operate such an object manually, and Freesia provides a class named `Respond`
+
+```ts
+const response = new Respond()
+    .setStatusCode(200)
+    .setStatusMessage("Ok")
+    .setBody("hello, world.")
+    .setHeaders("Content-Type", "text/plain; charset=UTF-8")
+    .setHeaders("Content-Length", 13);
+```
+
+The instance of `Respond` implemented `ResponseProps` interface, and you can use `setXXX` methods to operate it.
+
+Except `setHeaders`, all other `setXXX` functions will replace existed value in the object and `setHeaders` will merge headers set newly into the existed headers. `setHeaders` provides many format of input, you can learn from [API document](https://qihexiang.github.io/freesia/classes/Respond.html#setHeaders)
+
+Here are some way to create a Respond more easy: `Respond.create`, it has an alias named `createRes`. This function provides many overloads to help developers create `Respond` while set `statusCode`, `body` and `headers`. Learn from [here](https://qihexiang.github.io/freesia/classes/Respond.html#create)
+
+`Status` is a enum of HTTP status codes, for example, `Status.NotFound` is `404`, `Status.Ok` is `200`. If you think this is more Readable, you can use it to set status code instead of numbers.
+
+### shimHTTP
+
+With upon introduction, it's not difficult to create your first main function:
+
+```ts
+export const main: EntryPoint = async (req) => createRes("hello, world");
+```
+
+Every time a request come in, we want to execute this function to handle it, but `EntryPoint` is not work with Node.js `http` or `http2` module. Now shimHTTP works, it can transform an `EntryPoint` to a request handler of `http` or `http2` module.
+
+```ts
+// server.ts
+import { main } from "./main.ts";
+import { shimHTTP } from "freesia";
+import { createServer } from "http";
+
+createServer(shimHTTP(main)).listen(8000);
+```
+
+Now it works! You created your first Freesia app.
+
+But we still have lots of things to do, please follow this introduction.
 
 ## Routes
 
@@ -120,19 +183,19 @@ Another way to create switchers is using `createSwRt`, you can create routes and
 
 ```ts
 const { switcher } = createSwRt
-    .route("/hello/<username>". ({ username }) => `hello, ${username}`)
+    .route("/hello/<username>", ({ username }) => `hello, ${username}`)
     .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
     /**
      * fallback method will return a route function that will not return null,
      * if no patter matched, it will execute the fallback handler. If you don't
      * use fallback method, the switcher can still return null.
      */
-    .fallback(url => `No pattern matched ${url}`)
+    .fallback((url) => `No pattern matched ${url}`);
 
 const main = async (req: HttpReq) => {
     const message = switcher(req.url ?? "/");
-    return createRes(message)
-}
+    return createRes(message);
+};
 ```
 
 The return type is inferred by the first called `route` method, if you'd like to specify a union-type as generic type, use `route<T>`.
@@ -157,7 +220,7 @@ const main = async (req: HttpReq) => {
 };
 ```
 
-It's of course not a good way. But you can use `createRouteX` to receive an extra param in handlers:
+It's of course not a good idea creating a route each time request come in. But you can use `createRouteX` to create a route function that can receive an extra param and pass to handlers:
 
 ```ts
 /**
@@ -191,20 +254,29 @@ There is also `createSwRtX`:
 
 ```ts
 const { switcher } = createSwRtX
-    .route("/hello/<username>". ({ username }, req: HttpReq) => `hello, ${username} from ${req.socket.address().address}`)
+    .route(
+        "/hello/<username>",
+        ({ username }, req: HttpReq) =>
+            `hello, ${username} from ${req.socket.address().address}`
+    )
     // No problem ignore extra parameter
     .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
     // fallback handler will also  receive the extra parameter
-    .fallback((url, req) => `No pattern matched ${url}, your ip is ${req.socket.address().address}`);
+    .fallback(
+        (url, req) =>
+            `No pattern matched ${url}, your ip is ${
+                req.socket.address().address
+            }`
+    );
 const main = async (req: HttpReq) => {
     const message = switcher(req.url ?? "/", req);
-    return createRes(message)
-}
+    return createRes(message);
+};
 ```
 
 ## Magical functions
 
-There are some magical functions, which can provide values in a non-pure-functional way.
+Freesia provides some magical functions, which provides a way to access values of current handling request without pass `req` as parameters.
 
 ### useRequest
 
@@ -264,9 +336,9 @@ databse
 
 `useURL` provides a way to access request url info. Visit API documents [here](https://qihexiang.github.io/freesia/modules.html#useURL).
 
-## In-direct magical functions
+## Pre-magical functions
 
-In-directy magical functions are functions that can be called outside of request handling process, and they return one or more functions that must be called in the process.
+Pre-magical functions are non-magical so they can be called outside of request process handling, but they return magical functions.
 
 ### createFlare
 
@@ -361,11 +433,11 @@ fn(1); // -> "final result is 16"
 `compute` can `Computation<T>` object.
 
 ```ts
-const credentialInfo = compute(tokenBuf /** Buffer */)
-    .map((buf) => buf.toString("utf-8"))
-    .map(parseToken) // parseToken 是一个异步函数
-    .aMapSkipNull((token) => (outDated(token) ? null : token))
-    .aMapSkipNull((token) => token.username).value; // -> Promise<string | null>
+const credentialInfo = compute(tokenBuf) // Computation<Buffer>
+    .map((buf) => buf.toString("utf-8")) // Computation<string>
+    .map(parseToken) // Computation<Promise<Token | null>>
+    .aMapSkipNull((token) => (outDated(token) ? null : token)) // Computation<Promise<Token | null>>
+    .aMapSkipNull((token) => token.username).value; // Promise<string | null>
 ```
 
 It has 4 methods：
@@ -378,7 +450,7 @@ It has 4 methods：
     return into Promise after call it.
 -   aMapSkipNull：use a function to deal with internal value，
     if origin value is `undefined | null | Promise<undefined | null>`,
-    keep it.
+    keep and wrap to `Promise<undefined | null>`.
 
 Each methods will return a new `Computation<T>`, if you pass it two different chains, they will not influence each other.
 
