@@ -96,8 +96,8 @@ interface CreateFlare {
         () => void
     ];
     <T>(options: { mutable: false; reassign: boolean; }): [
-        (value: T) => Readonly<void>,
-        () => T,
+        (value: T) => void,
+        () => Readonly<T>,
         () => void
     ];
 }
@@ -130,7 +130,7 @@ export const createFlare: CreateFlare = <T>(
      *
      * @param value the value you want to assign to flare
      */
-    const light = (value: T) => {
+    const assign = (value: T) => {
         const req = getReq();
         if (!reassign && values.has(req))
             throw new Error("Already has a value and not re-assignable.");
@@ -150,11 +150,11 @@ export const createFlare: CreateFlare = <T>(
     /**
      * Remove the value from the flare.
      */
-    const extinguish = () => {
+    const drop = () => {
         if (!values.delete(getReq()))
             throw new Error("No value assigned to this flare found.");
     };
-    return [light, observe, extinguish];
+    return [assign, observe, drop];
 };
 
 /**
