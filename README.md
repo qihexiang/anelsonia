@@ -111,10 +111,10 @@ export const helloRoute = createRoute("/hello/<username>", ({ username }) =>
 );
 ```
 
-The handler parameters will be inferred automatically by the path patter you give. Route params can be described in such ways:
+The handler parameters will be inferred automatically by the path pattern you gave. Route params can be described in such ways:
 
 -   `<ParamName>` non-greedily match at least one characters:
-    -   `/user/<username>` can match `/user/hexiang` `(username` is `"hexiang"`) and `/user/hexiang/avatar` (`username` is `"hexiang/avatar"`)
+    -   `/user/<username>` can match `/user/hexiang` (`username` is `"hexiang"`) and `/user/hexiang/avatar` (`username` is `"hexiang/avatar"`)
     -   `/user/<username>/` can match `/user/hexiang/` (`username` is `"hexiang"`) but can't match `/user/hexiang/avatar` (un-matched after the third slash).
 -   `<[ParamName]>` greedily match at least one characters:
     -   `/user/<username>/<[rest]>/` can match `/user/hexiang/avatar/` (`rest` is `"avatar"`) and `/user/hexiang/info/gender/` (`rest` is `"info/gender"`)
@@ -496,7 +496,7 @@ The parameter `hook` is a function (we can call it `beforeHook`) that can get th
 
 Some times, what we need to do is completely irrelevant to original function, we can use `createEffect4Any` instead of `createEffect`, the `beforeHook` and `afterHook` both has no arguments. The function type will not change after applying the wrapper created by `createEffect4Any`.
 
-> `beforeHook` must be an synchorous function, but `afterHook` can be a asynchorous function.
+> `beforeHook` must be an synchorous function, `afterHook` can be a asynchorous function but wrapped function won't wait for it resolving.
 
 #### createWrapper
 
