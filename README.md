@@ -430,6 +430,18 @@ createServer(shimHTTP(main, { noMagical: true })).listen(8000);
 
 > noMagical mode can make application faster 10%-50%.
 
+### allowMethodsN
+
+`allowMethodsN` and shortcuts `GetN`, `PostN` etc are completely non-magical functions, but they only work with X series route functions which use HttpReq as the extra parameter. For example:
+
+```ts
+const { switcher } = createSwRtX
+    .route("/hello/<username>", GetN(({username}) => createRes(username)))
+    .fallback(url => createRes(`No route matched ${url}`)
+```
+
+The switcher's extra argument type is `HttpReq`, and you need to pass `req` object to it when using. `handler` in `allowMethodsN` function can receive `req` object as parameter.
+
 ## Utils
 
 ### composeFn
