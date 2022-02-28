@@ -367,7 +367,7 @@ const main = async (req: HttpReq) => {
 
 `createFlare` can receive a object parameter which as two properties:
 
--   `reassign` means you can call `assign` many times to reset the value before call `drop` to relase it, set it to `true` when you need to change a primitive value during the process;
+-   `reassign` means you can call `assign` many times to reset the value before call `drop` to release it, set it to `true` when you need to change a primitive value during the process;
 -   `mutable` means the value get from `observe` should **not** be readonly. It in fact do nothing, and just change the return type of `observe` in TypeScript. For example, if you assign a ORM object to flare, you should set `mutable` to `true`.
 
 The three functions return by `createFlare` is:
@@ -430,7 +430,7 @@ fn(1); // -> "final result is 16"
 
 #### Computation
 
-`compute` can `Computation<T>` object.
+`compute` can create `Computation<T>` object.
 
 ```ts
 const credentialInfo = compute(tokenBuf) // Computation<Buffer>
