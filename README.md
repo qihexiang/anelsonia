@@ -420,6 +420,14 @@ You can use `allowMethodsX` for X series functions.
 
 Here are some shortcuts, like: `Get`, `GetX`, `Post`, `PostX`, etc. `All` and `AllX` cover request methods described [here](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods).
 
+## No magical mode
+
+Magical functions are implemented by Node.js `async_hooks` API, as a result your application might be slow down. If you'd like to build your application without magical functions to get better performance, you can pass a `noMagical` option to `shimHTTP`, like this:
+
+```ts
+createServer(shimHTTP(main, { noMagical: true })).listen(8000);
+```
+
 ## Utils
 
 ### composeFn
