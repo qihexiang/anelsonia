@@ -164,6 +164,7 @@ export const createFlare: CreateFlare = <T>(
  * @param extraOptions {errHandler, longestConnection}
  * - errHandler is a function that can handler errors on request,
  * - longestConnection is the longest timeout for a response handling and transporting, unit is ms.
+ * - noMagical is a boolean. It it's true, all magical functions will be disabled. This may provides better performance.
  * @returns a handler function for Node.js `http`、`https`、`http2` modules
  */
 export function shimHTTP(
@@ -171,41 +172,56 @@ export function shimHTTP(
     extraOptions?: {
         errHandler?: (err: any) => void;
         longestConnection?: number;
+        noMagical?: boolean;
     }
 ): ReqHandler {
-    const { errHandler, longestConnection } = extraOptions ?? {};
-    return async (req, res) => {
-        requests.run(req, async () => {
-            let connectionTimer: NodeJS.Timeout;
-            if (longestConnection !== undefined)
-                connectionTimer = setTimeout(
-                    () => res.end(),
-                    longestConnection
-                );
-            try {
-                const { status, statusText, body, headers } = await entry(req);
-                if (res instanceof IncomingMessage && statusText !== undefined)
-                    res.writeHead(status, statusText, headers);
-                res.writeHead(status, headers);
-                if (body instanceof Stream) {
-                    body.pipe(res);
-                    body.on("error", (err) => {
-                        if (errHandler !== undefined) errHandler(err);
-                        res.end(() => clearTimeout(connectionTimer));
-                    });
-                    res.on("finish", () => {
-                        clearTimeout(connectionTimer);
-                        destroy(body);
-                    });
-                } else {
-                    body
-                        ? res.end(body as Buffer | string)
-                        : res.end(() => clearTimeout(connectionTimer));
-                }
-            } catch (err) {
-                if (errHandler !== undefined) errHandler(err);
-                res.end(() => clearTimeout(connectionTimer));
+    if (extraOptions?.noMagical === true)
+        return (req, res) => getResponser(req, res, entry, extraOptions);
+    else
+        return (req, res) =>
+            requests.run(
+                req,
+                getResponser(req, res, entry, extraOptions ?? {})
+            );
+}
+
+function getResponser(
+    req: HttpReq,
+    res: HttpRes,
+    entry: EntryPoint,
+    extraOptions: {
+        longestConnection?: number;
+        errHandler?: (err: any) => void;
+    }
+): () => Promise<void> {
+    const { longestConnection, errHandler } = extraOptions;
+    return async () => {
+        let connectionTimer: NodeJS.Timeout;
+        if (longestConnection !== undefined)
+            connectionTimer = setTimeout(() => res.end(), longestConnection);
+        try {
+            const { status, statusText, body, headers } = await entry(req);
+            if (res instanceof IncomingMessage && statusText !== undefined)
+                res.writeHead(status, statusText, headers);
+            res.writeHead(status, headers);
+            if (body instanceof Stream) {
+                body.pipe(res);
+                body.on("error", (err) => {
+                    if (errHandler !== undefined) errHandler(err);
+                    res.end(() => clearTimeout(connectionTimer));
+                });
+                res.on("finish", () => {
+                    clearTimeout(connectionTimer);
+                    destroy(body);
+                });
+            } else {
+                body
+                    ? res.end(body as Buffer | string)
+                    : res.end(() => clearTimeout(connectionTimer));
             }
-        });
+        } catch (err) {
+            if (errHandler !== undefined) errHandler(err);
+            res.end(() => clearTimeout(connectionTimer));
+        }
     };
 }
