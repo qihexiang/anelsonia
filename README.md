@@ -376,7 +376,7 @@ The three functions return by `createFlare` is:
 -   `observe` get the value assigned to the flare.
 -   `drop` deattach the value from the flare, value will not unaccessable after called drop.
 
-> This is implemented by `WeakMap`, so it's not necessary to call `drop`.
+> This is implemented by `WeakMap`, so it's unnecessary to call `drop`.
 
 ### allowMethods and allowMethodsX
 
@@ -413,9 +413,9 @@ Here are some shortcuts, like: `Get`, `GetX`, `Post`, `PostX`, etc. `All` and `A
 
 ## Utils
 
-### ComposeFn
+### composeFn
 
-`ComposeFn` provides a way to connect functions together.
+`composeFn` provides a way to connect functions together.
 
 ```ts
 const { fn } = composeFn((x: number) => x + 1)
