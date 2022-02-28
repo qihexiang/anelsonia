@@ -445,11 +445,11 @@ It has 4 methods：
 -   map：use a function to deal with internal value
 -   mapSkipNull：use a function to deal with internal value,
     but left origin value if it's undefined and null
--   aMap：use a function to deal with internal value,
-    but unpack a Promise the value before call it, and wrap
-    return into Promise after call it.
--   aMapSkipNull：use a function to deal with internal value，
-    if origin value is `undefined | null | Promise<undefined | null>`,
+-   aMap： unpack the Promise and use function to deal with the
+    value, and use Promise to wrap the result.
+-   aMapSkipNull：unpack the Promise and use function to deal
+    with the value, and use Promise to wrap the result. if
+    origin value is `undefined | null | Promise<undefined | null>`,
     keep and wrap to `Promise<undefined | null>`.
 
 Each methods will return a new `Computation<T>`, if you pass it two different chains, they will not influence each other.
