@@ -114,14 +114,18 @@ function createResWithTwoValue(
     value1: Status | ResponseBody,
     value2: ResponseBody | Headers
 ) {
-    if (typeof value1 === "number")
-        return createFullRes({ status: value1, body: value2 as ResponseBody });
-    else
-        return createFullRes({
-            status: Status.Ok,
-            body: value1,
-            headers: formatToRecord(value2 as Headers),
-        });
+    if (typeof value1 === "number") {
+        if (isResponseBody(value2)) {
+            return createFullRes({ status: value1, body: value2 });
+        } else {
+            return createFullRes({ status: value1, headers: formatToRecord(value2) });
+        }
+    }
+    return createFullRes({ status: Status.Ok, body: value1, headers: formatToRecord(value2 as Headers) });
+}
+
+function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
+    return typeof value === "string" || value instanceof Buffer || value instanceof Readable;
 }
 
 export default createRes;
