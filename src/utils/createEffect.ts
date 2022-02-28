@@ -10,10 +10,10 @@ import { Fn } from "./createWrapper";
  * with side effect.
  */
 export function createEffect<F extends (...args: any[]) => any>(
-    hook: (...args: Parameters<F>) => (r: Readonly<ReturnType<F>>) => void
+    hook: (...args: Readonly<Parameters<F>>) => (r: Readonly<ReturnType<F>>) => void
 ): (
-    fn: (...args: Parameters<F>) => ReturnType<F>
-) => (...args: Parameters<F>) => ReturnType<F> {
+        fn: (...args: Parameters<F>) => ReturnType<F>
+    ) => (...args: Parameters<F>) => ReturnType<F> {
     return (fn) =>
         (...p) => {
             const hookAfter = hook(...p);
@@ -43,7 +43,7 @@ export function createEffect4Any(hook: () => () => void) {
 
 export function addEffect<F extends (...args: any[]) => any>(
     fn: F,
-    hook: (...args: Parameters<F>) => (r: Readonly<ReturnType<F>>) => void
+    hook: (...args: Readonly<Parameters<F>>) => (r: Readonly<ReturnType<F>>) => void
 ) {
     return createEffect(hook)(fn);
 }
