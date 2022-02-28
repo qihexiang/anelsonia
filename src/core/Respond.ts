@@ -1,215 +1,127 @@
+import { Readable } from "stream";
+import { isVoid } from "../utils/isVoid";
 import Status from "./Status";
-import MaybePromise from "../utils/MaybePromise";
-import Stream from "stream";
+
+export type ResponseBody = string | Buffer | Readable;
 
 export interface ResponseProps {
-    statusCode: Status;
-    statusMessage?: string;
-    body?: ResponseBody;
-    headers: HeaderObject;
+    readonly status: Status;
+    readonly statusText?: string;
+    readonly body?: ResponseBody;
+    readonly headers: Record<string, string>;
 }
 
-export type ResponseBody = string | Buffer | Stream;
+export interface Respond extends ResponseProps {
+    setStatus(code: Status): Respond;
+    setStatusText(text: string): Respond;
+    setBody(body: ResponseBody): Respond;
+    setHeaders(headerName: string, headerValue: string): Respond;
+    setHeaders(...headers: Headers[]): Respond;
+}
 
-export type AsyncResponse = MaybePromise<ResponseProps>;
+type ArrayHeaders = [string, string];
+type RecordHeaders = Record<string, string>;
+type Headers = ArrayHeaders | RecordHeaders;
 
-export class Respond implements ResponseProps {
-    private _statusCode?: Status = undefined;
-    private _statusMessage?: string = undefined;
-    private _body?: ResponseBody = undefined;
-    private _headers: HeaderObject = {};
-    /**
-     * Create an empty response, default status code is 404.
-     */
-    static create(): Respond;
-    /**
-     * Create an empty response with given status code.
-     *
-     * @param code http status code.
-     */
-    static create(code: Status): Respond;
-    /**
-     * Create a response with given body, default status code is 200.
-     *
-     * @param body a string, buffer or stream.
-     */
-    static create(body: ResponseBody): Respond;
-    /**
-     * Create a response with given status code and body.
-     *
-     * @param code http status code.
-     * @param body a string, buffer or stream.
-     */
-    static create(code: Status, body: ResponseBody): Respond;
-    /**
-     * Create a response with given status code and headers.
-     *
-     * @param code http status code.
-     * @param headers http headers like `"Content-Type"`.
-     */
-    static create(code: Status, headers: HeaderCollection): Respond;
-    /**
-     * Create a response with given body and headers, default status code is 200.
-     *
-     * @param body a string, buffer or stream.
-     * @param headers http headers like `"Content-Type"`.
-     */
-    static create(body: ResponseBody, headers: HeaderCollection): Respond;
-    /**
-     * Create a response with given status code, body and http headers.
-     *
-     * @param code http status code.
-     * @param body a string, buffer or stream.
-     * @param headers http headers like `"Content-Type"`.
-     */
-    static create(
-        code: Status,
-        body: ResponseBody,
-        headers: HeaderCollection
-    ): Respond;
-    static create(
-        arg1?: Status | ResponseBody,
-        arg2?: ResponseBody | HeaderCollection,
-        headers?: HeaderCollection
-    ): Respond {
-        const response = new Respond();
-        if (typeof arg1 === "number") {
-            response.setStatusCode(arg1);
-            if (
-                typeof arg2 === "string" ||
-                arg2 instanceof Buffer ||
-                arg2 instanceof Stream
-            )
-                response.setBody(arg2);
-            else if (typeof arg2 === "object") response.setHeaders(arg2);
-        }
-        if (
-            typeof arg1 === "string" ||
-            arg1 instanceof Buffer ||
-            arg1 instanceof Stream
+export function createRes(): Respond;
+export function createRes(code: Status): Respond;
+export function createRes(body: ResponseBody): Respond;
+export function createRes(code: Status, body: ResponseBody): Respond;
+export function createRes(code: Status, headers: Headers): Respond;
+export function createRes(body: ResponseBody, headers: Headers): Respond;
+export function createRes(
+    code: Status,
+    body: ResponseBody,
+    headers: Headers
+): Respond;
+export function createRes(
+    arg1?: Status | ResponseBody,
+    arg2?: ResponseBody | Headers,
+    arg3?: Headers
+): Respond {
+    if (isVoid(arg1)) return createFullRes({});
+    else if (isVoid(arg2)) return createResWithOneValue(arg1);
+    else if (isVoid(arg3)) return createResWithTwoValue(arg1, arg2);
+    else
+        return createFullRes({
+            status: arg1 as Status,
+            body: arg2 as ResponseBody,
+            headers: formatToRecord(arg3),
+        });
+}
+
+function createFullRes(response: Partial<ResponseProps>): Respond {
+    const {
+        status = Status.NotFound,
+        statusText,
+        body,
+        headers = {},
+    } = response;
+    return {
+        status,
+        statusText,
+        body,
+        headers,
+        setStatus(code) {
+            return createFullRes({ ...response, status: code });
+        },
+        setStatusText(text: string) {
+            return createFullRes({ ...response, statusText: text });
+        },
+        setBody(body) {
+            return createFullRes({ ...response, body });
+        },
+        setHeaders(
+            arg1: string | Headers,
+            arg2?: string | Headers,
+            ...rest: Headers[]
         ) {
-            response.setBody(arg1);
-            if (typeof arg2 === "object")
-                response.setHeaders(arg2 as HeaderCollection);
-        }
-        if (headers) response.setHeaders(headers);
-        return response;
-    }
-    /**
-     * Set status code manually
-     *
-     * @param code a valid http status code
-     * @returns this instance itself
-     */
-    setStatusCode(code: Status): Respond {
-        this._statusCode = code;
-        return this;
-    }
-    get statusCode(): Status {
-        return this._statusCode ?? (this._body ? 200 : 404);
-    }
-    /**
-     * Set a status message manually.
-     *
-     * > Don't forget that this dosen't work in HTTP/2
-     *
-     * @param message a status message in string type
-     * @returns this instance itself
-     */
-    setStatusMessage(message: string): Respond {
-        this._statusMessage = message;
-        return this;
-    }
-    get statusMessage(): string | undefined {
-        return this._statusMessage;
-    }
-    /**
-     * Set a response body, it can be a readable stream, a buffer or a string.
-     *
-     * If you'd like to response a json, using JSON.stringify to transfrom it.
-     *
-     * @param body the body you'd like to response.
-     * @returns this instance it self
-     */
-    setBody(body: ResponseBody): Respond {
-        this._body = body;
-        return this;
-    }
-    get body(): ResponseBody | undefined {
-        return this._body;
-    }
-    /**
-     * Add a header in key-value mode, for example: `res.setHeader("Keep-Alive": "timeout=5")`
-     *
-     * @param headerName the name of the HTTP response header
-     * @param value the value of the http response header
-     */
-    setHeaders(headerName: string, value: HeaderValue): Respond;
-    /**
-     * Add one or more headers in array style, like:
-     *
-     * ```ts
-     * response.setHeaders(
-     *     ["Keep-Alive", "timeout=5"],
-     *     ["Content-Type", "text/plain; charset=UTF-8"]
-     * )
-     * ```
-     *
-     * @param headers Array-Style http response headers.
-     */
-    setHeaders(...headers: HeaderArray[]): Respond;
-    /**
-     * Add one or more headers to the response, like:
-     *
-     * ```ts
-     * response.setHeaders({"Keep-Alive": "timeout=5"}, {"Content-Type": "text/plain; charset=UTF-8"})
-     * // which equals to
-     * response.setHeaders({"Keep-Alive": "timeout=5", "Content-Type": "text/plain; charset=UTF-8"})
-     * ```
-     *
-     * @param headers Object-style http response headers.
-     */
-    setHeaders(...headers: HeaderObject[]): Respond;
-    /**
-     * Add one or more headers to the response, you can use both
-     * array-style and object-style headers.
-     *
-     * @param headers Array-style or Object-style response headers.
-     */
-    setHeaders(...headers: HeaderCollection[]): Respond;
-    setHeaders(
-        arg1: string | HeaderCollection,
-        arg2?: HeaderValue | HeaderCollection,
-        ...rest: HeaderCollection[]
-    ): Respond {
-        if (typeof arg1 === "string") {
-            this._headers = { ...this._headers, [arg1]: arg2 as HeaderValue };
-            return this;
-        }
-        const headers = [arg1, arg2 as HeaderCollection, ...rest].map((h) =>
-            h instanceof Array ? { [h[0]]: h[1] } : h
-        );
-        this._headers = {
-            ...this._headers,
-            ...headers.reduce((pre, cur) => ({ ...pre, ...cur }), {}),
-        };
-        return this;
-    }
-    get headers(): HeaderObject {
-        return this._headers;
-    }
+            let headersToAppend: RecordHeaders[] = [];
+            if (typeof arg1 === "string" && typeof arg2 === "string")
+                headersToAppend.push({ [arg1]: arg2 });
+            else {
+                headersToAppend = [
+                    arg1 as Headers,
+                    arg2 as Headers,
+                    ...rest,
+                ].map(formatToRecord);
+            }
+            const updatedHeaders = headersToAppend.reduce(
+                (currentHeaders, nextHeader) => {
+                    return { ...currentHeaders, ...nextHeader };
+                },
+                headers
+            );
+            return createFullRes({ ...response, headers: updatedHeaders });
+        },
+    };
 }
 
-export const createRes = Respond.create;
-
-export type HeaderValue = string | string[] | number;
-
-export type HeaderObject = {
-    [propName: string]: HeaderValue;
+const formatToRecord = (header: Headers): RecordHeaders => {
+    if (header instanceof Array) {
+        const [key, value] = header;
+        return { [key]: value };
+    }
+    return header;
 };
 
-export type HeaderArray = [string, HeaderValue];
+function createResWithOneValue(value: Status | ResponseBody): Respond {
+    if (typeof value === "number") return createFullRes({ status: value });
+    else return createFullRes({ status: Status.Ok, body: value });
+}
 
-export type HeaderCollection = HeaderArray | HeaderObject;
+function createResWithTwoValue(
+    value1: Status | ResponseBody,
+    value2: ResponseBody | Headers
+) {
+    if (typeof value1 === "number")
+        return createFullRes({ status: value1, body: value2 as ResponseBody });
+    else
+        return createFullRes({
+            status: Status.Ok,
+            body: value1,
+            headers: formatToRecord(value2 as Headers),
+        });
+}
 
 export default createRes;

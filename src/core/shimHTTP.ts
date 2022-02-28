@@ -90,12 +90,12 @@ export function useURL<T>(
 
 interface CreateFlare {
     <T>(): [(value: T) => void, () => Readonly<T>, () => void];
-    <T>(options: { mutable: true; reassign: boolean; }): [
+    <T>(options: { mutable: true; reassign: boolean }): [
         (value: T) => void,
         () => T,
         () => void
     ];
-    <T>(options: { mutable: false; reassign: boolean; }): [
+    <T>(options: { mutable: false; reassign: boolean }): [
         (value: T) => void,
         () => Readonly<T>,
         () => void
@@ -183,14 +183,10 @@ export function shimHTTP(
                     longestConnection
                 );
             try {
-                const { statusCode, statusMessage, body, headers } =
-                    await entry(req);
-                if (
-                    res instanceof IncomingMessage &&
-                    statusMessage !== undefined
-                )
-                    res.writeHead(statusCode, statusMessage, headers);
-                res.writeHead(statusCode, headers);
+                const { status, statusText, body, headers } = await entry(req);
+                if (res instanceof IncomingMessage && statusText !== undefined)
+                    res.writeHead(status, statusText, headers);
+                res.writeHead(status, headers);
                 if (body instanceof Stream) {
                     body.pipe(res);
                     body.on("error", (err) => {

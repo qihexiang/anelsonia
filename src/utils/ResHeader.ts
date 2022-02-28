@@ -14,28 +14,28 @@ export function contentType(mediaType: string, charset?: string) {
  *
  * @param length the content-length you want to set. It must be an integer
  */
-export function contentLength(length: number): { "Content-Length"?: number };
+export function contentLength(length: number): { "Content-Length"?: string };
 /**
  * Using size of given string or Buffer as content length
  *
  * @param content the content you'd like to response.
  */
 export function contentLength(content: string | Buffer): {
-    "Content-Length": number;
+    "Content-Length": string;
 };
 export function contentLength(input: number | string | Buffer): {
-    "Content-Length"?: number;
+    "Content-Length"?: string;
 } {
     if (typeof input === "number") {
         const check = Number.isInteger(input);
         if (!check) console.log(`Content-Length should be an integer`);
-        return check ? { "Content-Length": input } : {};
+        return check ? { "Content-Length": String(input) } : {};
     }
     if (typeof input === "string") {
-        return { "Content-Length": input.length };
+        return { "Content-Length": String(input.length) };
     }
     if (input instanceof Buffer) {
-        return { "Content-Length": input.length };
+        return { "Content-Length": String(input.length) };
     }
     return {};
 }
