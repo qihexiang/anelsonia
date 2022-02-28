@@ -1,18 +1,18 @@
 import { Readable } from "stream";
+import { Status } from ".";
 import { isVoid } from "../utils/isVoid";
-import Status from "./Status";
 
 export type ResponseBody = string | Buffer | Readable;
 
 export interface ResponseProps {
-    readonly status: Status;
+    readonly status: number;
     readonly statusText?: string;
     readonly body?: ResponseBody;
     readonly headers: Record<string, string>;
 }
 
 export interface Respond extends ResponseProps {
-    setStatus(code: Status): Respond;
+    setStatus(code: number): Respond;
     setStatusText(text: string): Respond;
     setBody(body: ResponseBody): Respond;
     setHeaders(headerName: string, headerValue: string): Respond;
@@ -23,19 +23,57 @@ type ArrayHeaders = [string, string];
 type RecordHeaders = Record<string, string>;
 type Headers = ArrayHeaders | RecordHeaders;
 
+/**
+ * create a Respond without body and status code, default status code is 404
+ */
 export function createRes(): Respond;
-export function createRes(code: Status): Respond;
+/**
+ * create a Respond with a status code
+ * 
+ * @param code the status code
+ */
+export function createRes(code: number): Respond;
+/**
+ * create a Respond with given body, default status code is 200
+ * 
+ * @param body can be a string, Buffer or Readable stream
+ */
 export function createRes(body: ResponseBody): Respond;
-export function createRes(code: Status, body: ResponseBody): Respond;
-export function createRes(code: Status, headers: Headers): Respond;
+/**
+ * create a Respond with status code and body
+ * 
+ * @param code the status code
+ * @param body can be a string, Buffer or Readable stream
+ */
+export function createRes(code: number, body: ResponseBody): Respond;
+/**
+ * create a Respond with a status code and set headers
+ * 
+ * @param code the status code
+ * @param headers like `{"Content-Type": "application/json"}` or `["Content-Type", "application/json"]`
+ */
+export function createRes(code: number, headers: Headers): Respond;
+/**
+ * Create a Respond with body and headers, default code is 200
+ * 
+ * @param body can be a string, Buffer or a Readale stream
+ * @param headers like `{"Content-Type": "application/json"}` or `["Content-Type", "application/json"]`
+ */
 export function createRes(body: ResponseBody, headers: Headers): Respond;
+/**
+ * Create a Respond with status code, body and headers
+ * 
+ * @param code the status code
+ * @param body can be a string, Buffer or a Readale stream
+ * @param headers like `{"Content-Type": "application/json"}` or `["Content-Type", "application/json"]`
+ */
 export function createRes(
-    code: Status,
+    code: number,
     body: ResponseBody,
     headers: Headers
 ): Respond;
 export function createRes(
-    arg1?: Status | ResponseBody,
+    arg1?: number | ResponseBody,
     arg2?: ResponseBody | Headers,
     arg3?: Headers
 ): Respond {
@@ -44,7 +82,7 @@ export function createRes(
     else if (isVoid(arg3)) return createResWithTwoValue(arg1, arg2);
     else
         return createFullRes({
-            status: arg1 as Status,
+            status: arg1 as number,
             body: arg2 as ResponseBody,
             headers: formatToRecord(arg3),
         });
