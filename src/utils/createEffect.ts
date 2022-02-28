@@ -1,4 +1,4 @@
-import { Fn } from "./createWrapper";
+import { Fn } from "./createWrapper.ts";
 
 /**
  * createEffect can add hooks execute before and after original function,
@@ -14,8 +14,8 @@ export function createEffect<F extends (...args: any[]) => any>(
         ...args: Readonly<Parameters<F>>
     ) => (r: Readonly<ReturnType<F>>) => void
 ): (
-    fn: (...args: Parameters<F>) => ReturnType<F>
-) => (...args: Parameters<F>) => ReturnType<F> {
+        fn: (...args: Parameters<F>) => ReturnType<F>
+    ) => (...args: Parameters<F>) => ReturnType<F> {
     return (fn) =>
         (...p) => {
             const hookAfter = hook(...p);
