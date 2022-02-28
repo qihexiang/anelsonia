@@ -461,3 +461,70 @@ Using `computeLazy` to create `Lazy<T>` object，it provides methods as the same
 The difference between `Computation` and `Lazy` is that `Computation` will compute the value every time called method in chain, but `Lazy` just compose functions。when you finally access `value` in `Lazy` object，the composed functions will be executed. Be careful especailly when functions has side-effection! Every time you access `value`, composed function will be called.
 
 Just like `Computation`, methods of `Lazy` object will return a new `Lazy` object, but if you pass a `Lazy` to different chains, the results will not influence each other only if all functions are pure.
+
+### Effect and Wrapper
+
+Some times we would like to do something before or after a function, but these logics are not a part of target function, we will find a way to define them in other places. In other languages, we may use decorators to implement this, but in TypeScript, decorators can't apply to a simple function. So Freesia provides two ways to create outside logic of a function.
+
+#### createEffect
+
+`createEffect` can create a wrapper for target function, the wrapper will not influence the arugment and return value of original function, what the wrapper do is side-effect.
+
+```ts
+// visitLogger.ts
+export const visitLogger = createEffect<EntryPoint>((req) => {
+    const path = useURL("path");
+    const reqComeIn = new Date();
+    return async (res) => {
+        const { statusCode } = await res;
+        const resGoOut = new Date().getTime();
+        console.log(
+            `${reqComeIn.toLocaleString()} ${path} ${statusCode} ${
+                resGoOut - reqComeIn.getTime()
+            }ms`
+        );
+    };
+});
+
+// main.ts
+const mainWithVisitLogger = visitLogger(main);
+```
+
+In this example, `createEffect` create a wrapper for functions of type `EntryPoint`. It can access the parameter and return value of origin function, but unable to change them.
+
+The parameter `hook` is a function (we can call it `beforeHook`) that can get the paramters of original function, and called before original function. It will return another function (we can call it `afterHook`) which use original function's return value as parameter and called after original function, this function should return void. You can ignore arguments of `beforeHook` and `afterHook`.
+
+Some times, what we need to do is completely irrelevant to original function, we can use `createEffect4Any` instead of `createEffect`, the `beforeHook` and `afterHook` both has no arguments. The function type will not change after applying the wrapper created by `createEffect4Any`.
+
+> `beforeHook` must be an synchorous function, but `afterHook` can be a asynchorous function.
+
+#### createWrapper
+
+Some times we would like to do some pretreatment to function arguments or post processing to return values, then we use `createWrapper` to create such a wrapper.
+
+`createWrapper<O, T>` has 2 generic types, `O` is the original function type and `T` is the wrapped function type. If you don't like to change the type, you can specify `O` only, default `T` is `O`.
+
+```ts
+export const useAutoPlainText = createWrapper<
+    (req: HttpReq) => Promise<Respond>
+>((req) => [
+    [req],
+    async (res) => {
+        const response = await res;
+        if (
+            typeof response.body === "string" &&
+            !("Content-Type" in response.headers)
+        )
+            response.setHeaders(["Content-Type", "text/plain; charset=UTF-8"]);
+        return response;
+    },
+]);
+```
+
+The `beforeHook` should receive parameters of type `T`, and return a `BeforeHookTuple<O, T>`, It has 3 pattern:
+
+-   Full pattern: `[[Parameters<O>], (res: ReturnType<O>) => ReturnType<T>]`, the first element is parameters need to pass to original function, the second element is the `afterHook` called after original function, it returns the value of wrapped function.
+-   Block pattern: `[null, () => ReturnType<T>]`, if first element is `null`, the original function won't be called, and `afterHook` should has no arguments.
+-   Pretreatment only pattern: `[[Parameters<O>]]` if you don't want to change the return value, you can ignore the `afterHook`.
+
+> If at least one of `beforeHook`, `afterHook` and original function is asynchorous, the wrapped function (`T`) will return a `Promise`, which means `O` and `T` might be unable to be equal.
