@@ -29,40 +29,40 @@ type Headers = ArrayHeaders | RecordHeaders;
 export function createRes(): Respond;
 /**
  * create a Respond with a status code
- * 
+ *
  * @param code the status code
  */
 export function createRes(code: number): Respond;
 /**
  * create a Respond with given body, default status code is 200
- * 
+ *
  * @param body can be a string, Buffer or Readable stream
  */
 export function createRes(body: ResponseBody): Respond;
 /**
  * create a Respond with status code and body
- * 
+ *
  * @param code the status code
  * @param body can be a string, Buffer or Readable stream
  */
 export function createRes(code: number, body: ResponseBody): Respond;
 /**
  * create a Respond with a status code and set headers
- * 
+ *
  * @param code the status code
  * @param headers like `{"Content-Type": "application/json"}` or `["Content-Type", "application/json"]`
  */
 export function createRes(code: number, headers: Headers): Respond;
 /**
  * Create a Respond with body and headers, default code is 200
- * 
+ *
  * @param body can be a string, Buffer or a Readale stream
  * @param headers like `{"Content-Type": "application/json"}` or `["Content-Type", "application/json"]`
  */
 export function createRes(body: ResponseBody, headers: Headers): Respond;
 /**
  * Create a Respond with status code, body and headers
- * 
+ *
  * @param code the status code
  * @param body can be a string, Buffer or a Readale stream
  * @param headers like `{"Content-Type": "application/json"}` or `["Content-Type", "application/json"]`
@@ -156,14 +156,25 @@ function createResWithTwoValue(
         if (isResponseBody(value2)) {
             return createFullRes({ status: value1, body: value2 });
         } else {
-            return createFullRes({ status: value1, headers: formatToRecord(value2) });
+            return createFullRes({
+                status: value1,
+                headers: formatToRecord(value2),
+            });
         }
     }
-    return createFullRes({ status: Status.Ok, body: value1, headers: formatToRecord(value2 as Headers) });
+    return createFullRes({
+        status: Status.Ok,
+        body: value1,
+        headers: formatToRecord(value2 as Headers),
+    });
 }
 
 function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
-    return typeof value === "string" || value instanceof Buffer || value instanceof Readable;
+    return (
+        typeof value === "string" ||
+        value instanceof Buffer ||
+        value instanceof Readable
+    );
 }
 
 export default createRes;
