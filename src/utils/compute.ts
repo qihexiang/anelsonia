@@ -1,16 +1,19 @@
 import { baseCompose } from "./composeFn";
 import { isVoid } from "./isVoid";
-type Then<T> = T extends Promise<infer N> ? Then<N> : T;
 
 export interface Computation<T> {
     readonly map: <R>(fn: (t: T) => R) => Computation<R>;
     readonly mapSkipNull: <R>(
         nextFn: (r: NonNullable<T>) => R
     ) => Computation<R | Extract<T, undefined | null>>;
-    readonly aMap: <R>(fn: (t: Then<T>) => R) => Computation<Promise<Then<R>>>;
+    readonly aMap: <R>(
+        fn: (t: Awaited<T>) => R
+    ) => Computation<Promise<Awaited<R>>>;
     readonly aMapSkipNull: <R>(
-        fn: (t: NonNullable<Then<T>>) => R
-    ) => Computation<Promise<Then<R> | Extract<Then<T>, undefined | null>>>;
+        fn: (t: NonNullable<Awaited<T>>) => R
+    ) => Computation<
+        Promise<Awaited<R> | Extract<Awaited<T>, undefined | null>>
+    >;
     get value(): T;
 }
 
@@ -33,24 +36,30 @@ export const compute = <T>(initValue: T): Computation<T> => {
             type R = ReturnType<typeof fn>;
             if (initValue instanceof Promise)
                 return compute(
-                    initValue.then((t: Then<T>) => fn(t)) as Promise<Then<R>>
+                    initValue.then((t: Awaited<T>) =>
+                        fn(t as Awaited<T>)
+                    ) as Promise<Awaited<R>>
                 );
             return compute(
-                Promise.resolve(fn(initValue as Then<T>)) as Promise<Then<R>>
+                Promise.resolve(fn(initValue as Awaited<T>)) as Promise<
+                    Awaited<R>
+                >
             );
         },
         aMapSkipNull: (fn) => {
             type R = ReturnType<typeof fn>;
             if (initValue instanceof Promise)
                 return compute(
-                    initValue.then((t: Then<T>) =>
-                        isVoid(t) ? t : fn(t as NonNullable<Then<T>>)
-                    ) as Promise<Then<R> | Extract<Then<T>, undefined | null>>
+                    initValue.then((t: Awaited<T>) =>
+                        isVoid(t) ? t : fn(t as NonNullable<Awaited<T>>)
+                    ) as Promise<
+                        Awaited<R> | Extract<Awaited<T>, undefined | null>
+                    >
                 );
             return compute(
                 Promise.resolve(
-                    fn(initValue as NonNullable<Then<T>>)
-                ) as Promise<Then<R>>
+                    fn(initValue as NonNullable<Awaited<T>>)
+                ) as Promise<Awaited<R>>
             );
         },
         get value() {
