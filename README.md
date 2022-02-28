@@ -428,6 +428,8 @@ Magical functions are implemented by Node.js `async_hooks` API, as a result your
 createServer(shimHTTP(main, { noMagical: true })).listen(8000);
 ```
 
+> noMagical mode can make application faster 10%-50%.
+
 ## Utils
 
 ### composeFn

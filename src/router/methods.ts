@@ -1,4 +1,4 @@
-import { useURL } from "../core/shimHTTP";
+import { HttpReq, useURL } from "../core/shimHTTP";
 import { RouteHandler, RouteHandlerX } from "./createRoute";
 
 /**
@@ -105,3 +105,41 @@ export const TraceX = <P extends string, X, R>(
 export const PatchX = <P extends string, X, R>(
     handler: RouteHandlerX<P, X, R>
 ) => allowMethodsX(handler, ["PATCH"]);
+
+const allowMethodsN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>, methods: string[]): RouteHandlerX<P, HttpReq, R | null> => {
+    return (params, req) => {
+        if (!methods.includes(req.method ?? "UNKNOWN")) return null;
+        return handler(params, req);
+    };
+};
+
+export const AllN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, [
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "DELETE",
+        "CONNECT",
+        "OPTIONS",
+        "TRACE",
+        "PATCH",
+    ]);
+export const GetN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["GET"]);
+export const HeadN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["HEAD"]);
+export const PostN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["POST"]);
+export const PutN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["PUT"]);
+export const DeleteN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["DELETE"]);
+export const ConnectN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["CONNECT"]);
+export const OptionsN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["OPTIONS"]);
+export const TraceN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["TRACE"]);
+export const PatchN = <P extends string, R>(handler: RouteHandlerX<P, HttpReq, R>) =>
+    allowMethodsN(handler, ["PATCH"]);
