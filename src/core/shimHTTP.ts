@@ -88,14 +88,14 @@ export function useURL<T>(
     return prop(path);
 }
 
-interface CreateFlare {
+interface CreateContext {
     <T>(): [(value: T) => void, () => Readonly<T>, () => void];
-    <T>(options: { mutable: true; reassign: boolean; }): [
+    <T>(options: { mutable: true; reassign: boolean }): [
         (value: T) => void,
         () => T,
         () => void
     ];
-    <T>(options: { mutable: false; reassign: boolean; }): [
+    <T>(options: { mutable: false; reassign: boolean }): [
         (value: T) => void,
         () => Readonly<T>,
         () => void
@@ -107,11 +107,11 @@ interface CreateFlare {
  *
  * @param options `{ mutable: boolean, reassign: boolean }` define it this flare mutable and reassignable
  * @returns `[light, observe, extinguish]`
- * - `light`  assign value to the flare
+ * - `assign`  assign value to the flare
  * - `observe` get the value from the flare
- * - `extinguish` remove the value from the flare
+ * - `drop` remove the value from the flare
  */
-export const createFlare: CreateFlare = <T>(
+export const createContext: CreateContext = <T>(
     options = {
         mutable: false,
         reassign: false,
@@ -152,6 +152,63 @@ export const createFlare: CreateFlare = <T>(
      */
     const drop = () => {
         if (!values.delete(getReq()))
+            throw new Error("No value assigned to this flare found.");
+    };
+    return [assign, observe, drop];
+};
+
+interface CreateContextN {
+    <T>(): [
+        (value: T, req: HttpReq) => void,
+        (req: HttpReq) => Readonly<T>,
+        (req: HttpReq) => void
+    ];
+    <T>(options: { mutable: true; reassign: boolean }): [
+        (value: T, req: HttpReq) => void,
+        (req: HttpReq) => T,
+        (req: HttpReq) => void
+    ];
+    <T>(options: { mutable: false; reassign: boolean }): [
+        (value: T, req: HttpReq) => void,
+        (req: HttpReq) => Readonly<T>,
+        (req: HttpReq) => void
+    ];
+}
+
+export const createContextN: CreateContextN = <T>(
+    options = {
+        mutable: false,
+        reassign: false,
+    }
+) => {
+    const { reassign } = options;
+    const values = new WeakMap<HttpReq, T>();
+    /**
+     * Assign or re-assign a value to this flare
+     *
+     * @param value the value you want to assign to flare
+     */
+    const assign = (value: T, req: HttpReq) => {
+        if (!reassign && values.has(req))
+            throw new Error("Already has a value and not re-assignable.");
+        values.set(req, value);
+    };
+    /**
+     * Get value from the flare.
+     *
+     * @returns the value assgined to the flare
+     */
+    const observe = (req: HttpReq) => {
+        const value = values.get(req);
+        if (value === undefined)
+            throw new Error("No value has been assigned to this flare.");
+        return value;
+    };
+    /**
+     * Remove the value from the flare.
+     */
+    const drop = (req: HttpReq) => {
+        if (!values.delete(req))
             throw new Error("No value assigned to this flare found.");
     };
     return [assign, observe, drop];
