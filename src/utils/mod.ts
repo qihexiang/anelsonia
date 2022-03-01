@@ -5,3 +5,4 @@ export * from "./createWrapper.ts";
 export * from "./isVoid.ts";
 export * from "./jsonType.ts";
 export * from "./MaybePromise.ts";
+export * from "./urlParser.ts";
