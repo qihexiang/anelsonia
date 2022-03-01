@@ -1,17 +1,16 @@
 import { isVoid } from "../utils/isVoid.ts";
-import Status from "./Status.ts";
 
 export type ResponseBody = string | Blob | ReadableStream<Uint8Array>;
 
 export interface ResponseProps {
-    readonly status: Status;
+    readonly status: number;
     readonly statusText?: string;
     readonly body?: ResponseBody;
     readonly headers: Record<string, string>;
 }
 
 export interface Respond extends ResponseProps {
-    setStatus(code: Status): Respond;
+    setStatus(code: number): Respond;
     setStatusText(text: string): Respond;
     setBody(body: ResponseBody): Respond;
     setHeaders(headerName: string, headerValue: string): Respond;
@@ -23,18 +22,18 @@ type RecordHeaders = Record<string, string>;
 type Headers = ArrayHeaders | RecordHeaders;
 
 export function createRes(): Respond;
-export function createRes(code: Status): Respond;
+export function createRes(code: number): Respond;
 export function createRes(body: ResponseBody): Respond;
-export function createRes(code: Status, body: ResponseBody): Respond;
-export function createRes(code: Status, headers: Headers): Respond;
+export function createRes(code: number, body: ResponseBody): Respond;
+export function createRes(code: number, headers: Headers): Respond;
 export function createRes(body: ResponseBody, headers: Headers): Respond;
 export function createRes(
-    code: Status,
+    code: number,
     body: ResponseBody,
     headers: Headers,
 ): Respond;
 export function createRes(
-    arg1?: Status | ResponseBody,
+    arg1?: number | ResponseBody,
     arg2?: ResponseBody | Headers,
     arg3?: Headers,
 ): Respond {
@@ -43,7 +42,7 @@ export function createRes(
     else if (isVoid(arg3)) return createResWithTwoValue(arg1, arg2);
     else {
         return createFullRes({
-            status: arg1 as Status,
+            status: arg1 as number,
             body: arg2 as ResponseBody,
             headers: formatToRecord(arg3),
         });
@@ -51,7 +50,7 @@ export function createRes(
 }
 
 function createFullRes(response: Partial<ResponseProps>): Respond {
-    const { status = Status.NotFound, statusText, body, headers = {} } =
+    const { status = 404, statusText, body, headers = {} } =
         response;
     return {
         status,
@@ -102,13 +101,13 @@ const formatToRecord = (header: Headers): RecordHeaders => {
     return header;
 };
 
-function createResWithOneValue(value: Status | ResponseBody): Respond {
+function createResWithOneValue(value: number | ResponseBody): Respond {
     if (typeof value === "number") return createFullRes({ status: value });
-    else return createFullRes({ status: Status.Ok, body: value });
+    else return createFullRes({ status: 200, body: value });
 }
 
 function createResWithTwoValue(
-    value1: Status | ResponseBody,
+    value1: number | ResponseBody,
     value2: ResponseBody | Headers,
 ) {
     if (typeof value1 === "number") {
@@ -125,7 +124,7 @@ function createResWithTwoValue(
         }
     } else {
         return createFullRes({
-            status: Status.Ok,
+            status: 200,
             body: value1,
             headers: formatToRecord(value2 as Headers),
         });
