@@ -1,31 +1,38 @@
-# Freesia: a TypeScript library for building Node.js HTTP servers.
+# Freesia for Deno: a TypeScript library for building HTTP servers.
 
-Freesia is a library for building Node.js HTTP servers, it provides a way to describe you HTTP handling process in a functional way.
+This is the Freesia library for Deno, which provides an experience similar to Node.js version. You can load this library directly from GitHub by url `"https://raw.githubusercontent.com/qihexiang/freesia/deno/src/mod.ts"`.
 
-For example, a hello world application in express is like this:
+> This project is still under developing, specify a commit id to access it or clone its deno branch as a submodule if you want to use in production.
 
-```ts
-import express from "express";
-
-const app = express();
-app.use((req, res) => {
-    res.send("hello, world");
-});
-app.listen(8000);
-```
-
-The handler is a function that returns void, it's strange and un-typed in programming. Using Freesia, you can write like this:
+Here is a simple example:
 
 ```ts
-import { shimHTTP, createRes } from "freesia";
-import { createServer } from "http";
+import {
+    EntryPoint,
+    createRes,
+    shimHTTP,
+    createSwRtX,
+    Get,
+    urlParser,
+} from "https://raw.githubusercontent.com/qihexiang/freesia/deno/src/mod.ts";
+import { serve } from "https://deno.land/std@0.127.0/http/server.ts";
 
-createServer(
-    shimHTTP(async (req: HttpReq) => createRes("hello, world"))
-).listen(8000);
+const { switcher } = createSwRtX
+    .route(
+        "/hello/<username>/",
+        Get(async ({ username }) => createRes(`hello, ${username}`))
+    )
+    .fallback(async (url, req) => createRes(404, `Can't ${req.method} ${url}`));
+
+const main: EntryPoint = async (req) => {
+    const { pathname } = urlParser(req.url);
+    return switcher(pathname, req);
+};
+
+serve(shimHTTP(main), { port: 8000 });
 ```
 
-It was clear and fully typed.
+> Be aware of that Freesia for Deno has no magical functions.
 
 ## Basic
 
@@ -274,142 +281,36 @@ const main = async (req: HttpReq) => {
 };
 ```
 
-## Magical functions
+### Methods limit
 
-Freesia provides some magical functions, which provides a way to access values of current handling request without pass `req` as parameters.
-
-### useRequest
-
-`useRequest` is the core magical function, all magical function depends on it. In situations what `useRequest` doesn't work, all other magical function will not work either.
-
-`useRequest` can be called only in the function called by main function that use as parameter of `shimHTTP`. `useRequest` provides a way to get `req` object, while you don't pass it as parameters.
-
-Such code is ok:
+As there is no magical functions, `allowMethods` and `allowMethodsX` dosen't work in deno version. `allowMethods` function for deno is in fact the non-magical function `allowMethodsN` from `v2` branch. As a result, methods limit in routing is supported with X series routes only, and the extra parameter must be `HttpReq`.
 
 ```ts
-createServer(
-    shimHTTP(async (req) => {
-        return layer1();
-    })
-).listen(8000);
-
-function layer1() {
-    return layer2();
-}
-
-function layer2() {
-    return layer3();
-}
-
-/**
- * layer3 is called by main function, though indirectly,
- * it can access `req` by `useRequest`
- */
-function layer3() {
-    const req = useRequest();
-    return createRes(req.socket.address().address);
-}
-```
-
-But is not ok in this:
-
-```ts
-databse
-    .connect()
-    .then((db) => {
-        /**
-         * function here is not related to any request,
-         * `useRequest` will throw an error.
-         */
-        const req = useRequest();
-        console.log(JSON.stringify(req.socket.address()));
-        createServer(
-            shimHTTP(async () => {
-                return createRes(404, "Not found");
-            })
-        ).listen(8000);
-    })
-    .catch(console.error);
-```
-
-### useURL
-
-`useURL` provides a way to access request url info. Visit API documents [here](https://qihexiang.github.io/freesia/modules.html#useURL).
-
-## Pre-magical functions
-
-Pre-magical functions are non-magical so they can be called outside of request process handling, but they return magical functions.
-
-### createFlare
-
-createFlare provides a way to declare and access a value for an request handling process.
-
-```ts
-export const [assign, observe, drop] = createFlare<Buffer>({
-    reassign: true,
-    mutable: false,
-});
-
-const main = async (req: HttpReq) => {
-    const body = await getRawBody(req);
-    assign(body);
-    /**
-     * fn1, fn2, fn3 and functions called by them can access body
-     * by observe function.
-     */
-    const a = fn1();
-    const b = fn2();
-    const c = fn3();
-    drop();
-    return createRes(200, "success");
-};
-```
-
-`createFlare` can receive a object parameter which as two properties:
-
--   `reassign` means you can call `assign` many times to reset the value before call `drop` to release it, set it to `true` when you need to change a primitive value during the process;
--   `mutable` means the value get from `observe` should **not** be readonly. It in fact do nothing, and just change the return type of `observe` in TypeScript. For example, if you assign a ORM object to flare, you should set `mutable` to `true`.
-
-The three functions return by `createFlare` is:
-
--   `assign` assign a value to the flare for current request.
--   `observe` get the value assigned to the flare.
--   `drop` deattach the value from the flare, value will not unaccessable after called drop.
-
-> This is implemented by `WeakMap`, so it's unnecessary to call `drop`.
-
-### allowMethods and allowMethodsX
-
-These two functions can limits the request methods of handlers binding to routes. For example:
-
-```ts
-const { switcher } = createSwRt
+const { switcher } = createSwRtX
     .route(
-        "/hello/<username>".allowMethods(
-            ({ username }) => `hello, ${username}`,
-            ["GET"]
+        "/hello/<username>",
+        // As you use Get function to wrap the handler, the second parameter of handler is inferred as HttpReq
+        Get(
+            ({ username }, req) =>
+                `hello, ${username} from ${req.socket.address().address}`
         )
     )
     .route(
         "/goodbye/<username>",
-        allowMethods(({ username }) => `goodbye, ${username}`, ["GET"])
+        Get(({ username }) => `goodbye, ${username}`)
     )
-    /**
-     * fallback method will return a route function that will not return null,
-     * if no patter matched, it will execute the fallback handler. If you don't
-     * use fallback method, the switcher can still return null.
-     */
-    .fallback((url) => `No pattern matched ${url}`);
+    .fallback(
+        (url, req) =>
+            `No pattern matched ${url}, your ip is ${
+                req.socket.address().address
+            }`
+    );
 
-const main = async (req: HttpReq) => {
-    const message = switcher(req.url ?? "/");
+const main: EntryPoint = async (req) => {
+    const message = switcher(urlParser(req.url), req) ?? "No route matched";
     return createRes(message);
 };
 ```
-
-You can use `allowMethodsX` for X series functions.
-
-Here are some shortcuts, like: `Get`, `GetX`, `Post`, `PostX`, etc. `All` and `AllX` cover request methods described [here](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods).
 
 ## Utils
 
