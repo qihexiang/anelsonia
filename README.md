@@ -54,27 +54,45 @@ Process of this function and all function called by it (directly and indirectly)
 
 `ResponseProps` is a interface of response object, it includes 4 properties:
 
--   `statusCode` valid http status code
--   `statusMessage` status message, can be set to `undefined`, and it's not work with HTTP/2
+-   `status` valid http status code
+-   `statusText` status message, can be set to `undefined`, and it's not work with HTTP/2
 -   `body` response body, can be a `string`, `Buffer` or a `Readable` stream, or `undefined`
 -   `headers` response headers, type of it is `Record<string, string | string[] | number>`
 
-It's difficult to create and operate such an object manually, and Freesia provides a class named `Respond`
+It's difficult to create and operate such an object manually, and Freesia provides a interface with methods named `Respond`
+
+It's difficult to create and operate such an object manually, and Freesia provides a interface `Respond` which has some methods to modify the object.
 
 ```ts
-const response = new Respond()
-    .setStatusCode(200)
-    .setStatusMessage("Ok")
+const response = createRes()
+    .setStatus(200)
+    .setStatusText("Ok")
     .setBody("hello, world.")
     .setHeaders("Content-Type", "text/plain; charset=UTF-8")
     .setHeaders("Content-Length", 13);
 ```
 
-The instance of `Respond` implemented `ResponseProps` interface, and you can use `setXXX` methods to operate it.
+The interface of `Respond` is extended from `ResponseProps` interface, and you can use `setXXX` methods to operate it.
 
 Except `setHeaders`, all other `setXXX` functions will replace existed value in the object and `setHeaders` will merge headers set newly into the existed headers. `setHeaders` provides many format of input, you can learn from [API document](https://qihexiang.github.io/freesia/classes/Respond.html#setHeaders)
 
-Here are some way to create a Respond more easy: `Respond.create`, it has an alias named `createRes`. This function provides many overloads to help developers create `Respond` while set `statusCode`, `body` and `headers`. Learn from [here](https://qihexiang.github.io/freesia/classes/Respond.html#create)
+`createRes` function provides many overloads to help developers create such an object easily:
+
+```ts
+export function createRes(): Respond; // This will give you an empty response with 404
+export function createRes(code: number): Respond; // This will give you a response with specified status
+export function createRes(body: ResponseBody): Respond; // This will give a response with specify body and status 200
+export function createRes(code: number, body: ResponseBody): Respond; // specify status and body
+export function createRes(code: number, headers: Headers): Respond; // specify status and headers
+export function createRes(body: ResponseBody, headers: Headers): Respond; // specify body and headers, default status is 200
+export function createRes(
+    code: number,
+    body: ResponseBody,
+    headers: Headers
+): Respond; // specify status, body and headers
+```
+
+`Status` is a enum of HTTP status codes, for example, `Status.NotFound` is `404`, `Status.Ok` is `200`. If you think this is more Readable, you can use it to set status code instead of numbers.
 
 `Status` is a enum of HTTP status codes, for example, `Status.NotFound` is `404`, `Status.Ok` is `200`. If you think this is more Readable, you can use it to set status code instead of numbers.
 
