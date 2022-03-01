@@ -1,4 +1,4 @@
-import { Route, RouteX } from "./createRoute";
+import { Route, RouteX } from "./createRoute.ts";
 
 /**
  * Create a switcher connected to many routes.

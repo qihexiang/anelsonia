@@ -1,4 +1,4 @@
-import { RouteParam } from "./params";
+import { RouteParam } from "./params.ts";
 
 export type RouteHandler<P extends string, R> = (params: RouteParam<P>) => R;
 export type Route<R> = (url: string) => R | null;

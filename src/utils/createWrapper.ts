@@ -1,6 +1,8 @@
 import MaybePromise from "./MaybePromise.ts";
 
+// deno-lint-ignore no-explicit-any
 export type Fn = (...args: any[]) => any;
+// deno-lint-ignore no-explicit-any
 export type AsyncFn = (...args: any[]) => Promise<any>;
 
 export type BeforeHookTuple<O extends Fn | AsyncFn, T extends Fn | AsyncFn> =
