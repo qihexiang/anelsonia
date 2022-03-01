@@ -5,8 +5,8 @@ import {
     RouteHandlerX,
     Route,
     RouteHandler,
-} from "./createRoute";
-import { createSwitcherX, createSwitcher } from "./createSwitcher";
+} from "./createRoute.ts";
+import { createSwitcherX, createSwitcher } from "./createSwitcher.ts";
 
 export type RouteChainInit = {
     route: <R, P extends string>(
@@ -71,45 +71,7 @@ export type RouteChainX<R, X> = {
  *
  * @returns a route function and switcher function.
  */
-export function createSwRt(): RouteChainInit {
-    return {
-        /**
-         * Add first route to the switcher.
-         *
-         * @param pattern a matching pattern
-         * @param handler a handler dealing with the route
-         * @returns a router chain.
-         */
-        route: (pattern, handler, flags) => {
-            type R = ReturnType<typeof handler>;
-            let routes = [createRoute(pattern, handler, flags)];
-            /**
-             * Handler the request when no routes matched
-             *
-             * @param handler a handler receives url and return value
-             * @returns object only contains the switcher
-             */
-            const fallback: RouteChainFallback<NonNullable<R>> = (handler) => ({
-                switcher: (url) =>
-                    createSwitcher(...routes)(url) ?? handler(url),
-            });
-            /**
-             * Add another route to the switcher.
-             *
-             * @param pattern a matching pattern
-             * @param handler a handler dealing with the route
-             * @returns a router chain.
-             */
-            const route: RouteChainAdder<R> = (pattern, handler, flags) => {
-                routes = [...routes, createRoute(pattern, handler, flags)];
-                return { route, switcher: createSwitcher(...routes), fallback };
-            };
-            return { route, switcher: createSwitcher(...routes), fallback };
-        },
-    };
-}
-
-export namespace createSwRt {
+export const createSwRt: RouteChainInit = {
     /**
      * Add first route to the switcher.
      *
@@ -117,8 +79,33 @@ export namespace createSwRt {
      * @param handler a handler dealing with the route
      * @returns a router chain.
      */
-    export const route = createSwRt().route;
-}
+    route: (pattern, handler, flags) => {
+        type R = ReturnType<typeof handler>;
+        let routes = [createRoute(pattern, handler, flags)];
+        /**
+         * Handler the request when no routes matched
+         *
+         * @param handler a handler receives url and return value
+         * @returns object only contains the switcher
+         */
+        const fallback: RouteChainFallback<NonNullable<R>> = (handler) => ({
+            switcher: (url) =>
+                createSwitcher(...routes)(url) ?? handler(url),
+        });
+        /**
+         * Add another route to the switcher.
+         *
+         * @param pattern a matching pattern
+         * @param handler a handler dealing with the route
+         * @returns a router chain.
+         */
+        const route: RouteChainAdder<R> = (pattern, handler, flags) => {
+            routes = [...routes, createRoute(pattern, handler, flags)];
+            return { route, switcher: createSwitcher(...routes), fallback };
+        };
+        return { route, switcher: createSwitcher(...routes), fallback };
+    },
+};
 
 /**
  * Create a extended switcher and extended routes connect to it at the same time.
@@ -139,59 +126,7 @@ export namespace createSwRt {
  *
  * @returns a route function and switcher function.
  */
-export function createSwRtX(): RouteChainInitX {
-    return {
-        /**
-         * Add first extend route to the switcher.
-         *
-         * @param pattern a matching pattern
-         * @param handler a handler dealing with the route
-         * @returns a router chain.
-         */
-        route: (pattern, handler, flags) => {
-            type R = ReturnType<typeof handler>;
-            type X = Parameters<typeof handler>[1];
-            let routes = [createRouteX(pattern, handler, flags)];
-            /**
-             * Handler the request when no routes matched
-             *
-             * @param handler a handler receives url and return value
-             * @returns object only contains the switcher
-             */
-            const fallback: RouteChainFallbackX<NonNullable<R>, X> = (
-                handler
-            ) => {
-                return {
-                    switcher: (url, extra) =>
-                        createSwitcherX(...routes)(url, extra) ??
-                        handler(url, extra),
-                };
-            };
-            /**
-             * Add another extend route to the switcher.
-             *
-             * @param pattern a matching pattern
-             * @param handler a handler dealing with the route
-             * @returns a router chain.
-             */
-            const route: RouteChainAdderX<R, X> = (pattern, handler, flags) => {
-                routes = [...routes, createRouteX(pattern, handler, flags)];
-                return {
-                    route,
-                    fallback,
-                    switcher: createSwitcherX(...routes),
-                };
-            };
-            return {
-                route,
-                fallback,
-                switcher: createSwitcherX(...routes),
-            };
-        },
-    };
-}
-
-export namespace createSwRtX {
+export const createSwRtX: RouteChainInitX = {
     /**
      * Add first extend route to the switcher.
      *
@@ -199,5 +134,44 @@ export namespace createSwRtX {
      * @param handler a handler dealing with the route
      * @returns a router chain.
      */
-    export const route = createSwRtX().route;
-}
+    route: (pattern, handler, flags) => {
+        type R = ReturnType<typeof handler>;
+        type X = Parameters<typeof handler>[1];
+        let routes = [createRouteX(pattern, handler, flags)];
+        /**
+         * Handler the request when no routes matched
+         *
+         * @param handler a handler receives url and return value
+         * @returns object only contains the switcher
+         */
+        const fallback: RouteChainFallbackX<NonNullable<R>, X> = (
+            handler
+        ) => {
+            return {
+                switcher: (url, extra) =>
+                    createSwitcherX(...routes)(url, extra) ??
+                    handler(url, extra),
+            };
+        };
+        /**
+         * Add another extend route to the switcher.
+         *
+         * @param pattern a matching pattern
+         * @param handler a handler dealing with the route
+         * @returns a router chain.
+         */
+        const route: RouteChainAdderX<R, X> = (pattern, handler, flags) => {
+            routes = [...routes, createRouteX(pattern, handler, flags)];
+            return {
+                route,
+                fallback,
+                switcher: createSwitcherX(...routes),
+            };
+        };
+        return {
+            route,
+            fallback,
+            switcher: createSwitcherX(...routes),
+        };
+    },
+};
