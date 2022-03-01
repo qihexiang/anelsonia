@@ -257,8 +257,8 @@ Freesia provides X-series route creators to solve this problem. They are `create
  */
 const helloRoute = createRouteX(
   "/hello/<username>",
-  ({ username }, req: HttpReq) =>
-    `hello, ${username} from ${req.socket.address().address}`
+  async ({ username }, req: HttpReq) =>
+    `hello, ${username} from, you send content: ${await req.text()}`
 );
 const goodByeRoute = createRouteX(
   "/goodbye/<username>",
@@ -266,7 +266,7 @@ const goodByeRoute = createRouteX(
    * It's no problem ignore the extra parameter, it just
    * declare the same type with helloRoute.
    */
-  ({ username }, req: HttpReq) => `goodbye, ${username}`
+  async ({ username }, req: HttpReq) => `goodbye, ${username}`
 );
 const switcher = createSwitcherX(helloRoute, goodByeRoute);
 
@@ -286,7 +286,7 @@ const { switcher } = createSwRtX
   .route(
     "/hello/<username>",
     ({ username }, req: HttpReq) =>
-      `hello, ${username} from ${req.socket.address().address}`
+      `hello, ${username} from, you send content: ${await req.text()}`
   )
   // No problem ignore extra parameter
   .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
@@ -312,17 +312,14 @@ const { switcher } = createSwRtX
     // As you use Get function to wrap the handler, the second parameter of handler is inferred as HttpReq
     Get(
       ({ username }, req) =>
-        `hello, ${username} from ${req.socket.address().address}`
+        `hello, ${username} from, you send content: ${await req.text()}`
     )
   )
   .route(
     "/goodbye/<username>",
     Get(({ username }) => `goodbye, ${username}`)
   )
-  .fallback(
-    (url, req) =>
-      `No pattern matched ${url}, your ip is ${req.socket.address().address}`
-  );
+  .fallback((url) => `No pattern matched ${url}`);
 
 const main: EntryPoint = async (req) => {
   const message = switcher(parseURL(req).pathname, req) ?? "No route matched";
