@@ -1,14 +1,14 @@
 export interface ConditionInit<R extends string> {
     match: <T>(
         pattern: R | R[] | RegExp,
-        handler: (reality: R) => T
+        handler: (reality: R) => T,
     ) => Condition<T, R>;
 }
 
 export interface Condition<T, R extends string> {
     match: (
         pattern: R | R[] | RegExp,
-        handler: (reality: R) => T
+        handler: (reality: R) => T,
     ) => Condition<T, R>;
     withDefault: (handler: (reality: R) => T) => T;
     getValue: () => T | null;
@@ -26,12 +26,15 @@ export function condition<R extends string>(reality: R): ConditionInit<R> {
         match: (pattern, handler) => {
             type T = ReturnType<typeof handler>;
             let result: T | null = null;
-            if (pattern instanceof RegExp && pattern.exec(reality))
+            if (pattern instanceof RegExp && pattern.exec(reality)) {
                 result = handler(reality);
-            if (pattern instanceof Array && pattern.includes(reality))
+            }
+            if (pattern instanceof Array && pattern.includes(reality)) {
                 result = handler(reality);
-            if (typeof pattern === "string" && pattern === reality)
+            }
+            if (typeof pattern === "string" && pattern === reality) {
                 result = handler(reality);
+            }
             /**
              * Get the final value.
              *
@@ -56,12 +59,15 @@ export function condition<R extends string>(reality: R): ConditionInit<R> {
              * @returns an object that provides match, withDefault and getValue method.
              */
             const match: Condition<T, R>["match"] = (pattern, handler) => {
-                if (pattern instanceof RegExp && pattern.exec(reality))
+                if (pattern instanceof RegExp && pattern.exec(reality)) {
                     result = handler(reality);
-                if (pattern instanceof Array && pattern.includes(reality))
+                }
+                if (pattern instanceof Array && pattern.includes(reality)) {
                     result = handler(reality);
-                if (typeof pattern === "string" && pattern === reality)
+                }
+                if (typeof pattern === "string" && pattern === reality) {
                     result = handler(reality);
+                }
                 return { match, withDefault, getValue };
             };
             return { match, withDefault, getValue };

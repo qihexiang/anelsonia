@@ -3,10 +3,8 @@ export interface Composer<T, R> {
     get fn(): (t: T) => R;
 }
 
-export const baseCompose =
-    <P, T, R>(a: (param: P) => T, b: (temp: T) => R) =>
-    (param: P) =>
-        b(a(param));
+export const baseCompose = <P, T, R>(a: (param: P) => T, b: (temp: T) => R) =>
+    (param: P) => b(a(param));
 
 /**
  * Create a function composition, and add first function.

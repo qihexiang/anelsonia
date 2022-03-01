@@ -23,7 +23,7 @@ export function echo<T>(value: T): T {
  * returns parameters and a hook executed after the original function.
  */
 export function createWrapper<O extends Fn, T extends Fn | AsyncFn = O>(
-    hook: (...args: Parameters<T>) => BeforeHookTuple<O, T>
+    hook: (...args: Parameters<T>) => BeforeHookTuple<O, T>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * Add hooks to a synchronous original function, while the beforeHook is
@@ -34,7 +34,7 @@ export function createWrapper<O extends Fn, T extends Fn | AsyncFn = O>(
  * returns parameters and a hook executed after the original function.
  */
 export function createWrapper<O extends Fn, T extends AsyncFn>(
-    hook: (...args: Parameters<T>) => Promise<BeforeHookTuple<O, T>>
+    hook: (...args: Parameters<T>) => Promise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * Add hooks to an asynchronous original function, while the beforeHook is
@@ -45,7 +45,7 @@ export function createWrapper<O extends Fn, T extends AsyncFn>(
  * returns parameters and a hook executed after the original function.
  */
 export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
-    hook: (...args: Parameters<T>) => Promise<BeforeHookTuple<O, T>>
+    hook: (...args: Parameters<T>) => Promise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * Add hooks to an asynchronous original function, while the beforeHook is
@@ -56,22 +56,23 @@ export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
  * returns parameters and a hook executed after the original function.
  */
 export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
-    hook: (...args: Parameters<T>) => BeforeHookTuple<O, T>
+    hook: (...args: Parameters<T>) => BeforeHookTuple<O, T>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 export function createWrapper<
     O extends Fn | AsyncFn,
-    T extends Fn | AsyncFn = O
+    T extends Fn | AsyncFn = O,
 >(
-    hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>
+    hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T> {
     return (fn) =>
         (...args) => {
             const t = hook(...args);
-            if (t instanceof Promise)
+            if (t instanceof Promise) {
                 return t.then(([p, after]) => {
                     if (p === null) return (after as () => ReturnType<T>)();
                     return (after ?? echo)(fn(...p));
                 });
+            }
             const [p, after] = t;
             if (p === null) return (after as () => ReturnType<T>)();
             return (after ?? echo)(fn(...p));
@@ -83,7 +84,7 @@ export default createWrapper;
 export function addWrapper<
     F extends Fn | AsyncFn,
     P extends unknown[] = Parameters<F>,
-    R = ReturnType<F>
+    R = ReturnType<F>,
 >(fn: F, hook: (...args: P) => BeforeHookTuple<F, (...args: P) => R>) {
     return createWrapper(hook)(fn);
 }

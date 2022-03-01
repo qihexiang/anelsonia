@@ -10,7 +10,9 @@ export const shimHTTP = (main: EntryPoint) => {
     return async (req: Request) => {
         const { status, statusText, body, headers } = await main(req);
         return new Response(body, {
-            status: status, statusText: statusText, headers
+            status: status,
+            statusText: statusText,
+            headers,
         });
     };
 };

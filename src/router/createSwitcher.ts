@@ -17,7 +17,7 @@ export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
     return (url: string): R | null =>
         routes.reduce<R | null>(
             (lastRouted, nextRoute) => lastRouted ?? nextRoute(url),
-            null
+            null,
         );
 }
 
@@ -39,6 +39,6 @@ export function createSwitcherX<R, X>(...routes: RouteX<R, X>[]): RouteX<R, X> {
     return (url: string, extra: X): R | null =>
         routes.reduce<R | null>(
             (lastRouted, nextRoute) => lastRouted ?? nextRoute(url, extra),
-            null
+            null,
         );
 }
