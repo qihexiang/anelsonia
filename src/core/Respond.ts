@@ -50,8 +50,7 @@ export function createRes(
 }
 
 function createFullRes(response: Partial<ResponseProps>): Respond {
-    const { status = 404, statusText, body, headers = {} } =
-        response;
+    const { status = 404, statusText, body, headers = {} } = response;
     return {
         status,
         statusText,
@@ -112,7 +111,8 @@ function createResWithTwoValue(
 ) {
     if (typeof value1 === "number") {
         if (
-            typeof value2 === "string" || value2 instanceof ReadableStream ||
+            typeof value2 === "string" ||
+            value2 instanceof ReadableStream ||
             value2 instanceof Blob
         ) {
             return createFullRes({ status: value1, body: value2 });
