@@ -1,7 +1,5 @@
 import { isVoid } from "../utils/isVoid.ts";
 
-type Body = BodyInit;
-
 /**
  * ResponseBody is a subset of Deno BodyInit, which includes 
  * `string`, `Blob` and `ReadableStream` of `Uint8Array`
