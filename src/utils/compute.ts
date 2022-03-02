@@ -14,6 +14,12 @@ export interface Computation<T> {
     ) => Computation<
         Promise<Awaited<R> | Extract<Awaited<T>, undefined | null>>
     >;
+    readonly ifNull: <R>(
+        fn: () => R
+    ) => Computation<NonNullable<T> | R>;
+    readonly aIfNull: <R>(
+        fn: () => R
+    ) => Computation<Promise<NonNullable<Awaited<T>> | Awaited<R>>>;
     get value(): T;
 }
 
@@ -66,6 +72,19 @@ export const compute = <T>(initValue: T): Computation<T> => {
                 ) as Promise<Awaited<R>>,
             );
         },
+        ifNull: (fn) => {
+            if (isVoid(initValue)) return compute(fn());
+            return compute(initValue as NonNullable<T>);
+        },
+        aIfNull: (fn) => {
+            type R = ReturnType<typeof fn>;
+            if (initValue instanceof Promise) return compute(initValue.then((t: Awaited<T>) =>
+                isVoid(t) ? fn() as Awaited<R> : t as NonNullable<Awaited<T>>
+            ));
+            return compute(Promise.resolve(initValue).then(t =>
+                isVoid(t) ? fn() as Awaited<R> : t as NonNullable<Awaited<T>>
+            ));
+        },
         get value() {
             return initValue;
         },
@@ -85,6 +104,12 @@ export interface Lazy<T> {
     readonly aMapSkipNull: <N>(
         nextFn: (t: NonNullable<Awaited<T>>) => N,
     ) => Lazy<Promise<Awaited<N> | Extract<Awaited<T>, undefined | null>>>;
+    readonly ifNull: <R>(
+        nextFn: () => R
+    ) => Lazy<NonNullable<T> | R>;
+    readonly aIfNull: <R>(
+        nextFn: () => R
+    ) => Lazy<Promise<NonNullable<Awaited<T>> | Awaited<R>>>;
     get value(): T;
 }
 
@@ -142,6 +167,21 @@ export const lazy = <T>(fn: () => T): Lazy<T> => {
                     },
                 ),
             ),
+        ifNull: (nextFn) => lazy(
+            baseCompose<void, T, ReturnType<typeof nextFn> | NonNullable<T>>(fn, (t: T) => {
+                if (isVoid(t)) return nextFn();
+                else return t as NonNullable<T>;
+            })
+        ),
+        aIfNull: (nextFn) => {
+            type R = ReturnType<typeof nextFn>;
+            return lazy(
+                baseCompose<void, T, Promise<NonNullable<Awaited<T>> | Awaited<R>>>(fn, (t: T) => {
+                    if (t instanceof Promise) return t.then((value: Awaited<T>) => isVoid(t) ? nextFn() as Awaited<R> : value as NonNullable<Awaited<T>>);
+                    else return Promise.resolve(isVoid(t) ? nextFn() as Awaited<R> : t as NonNullable<Awaited<T>>);
+                })
+            );
+        },
         get value() {
             return fn();
         },
