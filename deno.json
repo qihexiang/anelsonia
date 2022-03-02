@@ -1,10 +1,5 @@
 {
     "lint": {
-        "files": {
-            "include": [
-                "src/"
-            ]
-        },
         "rules": {
             "tags": [
                 "recommended"
@@ -12,11 +7,6 @@
         }
     },
     "fmt": {
-        "files": {
-            "include": [
-                "src/"
-            ]
-        },
         "options": {
             "useTabs": false,
             "indentWidth": 4,
