@@ -24,7 +24,7 @@ export interface Computation<T> {
         fn: (t: Awaited<T>) => R,
     ) => Computation<Promise<Awaited<R>>>;
     /**
-     * Just like `mapSkipNull`, but it will unpack the Promise value 
+     * Just like `mapSkipNull`, but it will unpack the Promise value
      * as a parameter, and pack the result into a Promise
      */
     readonly aMapSkipNull: <R>(
@@ -221,10 +221,10 @@ const lazy = <T>(fn: () => T): Computation<T> => {
 };
 
 /**
- * Create a Computation container and put a value in. This container is in 
- * lazy mode, which means methos of it will just compose functions, and 
+ * Create a Computation container and put a value in. This container is in
+ * lazy mode, which means methos of it will just compose functions, and
  * do computation on each time access the `value` property.
- * 
+ *
  * @param initValue the initial value to be computed
  * @returns a Computation container in lazy mode.
  */

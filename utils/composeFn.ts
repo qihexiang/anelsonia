@@ -3,7 +3,7 @@
  */
 export interface Composer<T, R> {
     /**
-     * next method can compose current function and anther function, 
+     * next method can compose current function and anther function,
      * and return a Composer container include the composed function.
      */
     readonly next: <V>(anotherFn: (r: R) => V) => Composer<T, V>;
@@ -15,7 +15,7 @@ export interface Composer<T, R> {
 
 /**
  * The basic compose function, which can compose two functions together.
- * 
+ *
  * @param a the first function th be called.
  * @param b the function use return value of `a`
  * @returns a composed function.

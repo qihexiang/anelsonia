@@ -21,7 +21,7 @@ export type BeforeHookTuple<O extends Fn | AsyncFn, T extends Fn | AsyncFn> =
 
 /**
  * A function that just return the given value
- * 
+ *
  * @param value the value pass to the function
  * @returns the value passed to the function
  */
@@ -76,8 +76,8 @@ export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
 export function createWrapper<
     O extends Fn | AsyncFn,
     T extends Fn | AsyncFn = O,
-    >(
-        hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
+>(
+    hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T> {
     return (fn) =>
         (...args) => {

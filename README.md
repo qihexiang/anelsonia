@@ -11,25 +11,25 @@ Here is a simple example:
 
 ```ts
 import {
-  createRes,
-  createSwRtX,
-  EntryPoint,
-  Get,
-  parseURL,
-  shimHTTP,
+    createRes,
+    createSwRtX,
+    EntryPoint,
+    Get,
+    parseURL,
+    shimHTTP,
 } from "https://deno.land/x/freesia";
 import { serve } from "https://deno.land/std@0.127.0/http/server.ts";
 
 const { switcher } = createSwRtX
-  .route(
-    "/hello/<username>/",
-    Get(async ({ username }) => createRes(`hello, ${username}`))
-  )
-  .fallback(async (url, req) => createRes(404, `Can't ${req.method} ${url}`));
+    .route(
+        "/hello/<username>/",
+        Get(async ({ username }) => createRes(`hello, ${username}`)),
+    )
+    .fallback(async (url, req) => createRes(404, `Can't ${req.method} ${url}`));
 
 const main: EntryPoint = async (req) => {
-  const { pathname } = parseURL(req);
-  return switcher(pathname, req);
+    const { pathname } = parseURL(req);
+    return switcher(pathname, req);
 };
 
 serve(shimHTTP(main), { port: 8000 });
@@ -82,11 +82,11 @@ provides a interface `Respond` which has some methods to modify the object.
 
 ```ts
 const response = createRes()
-  .setStatus(200)
-  .setStatusText("Ok")
-  .setBody("hello, world.")
-  .setHeaders("Content-Type", "text/plain; charset=UTF-8")
-  .setHeaders("Content-Length", 13);
+    .setStatus(200)
+    .setStatusText("Ok")
+    .setBody("hello, world.")
+    .setHeaders("Content-Type", "text/plain; charset=UTF-8")
+    .setHeaders("Content-Length", 13);
 ```
 
 The interface of `Respond` is extended from `ResponseProps` interface, and you
@@ -108,9 +108,9 @@ export function createRes(code: number, body: ResponseBody): Respond; // specify
 export function createRes(code: number, headers: Headers): Respond; // specify status and headers
 export function createRes(body: ResponseBody, headers: Headers): Respond; // specify body and headers, default status is 200
 export function createRes(
-  code: number,
-  body: ResponseBody,
-  headers: Headers
+    code: number,
+    body: ResponseBody,
+    headers: Headers,
 ): Respond; // specify status, body and headers
 ```
 
@@ -158,8 +158,9 @@ example, you may need a route that can say hello to the user, like this:
 With `createRoute` function, you can create such a route like this:
 
 ```ts
-export const helloRoute = createRoute("/hello/<username>", ({ username }) =>
-  createRes(`hello, ${username}`)
+export const helloRoute = createRoute(
+    "/hello/<username>",
+    ({ username }) => createRes(`hello, ${username}`),
 );
 ```
 
@@ -186,25 +187,24 @@ will return `null`. You can define many routes in practice:
 
 ```ts
 const helloRoute = createRoute(
-  "/hello/<username>",
-  ({ username }) => `hello, ${username}`
+    "/hello/<username>",
+    ({ username }) => `hello, ${username}`,
 );
 const goodByeRoute = createRoute(
-  "/goodbye/<username>",
-  ({ username }) => `goodbye, ${username}`
+    "/goodbye/<username>",
+    ({ username }) => `goodbye, ${username}`,
 );
 
 const main = async (req: HttpReq) => {
-  const { pathname } = parseURL(req);
-  const message =
-    helloRoute(pathname) ??
-    goodbyeRoute(pathname) ??
-    /**
-     * each route function can return null,
-     * you must handle it.
-     */
-    "No route matched";
-  return createRes(message);
+    const { pathname } = parseURL(req);
+    const message = helloRoute(pathname) ??
+        goodbyeRoute(pathname) ??
+        /**
+         * each route function can return null,
+         * you must handle it.
+         */
+        "No route matched";
+    return createRes(message);
 };
 ```
 
@@ -221,25 +221,24 @@ can connect many routes together:
 
 ```ts
 const helloRoute = createRoute(
-  "/hello/<username>",
-  ({ username }) => `hello, ${username}`
+    "/hello/<username>",
+    ({ username }) => `hello, ${username}`,
 );
 const goodByeRoute = createRoute(
-  "/goodbye/<username>",
-  ({ username }) => `goodbye, ${username}`
+    "/goodbye/<username>",
+    ({ username }) => `goodbye, ${username}`,
 );
 const switcher = createSwitcher(helloRoute, goodByeRoute);
 
 const main = async (req: HttpReq) => {
-  const { pathname } = parseURL(req);
-  const message =
-    switcher(pathname) ??
-    /**
-     * each route function can return null,
-     * you must handle it.
-     */
-    "No route matched";
-  return createRes(message);
+    const { pathname } = parseURL(req);
+    const message = switcher(pathname) ??
+        /**
+         * each route function can return null,
+         * you must handle it.
+         */
+        "No route matched";
+    return createRes(message);
 };
 ```
 
@@ -257,19 +256,19 @@ connect them to switcher at the same time.
 
 ```ts
 const { switcher } = createSwRt
-  .route("/hello/<username>", ({ username }) => `hello, ${username}`)
-  .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
-  /**
-   * fallback method will return a route function that will not return null,
-   * if no patter matched, it will execute the fallback handler. If you don't
-   * use fallback method, the switcher can still return null.
-   */
-  .fallback((url) => `No pattern matched ${url}`);
+    .route("/hello/<username>", ({ username }) => `hello, ${username}`)
+    .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
+    /**
+     * fallback method will return a route function that will not return null,
+     * if no patter matched, it will execute the fallback handler. If you don't
+     * use fallback method, the switcher can still return null.
+     */
+    .fallback((url) => `No pattern matched ${url}`);
 
 const main = async (req: HttpReq) => {
-  const { pathname } = parseURL(req);
-  const message = switcher(pathname);
-  return createRes(message);
+    const { pathname } = parseURL(req);
+    const message = switcher(pathname);
+    return createRes(message);
 };
 ```
 
@@ -288,11 +287,12 @@ import helloHandler from "./handler/hello";
 import goodByeRoute from "./route/goodBye";
 
 const main = async (req: HttpReq) => {
-  const helloRoute = createRoute("/hello/<username>", ({ username }) =>
-    helloHandler(username, req)
-  );
-  const switcher = createSwitcher(helloRoute, goodByeRoute);
-  return createRes(switcher(parseURL(req).pathname) ?? "No route matched");
+    const helloRoute = createRoute(
+        "/hello/<username>",
+        ({ username }) => helloHandler(username, req),
+    );
+    const switcher = createSwitcher(helloRoute, goodByeRoute);
+    return createRes(switcher(parseURL(req).pathname) ?? "No route matched");
 };
 ```
 
@@ -311,26 +311,26 @@ argument and pass it to handlers on routing.
  * here, helloRoute can receive an extra parameter of HttpReq type.
  */
 const helloRoute = createRouteX(
-  "/hello/<username>",
-  async ({ username }, req: HttpReq) =>
-    `hello, ${username} from, you send content: ${await req.text()}`
+    "/hello/<username>",
+    async ({ username }, req: HttpReq) =>
+        `hello, ${username} from, you send content: ${await req.text()}`,
 );
 const goodByeRoute = createRouteX(
-  "/goodbye/<username>",
-  /**
-   * It's no problem ignore the extra parameter, it just
-   * declare the same type with helloRoute.
-   */
-  async ({ username }, req: HttpReq) => `goodbye, ${username}`
+    "/goodbye/<username>",
+    /**
+     * It's no problem ignore the extra parameter, it just
+     * declare the same type with helloRoute.
+     */
+    async ({ username }, req: HttpReq) => `goodbye, ${username}`,
 );
 const switcher = createSwitcherX(helloRoute, goodByeRoute);
 
 const main = async (req: HttpReq) => {
-  /**
-   * Here, switcher can receive the extra parameter
-   */
-  const message = switcher(parseURL(req).pathname) ?? "No route matched";
-  return createRes(message);
+    /**
+     * Here, switcher can receive the extra parameter
+     */
+    const message = switcher(parseURL(req).pathname) ?? "No route matched";
+    return createRes(message);
 };
 ```
 
@@ -338,21 +338,21 @@ Example for `createSwRtX`:
 
 ```ts
 const { switcher } = createSwRtX
-  .route(
-    "/hello/<username>",
-    ({ username }, req: HttpReq) =>
-      `hello, ${username} from, you send content: ${await req.text()}`
-  )
-  // No problem ignore extra parameter
-  .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
-  // fallback handler will also  receive the extra parameter
-  .fallback(
-    (url, req) =>
-      `No pattern matched ${url}, your ip is ${req.socket.address().address}`
-  );
+    .route(
+        "/hello/<username>",
+        ({ username }, req: HttpReq) =>
+            `hello, ${username} from, you send content: ${await req.text()}`,
+    )
+    // No problem ignore extra parameter
+    .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
+    // fallback handler will also  receive the extra parameter
+    .fallback(
+        (url, req) =>
+            `No pattern matched ${url}, your ip is ${req.socket.address().address}`,
+    );
 const main = async (req: HttpReq) => {
-  const message = switcher(parseURL(req).pathname, req);
-  return createRes(message);
+    const message = switcher(parseURL(req).pathname, req);
+    return createRes(message);
 };
 ```
 
@@ -366,23 +366,24 @@ must be `HttpReq`.
 
 ```ts
 const { switcher } = createSwRtX
-  .route(
-    "/hello/<username>",
-    // As you use Get function to wrap the handler, the second parameter of handler is inferred as HttpReq
-    Get(
-      ({ username }, req) =>
-        `hello, ${username} from, you send content: ${await req.text()}`
+    .route(
+        "/hello/<username>",
+        // As you use Get function to wrap the handler, the second parameter of handler is inferred as HttpReq
+        Get(
+            ({ username }, req) =>
+                `hello, ${username} from, you send content: ${await req
+                    .text()}`,
+        ),
     )
-  )
-  .route(
-    "/goodbye/<username>",
-    Get(({ username }) => `goodbye, ${username}`)
-  )
-  .fallback((url) => `No pattern matched ${url}`);
+    .route(
+        "/goodbye/<username>",
+        Get(({ username }) => `goodbye, ${username}`),
+    )
+    .fallback((url) => `No pattern matched ${url}`);
 
 const main: EntryPoint = async (req) => {
-  const message = switcher(parseURL(req).pathname, req) ?? "No route matched";
-  return createRes(message);
+    const message = switcher(parseURL(req).pathname, req) ?? "No route matched";
+    return createRes(message);
 };
 ```
 
@@ -394,9 +395,9 @@ const main: EntryPoint = async (req) => {
 
 ```ts
 const { fn } = composeFn((x: number) => x + 1)
-  .next((x) => Math.pow(x, 2))
-  .next((x) => x * 4)
-  .next((x) => `final result is ${x}`);
+    .next((x) => Math.pow(x, 2))
+    .next((x) => x * 4)
+    .next((x) => `final result is ${x}`);
 
 fn(1); // -> "final result is 16"
 ```
@@ -407,10 +408,10 @@ fn(1); // -> "final result is 16"
 
 ```ts
 const credentialInfo = compute(tokenBuf) // Computation<Buffer>
-  .map((buf) => buf.toString("utf-8")) // Computation<string>
-  .map(parseToken) // Computation<Promise<Token | null>>
-  .aMapSkipNull((token) => (outDated(token) ? null : token)) // Computation<Promise<Token | null>>
-  .aMapSkipNull((token) => token.username).value; // Promise<string | null>
+    .map((buf) => buf.toString("utf-8")) // Computation<string>
+    .map(parseToken) // Computation<Promise<Token | null>>
+    .aMapSkipNull((token) => (outDated(token) ? null : token)) // Computation<Promise<Token | null>>
+    .aMapSkipNull((token) => token.username).value; // Promise<string | null>
 ```
 
 It has 4 methods：
@@ -431,8 +432,8 @@ chains, they will not influence each other.
 Using `computeLazy` can create `Computation<T>` object too.
 
 The difference between `compute` and `computeLazy` is that `compute` will
-compute the value every time called method in stream, but `computeLazy` just compose
-functions。when you finally access `value` of the object，the composed
+compute the value every time called method in stream, but `computeLazy` just
+compose functions。when you finally access `value` of the object，the composed
 functions will be executed. Be careful especailly when functions has
 side-effection! Every time you access `value`, composed function will be called.
 
@@ -457,17 +458,17 @@ do is side-effect.
 ```ts
 // visitLogger.ts
 export const visitLogger = createEffect<EntryPoint>((req) => {
-  const path = useURL("path");
-  const reqComeIn = new Date();
-  return async (res) => {
-    const { statusCode } = await res;
-    const resGoOut = new Date().getTime();
-    console.log(
-      `${reqComeIn.toLocaleString()} ${path} ${statusCode} ${
-        resGoOut - reqComeIn.getTime()
-      }ms`
-    );
-  };
+    const path = useURL("path");
+    const reqComeIn = new Date();
+    return async (res) => {
+        const { statusCode } = await res;
+        const resGoOut = new Date().getTime();
+        console.log(
+            `${reqComeIn.toLocaleString()} ${path} ${statusCode} ${
+                resGoOut - reqComeIn.getTime()
+            }ms`,
+        );
+    };
 });
 
 // main.ts
@@ -505,19 +506,19 @@ specify `O` only, default `T` is `O`.
 
 ```ts
 export const useAutoPlainText = createWrapper<
-  (req: HttpReq) => Promise<Respond>
+    (req: HttpReq) => Promise<Respond>
 >((req) => [
-  [req],
-  async (res) => {
-    const response = await res;
-    if (
-      typeof response.body === "string" &&
-      !("Content-Type" in response.headers)
-    ) {
-      response.setHeaders(["Content-Type", "text/plain; charset=UTF-8"]);
-    }
-    return response;
-  },
+    [req],
+    async (res) => {
+        const response = await res;
+        if (
+            typeof response.body === "string" &&
+            !("Content-Type" in response.headers)
+        ) {
+            response.setHeaders(["Content-Type", "text/plain; charset=UTF-8"]);
+        }
+        return response;
+    },
 ]);
 ```
 
