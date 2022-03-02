@@ -1,15 +1,30 @@
-import MaybePromise from "./MaybePromise.ts";
+import { MaybePromise } from "./MaybePromise.ts";
 
+/**
+ * Basic type of all functions
+ */
 // deno-lint-ignore no-explicit-any
 export type Fn = (...args: any[]) => any;
+/**
+ * Basic type of asynchorous functions
+ */
 // deno-lint-ignore no-explicit-any
 export type AsyncFn = (...args: any[]) => Promise<any>;
 
+/**
+ * The tuple that should be return be `createWrapper` hook.
+ */
 export type BeforeHookTuple<O extends Fn | AsyncFn, T extends Fn | AsyncFn> =
     | [Parameters<O>, (r: ReturnType<O>) => ReturnType<T>]
     | [Parameters<O>]
     | [null, () => ReturnType<T>];
 
+/**
+ * A function that just return the given value
+ * 
+ * @param value the value pass to the function
+ * @returns the value passed to the function
+ */
 export function echo<T>(value: T): T {
     return value;
 }
@@ -61,8 +76,8 @@ export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
 export function createWrapper<
     O extends Fn | AsyncFn,
     T extends Fn | AsyncFn = O,
->(
-    hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
+    >(
+        hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T> {
     return (fn) =>
         (...args) => {
@@ -77,14 +92,4 @@ export function createWrapper<
             if (p === null) return (after as () => ReturnType<T>)();
             return (after ?? echo)(fn(...p));
         };
-}
-
-export default createWrapper;
-
-export function addWrapper<
-    F extends Fn | AsyncFn,
-    P extends unknown[] = Parameters<F>,
-    R = ReturnType<F>,
->(fn: F, hook: (...args: P) => BeforeHookTuple<F, (...args: P) => R>) {
-    return createWrapper(hook)(fn);
 }
