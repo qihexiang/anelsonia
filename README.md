@@ -1,5 +1,10 @@
 # Freesia for Deno: a TypeScript library for building HTTP servers.
 
+![Deno](https://img.shields.io/badge/Deno-Freesia-000000?logo=Deno&style=flat-square)
+![version](https://img.shields.io/github/v/tag/qihexiang/freesia?style=flat-square)
+![language](https://img.shields.io/github/languages/top/qihexiang/freesia?style=flat-square)
+![license](https://img.shields.io/github/license/qihexiang/freesia?style=flat-square)
+
 This is the Freesia library for Deno, which provides an experience similar to
 Node.js version. You can load this library directly from GitHub by url
 `https://deno.land/x/freesia`.
@@ -95,7 +100,7 @@ can use `setXXX` methods to operate it.
 Except `setHeaders`, all other `setXXX` functions will replace existed value in
 the object and `setHeaders` will merge headers set newly into the existed
 headers. `setHeaders` provides many format of input, you can learn from
-[API document](https://qihexiang.github.io/freesia/classes/Respond.html#setHeaders)
+[API document](https://doc.deno.land/https://deno.land/x/freesia/mod.ts/~/Respond#setHeaders)
 
 `createRes` function provides many overloads to help developers create such an
 object easily:
