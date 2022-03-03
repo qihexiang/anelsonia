@@ -2,9 +2,10 @@ import { isVoid } from "../utils/isVoid.ts";
 
 /**
  * ResponseBody is a subset of Deno BodyInit, which includes
- * `string`, `Blob` and `ReadableStream` of `Uint8Array`
+ * `string`, `Blob` and `ReadableStream` of `Uint8Array`, and 
+ * you can use undefined or null for a no-contentn response
  */
-export type ResponseBody = string | Blob | ReadableStream<Uint8Array>;
+export type ResponseBody = string | Blob | ReadableStream<Uint8Array> | null | undefined;
 
 /**
  * ResponseProps is the return type of a EntryPoint function, which includes
@@ -214,7 +215,8 @@ function createResWithTwoValue(
         if (
             typeof value2 === "string" ||
             value2 instanceof ReadableStream ||
-            value2 instanceof Blob
+            value2 instanceof Blob ||
+            isVoid(value2)
         ) {
             return createFullRes({ status: value1, body: value2 });
         } else {
