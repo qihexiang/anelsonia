@@ -8,15 +8,15 @@ import { RouteHandlerX } from "./createRoute.ts";
  * @param methods all methods that can be use with this handler
  * @returns a handler that may return null if methods out of limitation
  */
-const allowMethods = <P extends string, R>(
+export function allowMethods<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
     methods: string[],
-): RouteHandlerX<P, Request, R | null> => {
+): RouteHandlerX<P, Request, R | null> {
     return (params, req) => {
         if (!methods.includes(req.method ?? "UNKNOWN")) return null;
         return handler(params, req);
     };
-};
+}
 
 /**
  * Allow GET, HEAD, POST, PUT, DELETE, CONNECT, TRACE, OPTIONS and PATCH.
@@ -26,97 +26,117 @@ const allowMethods = <P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const All = <P extends string, R>(
+export function All<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, [
-    "GET",
-    "HEAD",
-    "POST",
-    "PUT",
-    "DELETE",
-    "CONNECT",
-    "OPTIONS",
-    "TRACE",
-    "PATCH",
-]);
+) {
+    return allowMethods(handler, [
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "DELETE",
+        "CONNECT",
+        "OPTIONS",
+        "TRACE",
+        "PATCH",
+    ]);
+}
 /**
  * Allow GET method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Get = <P extends string, R>(
+export function Get<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["GET"]);
+) {
+    return allowMethods(handler, ["GET"]);
+}
 /**
  * Allow HEAD method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Head = <P extends string, R>(
+export function Head<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["HEAD"]);
+) {
+    return allowMethods(handler, ["HEAD"]);
+}
 /**
  * Allow POST method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Post = <P extends string, R>(
+export function Post<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["POST"]);
+) {
+    return allowMethods(handler, ["POST"]);
+}
 /**
  * Allow PUT method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Put = <P extends string, R>(
+export function Put<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["PUT"]);
+) {
+    return allowMethods(handler, ["PUT"]);
+}
 /**
  * Allow DELETE method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Delete = <P extends string, R>(
+export function Delete<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["DELETE"]);
+) {
+    return allowMethods(handler, ["DELETE"]);
+}
 /**
  * Allow CONNECT method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Connect = <P extends string, R>(
+export function Connect<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["CONNECT"]);
+) {
+    return allowMethods(handler, ["CONNECT"]);
+}
 /**
  * Allow OPTIONS method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Options = <P extends string, R>(
+export function Options<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["OPTIONS"]);
+) {
+    return allowMethods(handler, ["OPTIONS"]);
+}
 /**
  * Allow TRACE method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Trace = <P extends string, R>(
+export function Trace<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["TRACE"]);
+) {
+    return allowMethods(handler, ["TRACE"]);
+}
 /**
  * Allow PATCH method only
  *
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export const Patch = <P extends string, R>(
+export function Patch<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
-) => allowMethods(handler, ["PATCH"]);
+) {
+    return allowMethods(handler, ["PATCH"]);
+}

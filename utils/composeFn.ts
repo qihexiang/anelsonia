@@ -20,8 +20,12 @@ export interface Composer<T, R> {
  * @param b the function use return value of `a`
  * @returns a composed function.
  */
-export const baseCompose = <P, T, R>(a: (param: P) => T, b: (temp: T) => R) =>
-    (param: P) => b(a(param));
+export function baseCompose<P, T, R>(
+    a: (param: P) => T,
+    b: (temp: T) => R,
+): (p: P) => R {
+    return (param: P) => b(a(param));
+}
 
 /**
  * Create a function composition, and add first function.

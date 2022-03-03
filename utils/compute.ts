@@ -8,26 +8,26 @@ export interface Computation<T> {
     /**
      * Map a function to the value in the container.
      */
-    readonly map: <R>(fn: (t: T) => R) => Computation<R>;
+    map: <R>(fn: (t: T) => R) => Computation<R>;
     /**
      * Map a function to the value in the caontainer,
      * but left the origin value if it's undefined or null.
      */
-    readonly mapSkipNull: <R>(
+    mapSkipNull: <R>(
         nextFn: (r: NonNullable<T>) => R,
     ) => Computation<R | Extract<T, undefined | null>>;
     /**
      * Unpack the value if it's a Promise, and return a Computation
      * that contains a value in Promise.
      */
-    readonly aMap: <R>(
+    aMap: <R>(
         fn: (t: Awaited<T>) => R,
     ) => Computation<Promise<Awaited<R>>>;
     /**
      * Just like `mapSkipNull`, but it will unpack the Promise value
      * as a parameter, and pack the result into a Promise
      */
-    readonly aMapSkipNull: <R>(
+    aMapSkipNull: <R>(
         fn: (t: NonNullable<Awaited<T>>) => R,
     ) => Computation<
         Promise<Awaited<R> | Extract<Awaited<T>, undefined | null>>
@@ -35,14 +35,14 @@ export interface Computation<T> {
     /**
      * Use a value to replace empty value (null and undefined)
      */
-    readonly ifNull: <R>(
+    ifNull: <R>(
         fn: () => R,
     ) => Computation<NonNullable<T> | R>;
     /**
      * Use a value to replace empty value, but will unpack to check, and
      * return a Promise packed value
      */
-    readonly aIfNull: <R>(
+    aIfNull: <R>(
         fn: () => R,
     ) => Computation<Promise<NonNullable<Awaited<T>> | Awaited<R>>>;
     get value(): T;
@@ -55,7 +55,7 @@ export interface Computation<T> {
  * @param initValue The initial value
  * @returns a Computation container
  */
-export const compute = <T>(initValue: T): Computation<T> => {
+export function compute<T>(initValue: T): Computation<T> {
     return {
         map: (fn) => compute(fn(initValue)),
         mapSkipNull: (fn) =>
@@ -123,7 +123,7 @@ export const compute = <T>(initValue: T): Computation<T> => {
             return initValue;
         },
     };
-};
+}
 
 const lazy = <T>(fn: () => T): Computation<T> => {
     return {
@@ -228,6 +228,6 @@ const lazy = <T>(fn: () => T): Computation<T> => {
  * @param initValue the initial value to be computed
  * @returns a Computation container in lazy mode.
  */
-export const computeLazy = <T>(initValue: T): Computation<T> => {
+export function computeLazy<T>(initValue: T): Computation<T> {
     return lazy(() => initValue);
-};
+}

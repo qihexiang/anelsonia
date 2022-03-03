@@ -8,12 +8,12 @@ type Voids<T extends Void> = T[];
  * @param voidValues void values, can be `[null]`,`[undefined]` and `[null, undefined]`(default)
  * @returns a boolean, and infer if the value can be null or undefined.
  */
-export const isVoid = <T, V extends Void = undefined | null>(
+export function isVoid<T, V extends Void = undefined | null>(
     initValue: T,
     voidValues?: Voids<V>,
-): initValue is Extract<T, V> => {
+): initValue is Extract<T, V> {
     return (voidValues ?? ([undefined, null] as Voids<V>)).reduce(
         (current, next) => current || next === (initValue as unknown),
         false as boolean,
     );
-};
+}

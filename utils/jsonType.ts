@@ -31,7 +31,7 @@ export type JsonType = JsonObject | JsonArray | BasicJSONTypes | HasToJSON;
  * @param json the json content you'd like to send.
  * @returns Respond with json content
  */
-export const resJson = <T extends JsonType>(json: T) => {
+export function resJson<T extends JsonType>(json: T) {
     const body = JSON.stringify(json);
     return createRes(body, ["Content-Type", "application/json"]);
-};
+}

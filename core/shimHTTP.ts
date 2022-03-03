@@ -16,7 +16,7 @@ export type EntryPoint = (req: Request) => MaybePromise<ResponseProps>;
  * @param main the main function of your application.
  * @returns a handler for serve function
  */
-export const shimHTTP = (main: EntryPoint) => {
+export function shimHTTP(main: EntryPoint) {
     return async (req: Request) => {
         const { status, statusText, body, headers } = await main(req);
         return new Response(body, {
@@ -25,4 +25,4 @@ export const shimHTTP = (main: EntryPoint) => {
             headers,
         });
     };
-};
+}

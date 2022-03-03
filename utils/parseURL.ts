@@ -4,4 +4,6 @@
  * @param req the request object
  * @returns a URL instance
  */
-export const parseURL = (req: Request) => new URL(req.url);
+export function parseURL(req: Request) {
+    return new URL(req.url);
+}

@@ -8,6 +8,11 @@ import {
 } from "./createRoute.ts";
 import { createSwitcher, createSwitcherX } from "./createSwitcher.ts";
 
+/**
+ * The type of createSwRt, which includes a `route` function to registry
+ * the first route. This `route` function will define the return type of
+ * the created switcher
+ */
 export type RouteChainInit = {
     route: <R, P extends string>(
         pattern: P,
@@ -15,20 +20,38 @@ export type RouteChainInit = {
         flags?: string,
     ) => RouteChain<R>;
 };
+/**
+ * The type of `route` method in a `RouteChain<R>`, which
+ * will return new `RouteChain<R>`.
+ */
 export type RouteChainAdder<R> = <P extends string>(
     pattern: P,
     handler: RouteHandler<P, R>,
     flags?: string,
 ) => RouteChain<R>;
+/**
+ * The type of `fallback` method in a `RouteChain<R>`, which
+ * will return a object contains a switcher function. This
+ * switcher won't return null.
+ */
 export type RouteChainFallback<R> = (handler: (url: string) => R) => {
     switcher: (url: string) => R;
 };
+/**
+ * An object which includes `route` and `fallback` method, and
+ * a switcher function of registried routes.
+ */
 export type RouteChain<R> = {
     route: RouteChainAdder<R>;
     fallback: RouteChainFallback<NonNullable<R>>;
     switcher: Route<R>;
 };
 
+/**
+ * The type of createSwRtX, which includes a `route` function to registry
+ * the first route. This `route` function will define the return type of
+ * the created switcher
+ */
 export type RouteChainInitX = {
     route: <R, X, P extends string>(
         pattern: P,
@@ -36,16 +59,29 @@ export type RouteChainInitX = {
         flags?: string,
     ) => RouteChainX<R, X>;
 };
+/**
+ * The type of `route` method in a `RouteChainX<R, X>`, which
+ * will return new `RouteChainX<R, X>`.
+ */
 export type RouteChainAdderX<R, X> = <P extends string>(
     pattern: P,
     handler: RouteHandlerX<P, X, R>,
     flags?: string,
 ) => RouteChainX<R, X>;
+/**
+ * The type of `fallback` method in a `RouteChainX<R, X>`, which
+ * will return a object contains a switcher function. This
+ * switcher won't return null.
+ */
 export type RouteChainFallbackX<R, X> = (
     handler: (url: string, extra: X) => R,
 ) => {
     switcher: (url: string, extra: X) => R;
 };
+/**
+ * An object which includes `route` and `fallback` method, and
+ * a switcher function of registried routes.
+ */
 export type RouteChainX<R, X> = {
     route: RouteChainAdderX<R, X>;
     fallback: RouteChainFallbackX<NonNullable<R>, X>;
@@ -53,23 +89,14 @@ export type RouteChainX<R, X> = {
 };
 
 /**
- * Create a extended switcher and extended routes connect to it at the same time.
+ * create a switcher and registry routes to it. Use like this:
  *
- * It returns an object include a `switcher` function and a `route` function, you can
- * use `switcher` function as a switcher, or use `route` function to add one more
- * route to the switcher.
- *
- * For example, you can use it like this:
- *
- * ```js
- * const { switcher } = createSwRt()
- *     .route('/user/<username>/<age>', (p, q) => `User ${p.username} is ${p.age}`)
- *     .route('/user/<username>/hello', (p, q) => `hello, ${p.username}`)
- *
- * const reuslt = switcher(url)
+ * ```ts
+ * const { switcher } = createSwRt
+ *     .route("/hello/<username>/", async ({username}) => createRes(`hello, username`))
+ *     .route("/file/<filepath>", async ({filepath}) => createRes(createFileStreamSafely(filepath)))
+ *     .fallback(async url => createRes(Status.NotFound, `No route matched ${url}`))
  * ```
- *
- * @returns a route function and switcher function.
  */
 export const createSwRt: RouteChainInit = {
     /**
@@ -77,6 +104,7 @@ export const createSwRt: RouteChainInit = {
      *
      * @param pattern a matching pattern
      * @param handler a handler dealing with the route
+     * @param flags flags for RegExp, default is 'i'
      * @returns a router chain.
      */
     route: (pattern, handler, flags) => {
@@ -96,6 +124,7 @@ export const createSwRt: RouteChainInit = {
          *
          * @param pattern a matching pattern
          * @param handler a handler dealing with the route
+         * @param flags flags for RegExp, default is 'i'
          * @returns a router chain.
          */
         const route: RouteChainAdder<R> = (pattern, handler, flags) => {
@@ -107,30 +136,22 @@ export const createSwRt: RouteChainInit = {
 };
 
 /**
- * Create a extended switcher and extended routes connect to it at the same time.
- *
- * It returns an object include a `switcher` function and a `route` function, you can
- * use `switcher` function as a switcher, or use `route` function to add one more
- * route to the switcher.
- *
- * For example, you can use it like this:
+ * create a switcher with extra parameter and registry routes to it. Use like this:
  *
  * ```ts
- * const { switcher } = createExtendSwRt<string, Request>()
- *     .route('/user/<username>/<age>', (p, q, x) => `User ${p.username} is ${p.age}, request from ${x.ip}`)
- *     .route('/user/<username>/hello', (p, q, x) => `hello, ${p.username}, request from ${x.ip}`)
- *
- * const reuslt = switcher(url, req)
+ * const { switcher } = createSwRt
+ *     .route("/hello/<username>/", async ({username}, req: Request) => createRes(`hello, username, you send ${await req.text()}`))
+ *     .route("/file/<filepath>", async ({filepath}, _req) => createRes(createFileStreamSafely(filepath)))
+ *     .fallback(async (url, req) => createRes(Status.NotFound, `Can't ${req.method} ${url}`))
  * ```
- *
- * @returns a route function and switcher function.
  */
 export const createSwRtX: RouteChainInitX = {
     /**
-     * Add first extend route to the switcher.
+     * Add first route to the switcher.
      *
      * @param pattern a matching pattern
      * @param handler a handler dealing with the route
+     * @param flags flags for RegExp, default is 'i'
      * @returns a router chain.
      */
     route: (pattern, handler, flags) => {
@@ -157,6 +178,7 @@ export const createSwRtX: RouteChainInitX = {
          *
          * @param pattern a matching pattern
          * @param handler a handler dealing with the route
+         * @param flags flags for RegExp, default is 'i'
          * @returns a router chain.
          */
         const route: RouteChainAdderX<R, X> = (pattern, handler, flags) => {
