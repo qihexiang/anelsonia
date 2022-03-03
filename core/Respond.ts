@@ -12,10 +12,10 @@ export type ResponseBody = string | Blob | ReadableStream<Uint8Array>;
  * and response headers.
  */
 export interface ResponseProps {
-    readonly status: number;
-    readonly statusText?: string;
-    readonly body?: ResponseBody;
-    readonly headers: Record<string, string>;
+    status: number;
+    statusText?: string;
+    body?: ResponseBody;
+    headers: Record<string, string>;
 }
 
 /**
