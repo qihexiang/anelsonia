@@ -89,7 +89,6 @@ export type RouteChainX<R, X> = {
 };
 
 /**
-<<<<<<< HEAD
  * create a switcher and registry routes to it. Use like this:
  *
  * ```ts
@@ -97,22 +96,6 @@ export type RouteChainX<R, X> = {
  *     .route("/hello/<username>/", async ({username}) => createRes(`hello, username`))
  *     .route("/file/<filepath>", async ({filepath}) => createRes(createFileStreamSafely(filepath)))
  *     .fallback(async url => createRes(Status.NotFound, `No route matched ${url}`))
-=======
- * Create a switcher and registry routes to it.
- *
- * It returns an object include a `switcher` function and a `route` function, you can
- * use `switcher` function as a switcher, or use `route` function to add one more
- * route to the switcher.
- *
- * For example, you can use it like this:
- *
- * ```ts
- * const { switcher } = createSwRt
- *     .route('/user/<username>/<age>', (p) => `User ${p.username} is ${p.age}`)
- *     .route('/user/<username>/hello', (p) => `hello, ${p.username}`)
- *
- * const reuslt = switcher(url)
->>>>>>> b5dfcc2 (Rewrite the comment for deno version)
  * ```
  */
 export const createSwRt: RouteChainInit = {
@@ -153,7 +136,6 @@ export const createSwRt: RouteChainInit = {
 };
 
 /**
-<<<<<<< HEAD
  * create a switcher with extra parameter and registry routes to it. Use like this:
  *
  * ```ts
@@ -161,22 +143,6 @@ export const createSwRt: RouteChainInit = {
  *     .route("/hello/<username>/", async ({username}, req: Request) => createRes(`hello, username, you send ${await req.text()}`))
  *     .route("/file/<filepath>", async ({filepath}, _req) => createRes(createFileStreamSafely(filepath)))
  *     .fallback(async (url, req) => createRes(Status.NotFound, `Can't ${req.method} ${url}`))
-=======
- * Create a switcher with an extra parameter and routes to it.
- *
- * It returns an object include a `switcher` function and a `route` function, you can
- * use `switcher` function as a switcher, or use `route` function to add one more
- * route to the switcher.
- *
- * For example, you can use it like this:
- *
- * ```ts
- * const { switcher } = createSwRtX
- *     .route('/user/<username>/<age>', (p, x: Request) => `User ${p.username} is ${p.age}, request from ${x.ip}`)
- *     .route('/user/<username>/hello', (p, x) => `hello, ${p.username}, request from ${x.ip}`)
- *
- * const reuslt = switcher(url, req)
->>>>>>> b5dfcc2 (Rewrite the comment for deno version)
  * ```
  */
 export const createSwRtX: RouteChainInitX = {
