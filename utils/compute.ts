@@ -94,8 +94,8 @@ export function compute<T>(initValue: T): Computation<T> {
             }
             return compute(
                 Promise.resolve(
-                    fn(initValue as NonNullable<Awaited<T>>),
-                ) as Promise<Awaited<R>>,
+                    isVoid(initValue) ? initValue : fn(initValue as NonNullable<Awaited<T>>),
+                ) as Promise<Awaited<R> | Extract<Awaited<T>, undefined | null>>,
             );
         },
         ifNull: (fn) => {
