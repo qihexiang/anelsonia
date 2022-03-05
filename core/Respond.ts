@@ -1,18 +1,6 @@
 import { isVoid } from "../utils/isVoid.ts";
 
 /**
- * ResponseBody is a subset of Deno BodyInit, which includes
- * `string`, `Blob` and `ReadableStream` of `Uint8Array`, and
- * you can use undefined or null for a no-contentn response
- */
-export type ResponseBody =
-    | string
-    | Blob
-    | ReadableStream<Uint8Array>
-    | null
-    | undefined;
-
-/**
  * ResponseProps is the return type of a EntryPoint function, which includes
  * everything that a response need: status code, status meassage, response body
  * and response headers.
@@ -20,7 +8,7 @@ export type ResponseBody =
 export interface ResponseProps {
     status: number;
     statusText?: string;
-    body?: ResponseBody;
+    body?: BodyInit;
     headers: Record<string, string>;
 }
 
@@ -51,7 +39,7 @@ export interface Respond extends Readonly<ResponseProps> {
      * @param body response body, if your status is 204, just
      * left it undefined.
      */
-    setBody(body: ResponseBody): Respond;
+    setBody(body: BodyInit): Respond;
     /**
      * Generate a new Respond object with a new response header,
      * by given header name an the value.
@@ -111,14 +99,14 @@ export function createRes(code: number): Respond;
  *
  * @param body the response body
  */
-export function createRes(body: ResponseBody): Respond;
+export function createRes(body: BodyInit): Respond;
 /**
  * Create a Respond and set both code and body
  *
  * @param code the status code
  * @param body the response body
  */
-export function createRes(code: number, body: ResponseBody): Respond;
+export function createRes(code: number, body: BodyInit): Respond;
 /**
  * Create a Respond and set both code and headers, and left body empty
  *
@@ -126,7 +114,7 @@ export function createRes(code: number, body: ResponseBody): Respond;
  * @param headers a header in array or object format
  */
 export function createRes(code: number, headers: Headers): Respond;
-export function createRes(body: ResponseBody, headers: Headers): Respond;
+export function createRes(body: BodyInit, headers: Headers): Respond;
 /**
  * Create a Respond with given status code, response body and response headers.
  *
@@ -136,12 +124,12 @@ export function createRes(body: ResponseBody, headers: Headers): Respond;
  */
 export function createRes(
     code: number,
-    body: ResponseBody,
+    body: BodyInit,
     headers: Headers,
 ): Respond;
 export function createRes(
-    arg1?: number | ResponseBody,
-    arg2?: ResponseBody | Headers,
+    arg1?: number | BodyInit,
+    arg2?: BodyInit | Headers,
     arg3?: Headers,
 ): Respond {
     if (isVoid(arg1)) return createFullRes({});
@@ -150,7 +138,7 @@ export function createRes(
     else {
         return createFullRes({
             status: arg1 as number,
-            body: arg2 as ResponseBody,
+            body: arg2 as BodyInit,
             headers: formatToRecord(arg3),
         });
     }
@@ -207,22 +195,17 @@ const formatToRecord = (header: Headers): RecordHeaders => {
     return header;
 };
 
-function createResWithOneValue(value: number | ResponseBody): Respond {
+function createResWithOneValue(value: number | BodyInit): Respond {
     if (typeof value === "number") return createFullRes({ status: value });
     else return createFullRes({ status: 200, body: value });
 }
 
 function createResWithTwoValue(
-    value1: number | ResponseBody,
-    value2: ResponseBody | Headers,
+    value1: number | BodyInit,
+    value2: BodyInit | Headers,
 ) {
     if (typeof value1 === "number") {
-        if (
-            typeof value2 === "string" ||
-            value2 instanceof ReadableStream ||
-            value2 instanceof Blob ||
-            isVoid(value2)
-        ) {
+        if (isBodyInit(value2)) {
             return createFullRes({ status: value1, body: value2 });
         } else {
             return createFullRes({
@@ -237,4 +220,36 @@ function createResWithTwoValue(
             headers: formatToRecord(value2 as Headers),
         });
     }
+}
+
+function isArrayBufferView(
+    content: BodyInit | Headers,
+): content is ArrayBufferView {
+    return [
+        Int8Array,
+        Uint8Array,
+        Uint8ClampedArray,
+        Int16Array,
+        Uint16Array,
+        Int32Array,
+        Uint32Array,
+        Float32Array,
+        Float64Array,
+        BigInt64Array,
+        BigUint64Array,
+        DataView,
+    ].reduce(
+        (result, nextType) => result || (content instanceof nextType),
+        false as boolean,
+    );
+}
+
+function isBodyInit(content: BodyInit | Headers): content is BodyInit {
+    return typeof content === "string" ||
+        content instanceof Blob ||
+        content instanceof ReadableStream ||
+        content instanceof ArrayBuffer ||
+        isArrayBufferView(content) ||
+        content instanceof FormData ||
+        content instanceof URLSearchParams;
 }
