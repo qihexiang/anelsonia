@@ -1,13 +1,14 @@
 import { Readable } from "stream";
 import { Status } from ".";
+import { MaybePromise } from "../utils";
 import { isVoid } from "../utils/isVoid";
 
-export type ResponseBody = string | Buffer | Readable;
+export type ResponseBody = string | Buffer | Readable | undefined | null;
 
 export interface ResponseProps {
     readonly status: number;
     readonly statusText?: string;
-    readonly body?: ResponseBody;
+    readonly body: ResponseBody;
     readonly headers: Record<string, string>;
 }
 
@@ -178,3 +179,14 @@ function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
 }
 
 export default createRes;
+
+export type RespondTuple<T> = [Status] | [number, T] | [number, T, Headers];
+
+export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body?: T) => ResponseBody): Respond;
+export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body?: T) => Promise<ResponseBody>): Promise<Respond>;
+export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body?: T) => MaybePromise<ResponseBody>): MaybePromise<Respond> {
+    const [status, content, headers = {}] = tuple;
+    const body = transformer(content);
+    if (body instanceof Promise) return body.then(b => createRes(status, b, headers));
+    return createRes(status, body, headers);
+}
