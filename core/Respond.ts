@@ -1,4 +1,5 @@
 import { isVoid } from "../utils/isVoid.ts";
+import { MaybePromise } from "../utils/MaybePromise.ts";
 
 /**
  * ResponseProps is the return type of a EntryPoint function, which includes
@@ -252,4 +253,15 @@ function isBodyInit(content: BodyInit | Headers): content is BodyInit {
         isArrayBufferView(content) ||
         content instanceof FormData ||
         content instanceof URLSearchParams;
+}
+
+export type RespondTuple<T> = [number, T] | [number, T, RecordHeaders];
+
+export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body: T) => BodyInit): Respond;
+export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body: T) => Promise<BodyInit>): Promise<Respond>;
+export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body: T) => MaybePromise<BodyInit>): MaybePromise<Respond> {
+    const [status, content, headers = {}] = tuple;
+    const body = transformer(content);
+    if (body instanceof Promise) return body.then(b => createRes(status, b, headers));
+    return createRes(status, body, headers);
 }
