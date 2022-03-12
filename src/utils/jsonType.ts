@@ -1,5 +1,4 @@
 import createRes from "../core/Respond";
-import { contentLength, contentType } from "./ResHeader";
 
 export interface HasToJSON {
     toJSON: () => BasicJSONTypes | JsonArray | JsonObject;
@@ -19,8 +18,5 @@ export type JsonType = JsonObject | JsonArray | BasicJSONTypes | HasToJSON;
  */
 export const resJson = (json: JsonType) => {
     const body = JSON.stringify(json);
-    return createRes(body).setHeaders(
-        contentType("json", "utf-8"),
-        contentLength(body)
-    );
+    return createRes(body).setHeaders("Content-Type", "application/json");
 };

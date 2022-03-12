@@ -1,5 +1,4 @@
 import { AsyncLocalStorage } from "async_hooks";
-import destroy from "destroy";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
@@ -269,7 +268,7 @@ function getResponser(
                 });
                 res.on("finish", () => {
                     clearTimeout(connectionTimer);
-                    destroy(body);
+                    body.destroy();
                 });
             } else {
                 body

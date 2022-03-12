@@ -182,11 +182,21 @@ export default createRes;
 
 export type RespondTuple<T> = [Status] | [number, T] | [number, T, Headers];
 
-export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body?: T) => ResponseBody): Respond;
-export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body?: T) => Promise<ResponseBody>): Promise<Respond>;
-export function ResFromTuple<T>(tuple: RespondTuple<T>, transformer: (body?: T) => MaybePromise<ResponseBody>): MaybePromise<Respond> {
+export function ResFromTuple<T>(
+    tuple: RespondTuple<T>,
+    transformer: (body?: T) => ResponseBody
+): Respond;
+export function ResFromTuple<T>(
+    tuple: RespondTuple<T>,
+    transformer: (body?: T) => Promise<ResponseBody>
+): Promise<Respond>;
+export function ResFromTuple<T>(
+    tuple: RespondTuple<T>,
+    transformer: (body?: T) => MaybePromise<ResponseBody>
+): MaybePromise<Respond> {
     const [status, content, headers = {}] = tuple;
     const body = transformer(content);
-    if (body instanceof Promise) return body.then(b => createRes(status, b, headers));
+    if (body instanceof Promise)
+        return body.then((b) => createRes(status, b, headers));
     return createRes(status, body, headers);
 }
