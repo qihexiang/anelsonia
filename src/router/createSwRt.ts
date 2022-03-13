@@ -8,8 +8,8 @@ import {
 } from "./createRoute.js";
 import { createSwitcherX, createSwitcher } from "./createSwitcher.js";
 
-export type RouteChainInit = {
-    route: <R, P extends string>(
+export type RouteChainInit<R> = {
+    route: <P extends string>(
         pattern: P,
         handler: RouteHandler<P, R>,
         flags?: string
@@ -29,8 +29,8 @@ export type RouteChain<R> = {
     switcher: Route<R>;
 };
 
-export type RouteChainInitX = {
-    route: <R, X, P extends string>(
+export type RouteChainInitX<R, X> = {
+    route: <P extends string>(
         pattern: P,
         handler: RouteHandlerX<P, X, R>,
         flags?: string
@@ -71,7 +71,7 @@ export type RouteChainX<R, X> = {
  *
  * @returns a route function and switcher function.
  */
-export function createSwRt(): RouteChainInit {
+export function createSwRt<R>(): RouteChainInit<R> {
     return {
         /**
          * Add first route to the switcher.
@@ -81,7 +81,6 @@ export function createSwRt(): RouteChainInit {
          * @returns a router chain.
          */
         route: (pattern, handler, flags) => {
-            type R = ReturnType<typeof handler>;
             let routes = [createRoute(pattern, handler, flags)];
             /**
              * Handler the request when no routes matched
@@ -112,17 +111,6 @@ export function createSwRt(): RouteChainInit {
     };
 }
 
-export namespace createSwRt {
-    /**
-     * Add first route to the switcher.
-     *
-     * @param pattern a matching pattern
-     * @param handler a handler dealing with the route
-     * @returns a router chain.
-     */
-    export const route = createSwRt().route;
-}
-
 /**
  * Create a extended switcher and extended routes connect to it at the same time.
  *
@@ -142,7 +130,7 @@ export namespace createSwRt {
  *
  * @returns a route function and switcher function.
  */
-export function createSwRtX(): RouteChainInitX {
+export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
     return {
         /**
          * Add first extend route to the switcher.
@@ -152,8 +140,6 @@ export function createSwRtX(): RouteChainInitX {
          * @returns a router chain.
          */
         route: (pattern, handler, flags) => {
-            type R = ReturnType<typeof handler>;
-            type X = Parameters<typeof handler>[1];
             let routes = [createRouteX(pattern, handler, flags)];
             /**
              * Handler the request when no routes matched
@@ -194,15 +180,4 @@ export function createSwRtX(): RouteChainInitX {
             };
         },
     };
-}
-
-export namespace createSwRtX {
-    /**
-     * Add first extend route to the switcher.
-     *
-     * @param pattern a matching pattern
-     * @param handler a handler dealing with the route
-     * @returns a router chain.
-     */
-    export const route = createSwRtX().route;
 }
