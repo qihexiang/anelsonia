@@ -91,7 +91,10 @@ export function createSwRt(): RouteChainInit {
              */
             const fallback: RouteChainFallback<NonNullable<R>> = (handler) => ({
                 switcher: (url) =>
-                    createSwitcher(...routes)(url) ?? handler(url),
+                    (createSwitcher(...routes)(url) as
+                        | NonNullable<R>
+                        | null
+                        | undefined) ?? handler(url),
             });
             /**
              * Add another route to the switcher.
@@ -163,8 +166,10 @@ export function createSwRtX(): RouteChainInitX {
             ) => {
                 return {
                     switcher: (url, extra) =>
-                        createSwitcherX(...routes)(url, extra) ??
-                        handler(url, extra),
+                        (createSwitcherX(...routes)(url, extra) as
+                            | NonNullable<R>
+                            | null
+                            | undefined) ?? handler(url, extra),
                 };
             };
             /**

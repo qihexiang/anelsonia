@@ -153,7 +153,7 @@ export const createContext: CreateContext = <T>(
         if (!values.delete(getReq()))
             throw new Error("No value assigned to this flare found.");
     };
-    return [assign, observe, drop];
+    return [assign, observe, drop] as [(value: T) => void, () => T, () => void];
 };
 
 interface CreateContextN {
@@ -210,7 +210,11 @@ export const createContextN: CreateContextN = <T>(
         if (!values.delete(req))
             throw new Error("No value assigned to this flare found.");
     };
-    return [assign, observe, drop];
+    return [assign, observe, drop] as [
+        (value: T, req: HttpReq) => void,
+        (req: HttpReq) => T,
+        (req: HttpReq) => void
+    ];
 };
 
 /**

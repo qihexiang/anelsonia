@@ -29,5 +29,8 @@
     "check": "eslint ./src",
     "lint": "eslint --fix ./src",
     "prettier": "prettier --write ./src"
+  },
+  "dependencies": {
+    "freesia": "link:"
   }
 }
