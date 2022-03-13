@@ -1,6 +1,5 @@
 import { Readable } from "stream";
 import { Status } from "./Status.js";
-import { MaybePromise } from "../utils/MaybePromise.js";
 import { isVoid } from "../utils/isVoid.js";
 
 export type ResponseBody = string | Buffer | Readable | undefined | null;
@@ -180,23 +179,47 @@ function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
 
 export default createRes;
 
-export type RespondTuple<T> = [Status] | [number, T] | [number, T, Headers];
+export type Builder<T> = (transformer: (value: T) => ResponseBody) => Respond;
+export type ResponseType<T> = { build: Builder<T>; };
+export type ResponseSBH<T> = {
+    statusText(message: string): ResponseType<T>;
+    build: Builder<T>;
+};
+export type ResponseSB<T> = {
+    headers(...headers: Headers[]): ResponseSBH<T>,
+    build: Builder<T>;
+};
+export type ResponseB<T> = {
+    status(code?: Status): ResponseSB<T>;
+    build: Builder<T>;
+};
+export type PreResponse<T> = ResponseB<T> | ResponseSB<T> | ResponseSBH<T> | ResponseType<T>;
 
-export function ResFromTuple<T>(
-    tuple: RespondTuple<T>,
-    transformer: (body?: T) => ResponseBody
-): Respond;
-export function ResFromTuple<T>(
-    tuple: RespondTuple<T>,
-    transformer: (body?: T) => Promise<ResponseBody>
-): Promise<Respond>;
-export function ResFromTuple<T>(
-    tuple: RespondTuple<T>,
-    transformer: (body?: T) => MaybePromise<ResponseBody>
-): MaybePromise<Respond> {
-    const [status, content, headers = {}] = tuple;
-    const body = transformer(content);
-    if (body instanceof Promise)
-        return body.then((b) => createRes(status, b, headers));
-    return createRes(status, body, headers);
+export function response<T>(value: T): ResponseB<T> {
+    return {
+        status(code: Status = 200): ResponseSB<T> {
+            return {
+                headers(...headers: Headers[]): ResponseSBH<T> {
+                    return {
+                        statusText(message: string): ResponseType<T> {
+                            return {
+                                build(transformer: (value: T) => ResponseBody): Respond {
+                                    return createRes().setStatus(code).setBody(transformer(value)).setHeaders(...headers).setStatusText(message);
+                                }
+                            };
+                        },
+                        build(transformer: (value: T) => ResponseBody) {
+                            return createRes().setStatus(code).setBody(transformer(value)).setHeaders(...headers);
+                        }
+                    };
+                },
+                build(transformer: (value: T) => ResponseBody) {
+                    return createRes().setStatus(code).setBody(transformer(value));
+                }
+            };
+        },
+        build(transformer: (value: T) => ResponseBody) {
+            return createRes().setBody(transformer(value));
+        }
+    };
 }
