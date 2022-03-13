@@ -179,29 +179,29 @@ function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
 
 export default createRes;
 
-export type Builder<T> = (transformer: (value: T) => ResponseBody) => Respond;
-export type ResponseType<T> = { build: Builder<T>; };
-export type ResponseSBH<T> = {
-    statusText(message: string): ResponseType<T>;
+type Builder<T> = (transformer: (value: T) => ResponseBody) => Respond;
+type AllSettledResponse<T> = { build: Builder<T>; };
+type ResponseWithStatusBodyHeaders<T> = {
+    statusText(message: string): AllSettledResponse<T>;
     build: Builder<T>;
 };
-export type ResponseSB<T> = {
-    headers(...headers: Headers[]): ResponseSBH<T>,
+type ResponseWithStatusBody<T> = {
+    headers(...headers: Headers[]): ResponseWithStatusBodyHeaders<T>,
     build: Builder<T>;
 };
-export type ResponseB<T> = {
-    status(code?: Status): ResponseSB<T>;
+type ResponseWithBody<T> = {
+    status(code?: Status): ResponseWithStatusBody<T>;
     build: Builder<T>;
 };
-export type PreResponse<T> = ResponseB<T> | ResponseSB<T> | ResponseSBH<T> | ResponseType<T>;
+export type TypedResponse<T> = ResponseWithBody<T> | ResponseWithStatusBody<T> | ResponseWithStatusBodyHeaders<T> | AllSettledResponse<T>;
 
-export function response<T>(value: T): ResponseB<T> {
+export function response<T>(value: T): ResponseWithBody<T> {
     return {
-        status(code: Status = 200): ResponseSB<T> {
+        status(code: Status = 200): ResponseWithStatusBody<T> {
             return {
-                headers(...headers: Headers[]): ResponseSBH<T> {
+                headers(...headers: Headers[]): ResponseWithStatusBodyHeaders<T> {
                     return {
-                        statusText(message: string): ResponseType<T> {
+                        statusText(message: string): AllSettledResponse<T> {
                             return {
                                 build(transformer: (value: T) => ResponseBody): Respond {
                                     return createRes().setStatus(code).setBody(transformer(value)).setHeaders(...headers).setStatusText(message);
