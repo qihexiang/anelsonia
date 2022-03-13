@@ -83,12 +83,12 @@ export function useURL<T>(
 
 interface CreateContext {
     <T>(): [(value: T) => void, () => Readonly<T>, () => void];
-    <T>(options: { mutable: true; reassign: boolean; }): [
+    <T>(options: { mutable: true; reassign: boolean }): [
         (value: T) => void,
         () => T,
         () => void
     ];
-    <T>(options: { mutable: false; reassign: boolean; }): [
+    <T>(options: { mutable: false; reassign: boolean }): [
         (value: T) => void,
         () => Readonly<T>,
         () => void
@@ -156,12 +156,12 @@ interface CreateContextN {
         (req: HttpReq) => Readonly<T>,
         (req: HttpReq) => void
     ];
-    <T>(options: { mutable: true; reassign: boolean; }): [
+    <T>(options: { mutable: true; reassign: boolean }): [
         (value: T, req: HttpReq) => void,
         (req: HttpReq) => T,
         (req: HttpReq) => void
     ];
-    <T>(options: { mutable: false; reassign: boolean; }): [
+    <T>(options: { mutable: false; reassign: boolean }): [
         (value: T, req: HttpReq) => void,
         (req: HttpReq) => Readonly<T>,
         (req: HttpReq) => void

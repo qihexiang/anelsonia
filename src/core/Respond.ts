@@ -180,46 +180,63 @@ function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
 export default createRes;
 
 type Builder<T> = (transformer: (value: T) => ResponseBody) => Respond;
-type AllSettledResponse<T> = { build: Builder<T>; };
+type AllSettledResponse<T> = { build: Builder<T> };
 type ResponseWithStatusBodyHeaders<T> = {
     statusText(message: string): AllSettledResponse<T>;
     build: Builder<T>;
 };
 type ResponseWithStatusBody<T> = {
-    headers(...headers: Headers[]): ResponseWithStatusBodyHeaders<T>,
+    headers(...headers: Headers[]): ResponseWithStatusBodyHeaders<T>;
     build: Builder<T>;
 };
 type ResponseWithBody<T> = {
     status(code?: Status): ResponseWithStatusBody<T>;
     build: Builder<T>;
 };
-export type TypedResponse<T> = ResponseWithBody<T> | ResponseWithStatusBody<T> | ResponseWithStatusBodyHeaders<T> | AllSettledResponse<T>;
+export type TypedResponse<T> =
+    | ResponseWithBody<T>
+    | ResponseWithStatusBody<T>
+    | ResponseWithStatusBodyHeaders<T>
+    | AllSettledResponse<T>;
 
 export function response<T>(value: T): ResponseWithBody<T> {
     return {
         status(code: Status = 200): ResponseWithStatusBody<T> {
             return {
-                headers(...headers: Headers[]): ResponseWithStatusBodyHeaders<T> {
+                headers(
+                    ...headers: Headers[]
+                ): ResponseWithStatusBodyHeaders<T> {
                     return {
                         statusText(message: string): AllSettledResponse<T> {
                             return {
-                                build(transformer: (value: T) => ResponseBody): Respond {
-                                    return createRes().setStatus(code).setBody(transformer(value)).setHeaders(...headers).setStatusText(message);
-                                }
+                                build(
+                                    transformer: (value: T) => ResponseBody
+                                ): Respond {
+                                    return createRes()
+                                        .setStatus(code)
+                                        .setBody(transformer(value))
+                                        .setHeaders(...headers)
+                                        .setStatusText(message);
+                                },
                             };
                         },
                         build(transformer: (value: T) => ResponseBody) {
-                            return createRes().setStatus(code).setBody(transformer(value)).setHeaders(...headers);
-                        }
+                            return createRes()
+                                .setStatus(code)
+                                .setBody(transformer(value))
+                                .setHeaders(...headers);
+                        },
                     };
                 },
                 build(transformer: (value: T) => ResponseBody) {
-                    return createRes().setStatus(code).setBody(transformer(value));
-                }
+                    return createRes()
+                        .setStatus(code)
+                        .setBody(transformer(value));
+                },
             };
         },
         build(transformer: (value: T) => ResponseBody) {
             return createRes().setBody(transformer(value));
-        }
+        },
     };
 }

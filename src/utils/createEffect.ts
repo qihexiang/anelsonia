@@ -14,8 +14,8 @@ export function createEffect<F extends (...args: any[]) => any>(
         ...args: Readonly<Parameters<F>>
     ) => (r: Readonly<ReturnType<F>>) => void
 ): (
-        fn: (...args: Parameters<F>) => ReturnType<F>
-    ) => (...args: Parameters<F>) => ReturnType<F> {
+    fn: (...args: Parameters<F>) => ReturnType<F>
+) => (...args: Parameters<F>) => ReturnType<F> {
     return (fn) =>
         (...p) => {
             const hookAfter = hook(...p);
