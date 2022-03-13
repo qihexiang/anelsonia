@@ -29,12 +29,7 @@ export const useRequest = () => {
 /**
  * Get host, path and query object from the request.
  */
-export function useURL(): {
-    method: string;
-    host: string;
-    path: string;
-    query: URLSearchParams;
-};
+export function useURL(): URL;
 
 /**
  * Get request method.
@@ -82,19 +77,18 @@ export function useURL<T>(
     if (prop === "path") return path;
     const url = new URL(path, `http://${host}`);
     if (prop === "query") return url.searchParams;
-    if (prop === undefined)
-        return { host, path, query: url.searchParams, method };
+    if (prop === undefined) return url;
     return prop(path);
 }
 
 interface CreateContext {
     <T>(): [(value: T) => void, () => Readonly<T>, () => void];
-    <T>(options: { mutable: true; reassign: boolean }): [
+    <T>(options: { mutable: true; reassign: boolean; }): [
         (value: T) => void,
         () => T,
         () => void
     ];
-    <T>(options: { mutable: false; reassign: boolean }): [
+    <T>(options: { mutable: false; reassign: boolean; }): [
         (value: T) => void,
         () => Readonly<T>,
         () => void
@@ -162,12 +156,12 @@ interface CreateContextN {
         (req: HttpReq) => Readonly<T>,
         (req: HttpReq) => void
     ];
-    <T>(options: { mutable: true; reassign: boolean }): [
+    <T>(options: { mutable: true; reassign: boolean; }): [
         (value: T, req: HttpReq) => void,
         (req: HttpReq) => T,
         (req: HttpReq) => void
     ];
-    <T>(options: { mutable: false; reassign: boolean }): [
+    <T>(options: { mutable: false; reassign: boolean; }): [
         (value: T, req: HttpReq) => void,
         (req: HttpReq) => Readonly<T>,
         (req: HttpReq) => void
