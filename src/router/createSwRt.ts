@@ -5,8 +5,8 @@ import {
     RouteHandlerX,
     Route,
     RouteHandler,
-} from "./createRoute";
-import { createSwitcherX, createSwitcher } from "./createSwitcher";
+} from "./createRoute.js";
+import { createSwitcherX, createSwitcher } from "./createSwitcher.js";
 
 export type RouteChainInit = {
     route: <R, P extends string>(

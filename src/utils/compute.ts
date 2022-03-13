@@ -1,5 +1,5 @@
-import { baseCompose } from "./composeFn";
-import { isVoid } from "./isVoid";
+import { baseCompose } from "./composeFn.js";
+import { isVoid } from "./isVoid.js";
 
 export interface Computation<T> {
     readonly map: <R>(fn: (t: T) => R) => Computation<R>;

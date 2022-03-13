@@ -1,7 +1,7 @@
 import { Readable } from "stream";
-import { Status } from ".";
-import { MaybePromise } from "../utils";
-import { isVoid } from "../utils/isVoid";
+import { Status } from "./Status.js";
+import { MaybePromise } from "../utils/MaybePromise.js";
+import { isVoid } from "../utils/isVoid.js";
 
 export type ResponseBody = string | Buffer | Readable | undefined | null;
 

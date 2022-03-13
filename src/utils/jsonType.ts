@@ -1,4 +1,4 @@
-import createRes from "../core/Respond";
+import createRes from "../core/Respond.js";
 
 export interface HasToJSON {
     toJSON: () => BasicJSONTypes | JsonArray | JsonObject;

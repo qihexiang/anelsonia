@@ -2,8 +2,8 @@ import { AsyncLocalStorage } from "async_hooks";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Stream } from "stream";
-import { ResponseProps } from "./Respond";
-import { Route } from "../router/createRoute";
+import { ResponseProps } from "./Respond.js";
+import { Route } from "../router/createRoute.js";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;

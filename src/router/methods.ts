@@ -1,5 +1,5 @@
-import { HttpReq, useURL } from "../core/shimHTTP";
-import { RouteHandler, RouteHandlerX } from "./createRoute";
+import { HttpReq, useURL } from "../core/shimHTTP.js";
+import { RouteHandler, RouteHandlerX } from "./createRoute.js";
 
 /**
  * Limit HTTP methods on a route.

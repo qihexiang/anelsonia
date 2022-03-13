@@ -1,4 +1,4 @@
-import MaybePromise from "./MaybePromise";
+import MaybePromise from "./MaybePromise.js";
 
 export type Fn = (...args: any[]) => any;
 export type AsyncFn = (...args: any[]) => Promise<any>;
