@@ -179,64 +179,42 @@ function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
 
 export default createRes;
 
-type Builder<T> = (transformer: (value: T) => ResponseBody) => Respond;
-type AllSettledResponse<T> = { build: Builder<T> };
-type ResponseWithStatusBodyHeaders<T> = {
-    statusText(message: string): AllSettledResponse<T>;
-    build: Builder<T>;
-};
-type ResponseWithStatusBody<T> = {
-    headers(...headers: Headers[]): ResponseWithStatusBodyHeaders<T>;
-    build: Builder<T>;
-};
-type ResponseWithBody<T> = {
-    status(code?: Status): ResponseWithStatusBody<T>;
-    build: Builder<T>;
-};
-export type TypedResponse<T> =
-    | ResponseWithBody<T>
-    | ResponseWithStatusBody<T>
-    | ResponseWithStatusBodyHeaders<T>
-    | AllSettledResponse<T>;
+export type StatusElement = Status | [Status, string];
+/**
+ * Define a response with type by a tuple.
+ * 
+ * The first element can define the status code and the status message, like: `200`, `[200, "Ok"]`
+ * 
+ * The scecond element is the response body, if you'd like to give a empty body, left it empty or set it to `null`.
+ * 
+ * Elements after the third is headers.
+ * 
+ * Use ResFromTuple to transform it to a Respond.
+ * 
+ * examples:
+ * 
+ * ```ts
+ * const response: TypedRespond<bigint> = [200]
+ * const response: TypedRespond<bigint> = [[200, "Ok"]]
+ * const response: TypedRespond<bigint> = [[200, "Ok"], 0n]
+ * const response: TypedRespond<bigint> = [[200, "Ok"], 0n, ["Content-Type": "text/plain; charset=UTF-8"]]
+ * const response: TypedRespond<bigint> = [200, 0n, ["Content-Type": "text/plain; charset=UTF-8"]]
+ * const response: TypedRespond<bigint> = [500, null, ["Content-Type": "text/plain; charset=UTF-8"]]
+ * ```
+ */
+export type TypedResponse<T> = [StatusElement] | [StatusElement, T | null] | [StatusElement, T | null, ...Headers[]];
 
-export function response<T>(value: T): ResponseWithBody<T> {
-    return {
-        status(code: Status = 200): ResponseWithStatusBody<T> {
-            return {
-                headers(
-                    ...headers: Headers[]
-                ): ResponseWithStatusBodyHeaders<T> {
-                    return {
-                        statusText(message: string): AllSettledResponse<T> {
-                            return {
-                                build(
-                                    transformer: (value: T) => ResponseBody
-                                ): Respond {
-                                    return createRes()
-                                        .setStatus(code)
-                                        .setBody(transformer(value))
-                                        .setHeaders(...headers)
-                                        .setStatusText(message);
-                                },
-                            };
-                        },
-                        build(transformer: (value: T) => ResponseBody) {
-                            return createRes()
-                                .setStatus(code)
-                                .setBody(transformer(value))
-                                .setHeaders(...headers);
-                        },
-                    };
-                },
-                build(transformer: (value: T) => ResponseBody) {
-                    return createRes()
-                        .setStatus(code)
-                        .setBody(transformer(value));
-                },
-            };
-        },
-        build(transformer: (value: T) => ResponseBody) {
-            return createRes().setBody(transformer(value));
-        },
-    };
+/**
+ * Create a Respond from a TypedResponse
+ * 
+ * @param tuple The TypedResponse tuple
+ * @param transformer transformer to convert body to a ResponseBody
+ * @returns a Respond
+ */
+export function ResFromTuple<T>(tuple: TypedResponse<T>, transformer: (value?: T | null) => ResponseBody): Respond {
+    const [statusElement, body, ...headers] = tuple;
+    const [status, statusText] = statusElement instanceof Array ? statusElement : [statusElement];
+    const response = createRes(status, transformer(body)).setHeaders(...headers);
+    if (isVoid(statusText)) return response;
+    else return response.setStatusText(statusText);
 }
