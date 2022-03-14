@@ -180,6 +180,16 @@ function isResponseBody(value: unknown): value is ResponseBody {
 
 export default createRes;
 
+const defaultTransformer = (value: unknown): ResponseBody => {
+    if (isResponseBody(value)) return value;
+    else if (
+        typeof value === "number" ||
+        typeof value === "boolean" ||
+        typeof value === "bigint" ||
+        typeof value === "symbol"
+    ) return String(value);
+    else return JSON.stringify(value);
+};
 export type StatusElement = Status | [Status, string];
 /**
  * Define a response with type by a tuple.
@@ -212,7 +222,7 @@ export type TypedResponse<T> = [StatusElement] | [StatusElement, T | null] | [St
  * @param transformer transformer to convert body to a ResponseBody
  * @returns a Respond
  */
-export function ResFromTuple<T>(tuple: TypedResponse<T>, transformer: (value?: T | null) => ResponseBody): Respond {
+export function ResFromTuple<T>(tuple: TypedResponse<T>, transformer: (value?: T | null) => ResponseBody = defaultTransformer): Respond {
     const [statusElement, body, ...headers] = tuple;
     const [status, statusText] = statusElement instanceof Array ? statusElement : [statusElement];
     const response = createRes(status, transformer(body)).setHeaders(...headers);
