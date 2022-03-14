@@ -1,11 +1,11 @@
 import { RouteParam } from "./params.js";
 
-export type RouteHandler<P extends string, R> = (params: RouteParam<P>) => R;
+export type RouteHandler<P extends string, R> = (params: RouteParam<P>) => R | null;
 export type Route<R> = (url: string) => R | null;
 export type RouteHandlerX<P extends string, X, R> = (
     params: RouteParam<P>,
     extra: X
-) => R;
+) => R | null;
 export type RouteX<R, X> = (url: string, extra: X) => R | null;
 
 /**
