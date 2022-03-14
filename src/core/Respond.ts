@@ -169,11 +169,12 @@ function createResWithTwoValue(
     });
 }
 
-function isResponseBody(value: Headers | ResponseBody): value is ResponseBody {
+function isResponseBody(value: unknown): value is ResponseBody {
     return (
         typeof value === "string" ||
         value instanceof Buffer ||
-        value instanceof Readable
+        value instanceof Readable ||
+        isVoid(value)
     );
 }
 
