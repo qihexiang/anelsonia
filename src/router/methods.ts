@@ -12,7 +12,7 @@ import { RouteHandler, RouteHandlerX } from "./createRoute.js";
 export const allowMethods = <P extends string, R>(
     handler: RouteHandler<P, R>,
     methods: string[]
-): RouteHandler<P, R | null> => {
+): RouteHandler<P, R> => {
     return (...args: Parameters<typeof handler>) => {
         if (methods.includes(useURL("method"))) return handler(...args);
         return null;
@@ -61,7 +61,7 @@ export const Patch = <P extends string, R>(handler: RouteHandler<P, R>) =>
 export const allowMethodsX = <P extends string, X, R>(
     handler: RouteHandlerX<P, X, R>,
     methods: string[]
-): RouteHandlerX<P, X, R | null> => {
+): RouteHandlerX<P, X, R> => {
     return (...args: Parameters<typeof handler>) => {
         if (methods.includes(useURL("method"))) return handler(...args);
         return null;
@@ -109,7 +109,7 @@ export const PatchX = <P extends string, X, R>(
 const allowMethodsN = <P extends string, R>(
     handler: RouteHandlerX<P, HttpReq, R>,
     methods: string[]
-): RouteHandlerX<P, HttpReq, R | null> => {
+): RouteHandlerX<P, HttpReq, R> => {
     return (params, req) => {
         if (!methods.includes(req.method ?? "UNKNOWN")) return null;
         return handler(params, req);
