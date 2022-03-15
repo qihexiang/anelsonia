@@ -1,5 +1,11 @@
 {
     "lint": {
+        "files": {
+            "exclude": [
+                "./node_modules",
+                "./dist"
+            ]
+        },
         "rules": {
             "tags": [
                 "recommended"
@@ -7,6 +13,12 @@
         }
     },
     "fmt": {
+        "files": {
+            "exclude": [
+                "./node_modules",
+                "./dist"
+            ]
+        },
         "options": {
             "useTabs": false,
             "indentWidth": 4,

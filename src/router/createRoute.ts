@@ -1,10 +1,12 @@
 import { RouteParam } from "./params.ts";
 
-export type RouteHandler<P extends string, R> = (params: RouteParam<P>) => R | null;
+export type RouteHandler<P extends string, R> = (
+    params: RouteParam<P>,
+) => R | null;
 export type Route<R> = (url: string) => R | null;
 export type RouteHandlerX<P extends string, X, R> = (
     params: RouteParam<P>,
-    extra: X
+    extra: X,
 ) => R | null;
 export type RouteX<R, X> = (url: string, extra: X) => R | null;
 
@@ -26,7 +28,7 @@ export type RouteX<R, X> = (url: string, extra: X) => R | null;
 export function createRoute<P extends string, R>(
     pattern: P,
     handler: RouteHandler<P, R>,
-    flags?: string
+    flags?: string,
 ): Route<R> {
     const re = createRegExp(pattern, flags);
     return (url: string) => {
@@ -57,7 +59,7 @@ export function createRoute<P extends string, R>(
 export function createRouteX<P extends string, X, R>(
     pattern: P,
     handler: RouteHandlerX<P, X, R>,
-    flags?: string
+    flags?: string,
 ): RouteX<R, X> {
     const re = createRegExp(pattern, flags);
     return (url: string, extra: X) => {

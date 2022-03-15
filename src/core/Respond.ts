@@ -261,8 +261,9 @@ const defaultTransformer = (value: unknown): BodyInit => {
         typeof value === "boolean" ||
         typeof value === "bigint" ||
         typeof value === "symbol"
-    ) return String(value);
-    else return JSON.stringify(value);
+    ) {
+        return String(value);
+    } else return JSON.stringify(value);
 };
 const asyncDefaultTransformer = async (body: unknown): Promise<BodyInit> => {
     const value = await body;
@@ -271,17 +272,17 @@ const asyncDefaultTransformer = async (body: unknown): Promise<BodyInit> => {
 export type StatusElement = number | [number, string];
 /**
  * Define a response with type by a tuple.
- * 
+ *
  * The first element can define the status code and the status message, like: `200`, `[200, "Ok"]`
- * 
+ *
  * The scecond element is the response body, if you'd like to give a empty body, left it empty or set it to `null`.
- * 
+ *
  * Elements after the third is headers.
- * 
+ *
  * Use ResFromTuple to transform it to a Respond.
- * 
+ *
  * examples:
- * 
+ *
  * ```ts
  * const response: TypedRespond<bigint> = [200]
  * const response: TypedRespond<bigint> = [[200, "Ok"]]
@@ -291,34 +292,53 @@ export type StatusElement = number | [number, string];
  * const response: TypedRespond<bigint> = [500, null, ["Content-Type": "text/plain; charset=UTF-8"]]
  * ```
  */
-export type TypedResponse<T> = [StatusElement] | [StatusElement, T | null] | [StatusElement, T | null, ...Headers[]];
+export type TypedResponse<T> = [StatusElement] | [StatusElement, T | null] | [
+    StatusElement,
+    T | null,
+    ...Headers[],
+];
 
 /**
  * Create a Respond from a TypedResponse
- * 
+ *
  * @param tuple The TypedResponse tuple
  * @param transformer transformer to convert body to a BodyInit
  * @returns a Respond
  */
-export function ResFromTuple<T>(tuple: TypedResponse<T>, transformer: (value?: T | null) => BodyInit = defaultTransformer): Respond {
+export function ResFromTuple<T>(
+    tuple: TypedResponse<T>,
+    transformer: (value?: T | null) => BodyInit = defaultTransformer,
+): Respond {
     const [statusElement, body, ...headers] = tuple;
-    const [status, statusText] = statusElement instanceof Array ? statusElement : [statusElement];
-    const response = createRes(status, transformer(body)).setHeaders(...headers);
+    const [status, statusText] = statusElement instanceof Array
+        ? statusElement
+        : [statusElement];
+    const response = createRes(status, transformer(body)).setHeaders(
+        ...headers,
+    );
     if (isVoid(statusText)) return response;
     else return response.setStatusText(statusText);
 }
 
 /**
  * Create a Respond from a TypedResponse
- * 
+ *
  * @param tuple The TypedResponse tuple
  * @param transformer transformer to convert body to a Promised BodyInit
  * @returns a Promised Respond
  */
-export async function asyncResFromTuple<T>(tuple: TypedResponse<T>, transformer: (value?: T | null) => Promise<BodyInit> = asyncDefaultTransformer): Promise<Respond> {
+export async function asyncResFromTuple<T>(
+    tuple: TypedResponse<T>,
+    transformer: (value?: T | null) => Promise<BodyInit> =
+        asyncDefaultTransformer,
+): Promise<Respond> {
     const [statusElement, body, ...headers] = tuple;
-    const [status, statusText] = statusElement instanceof Array ? statusElement : [statusElement];
-    const response = createRes(status, await transformer(body)).setHeaders(...headers);
+    const [status, statusText] = statusElement instanceof Array
+        ? statusElement
+        : [statusElement];
+    const response = createRes(status, await transformer(body)).setHeaders(
+        ...headers,
+    );
     if (isVoid(statusText)) return response;
     else return response.setStatusText(statusText);
 }

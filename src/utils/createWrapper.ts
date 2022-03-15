@@ -76,8 +76,8 @@ export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
 export function createWrapper<
     O extends Fn | AsyncFn,
     T extends Fn | AsyncFn = O,
-    >(
-        hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
+>(
+    hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T> {
     return (fn) =>
         (...args) => {
@@ -109,8 +109,8 @@ export function createEffect<F extends (...args: any[]) => any>(
         ...args: Readonly<Parameters<F>>
     ) => (r: Readonly<ReturnType<F>>) => void,
 ): (
-        fn: (...args: Parameters<F>) => ReturnType<F>,
-    ) => (...args: Parameters<F>) => ReturnType<F> {
+    fn: (...args: Parameters<F>) => ReturnType<F>,
+) => (...args: Parameters<F>) => ReturnType<F> {
     return (fn) =>
         (...p) => {
             const hookAfter = hook(...p);

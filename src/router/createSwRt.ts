@@ -1,24 +1,24 @@
 import {
-    createRouteX,
     createRoute,
-    RouteX,
-    RouteHandlerX,
+    createRouteX,
     Route,
     RouteHandler,
+    RouteHandlerX,
+    RouteX,
 } from "./createRoute.ts";
-import { createSwitcherX, createSwitcher } from "./createSwitcher.ts";
+import { createSwitcher, createSwitcherX } from "./createSwitcher.ts";
 
 export type RouteChainInit<R> = {
     route: <P extends string>(
         pattern: P,
         handler: RouteHandler<P, R>,
-        flags?: string
+        flags?: string,
     ) => RouteChain<R>;
 };
 export type RouteChainAdder<R> = <P extends string>(
     pattern: P,
     handler: RouteHandler<P, R>,
-    flags?: string
+    flags?: string,
 ) => RouteChain<R>;
 export type RouteChainFallback<R> = (handler: (url: string) => R) => {
     switcher: (url: string) => R;
@@ -33,16 +33,16 @@ export type RouteChainInitX<R, X> = {
     route: <P extends string>(
         pattern: P,
         handler: RouteHandlerX<P, X, R>,
-        flags?: string
+        flags?: string,
     ) => RouteChainX<R, X>;
 };
 export type RouteChainAdderX<R, X> = <P extends string>(
     pattern: P,
     handler: RouteHandlerX<P, X, R>,
-    flags?: string
+    flags?: string,
 ) => RouteChainX<R, X>;
 export type RouteChainFallbackX<R, X> = (
-    handler: (url: string, extra: X) => R
+    handler: (url: string, extra: X) => R,
 ) => {
     switcher: (url: string, extra: X) => R;
 };
@@ -148,7 +148,7 @@ export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
              * @returns object only contains the switcher
              */
             const fallback: RouteChainFallbackX<NonNullable<R>, X> = (
-                handler
+                handler,
             ) => {
                 return {
                     switcher: (url, extra) =>
