@@ -11,7 +11,7 @@ import { RouteHandlerX } from "./createRoute.ts";
 export function allowMethods<P extends string, R>(
     handler: RouteHandlerX<P, Request, R>,
     methods: string[],
-): RouteHandlerX<P, Request, R | null> {
+): RouteHandlerX<P, Request, R> {
     return (params, req) => {
         if (!methods.includes(req.method ?? "UNKNOWN")) return null;
         return handler(params, req);
