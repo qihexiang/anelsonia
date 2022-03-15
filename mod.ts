@@ -1,3 +1,3 @@
-export * from "./core/mod.ts";
-export * from "./router/mod.ts";
-export * from "./utils/mod.ts";
+export * from "./src/core/mod.ts";
+export * from "./src/router/mod.ts";
+export * from "./src/utils/mod.ts";
