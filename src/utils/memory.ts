@@ -46,6 +46,9 @@ export const CacheMap = <K extends Array<any>, V>() => {
                 ];
             }
         },
+        entries(): Readonly<K[]> {
+            return keyArray
+        }
     };
 };
 
@@ -69,6 +72,14 @@ export function memoryCache<F extends (...args: any[]) => any>(
             (...args) => {
                 const now = new Date().getTime();
                 const cached = cacheMapWithExpire.get(args);
+                setTimeout(() => {
+                    const entries = cacheMapWithExpire.entries();
+                    for (const entry of entries) {
+                        if (now - cacheMapWithExpire.get(entry)!.createdAt <= expire) {
+                            cacheMapWithExpire.delete(entry)
+                        }
+                    }
+                })
                 if (isVoid(cached, [undefined]) || now - cached.createdAt >= expire) {
                     return [args, (value) => {
                         cacheMapWithExpire.set(args, {
