@@ -1,4 +1,4 @@
-import { createWrapper } from "./createWrapper.ts";
+import { createProxy } from "./createWrapper.ts";
 import { isVoid } from "./isVoid.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -68,7 +68,7 @@ export function memoryCache<F extends (...args: any[]) => any>(
         ReturnValue
     >();
     return Number.isFinite(expire)
-        ? createWrapper<F>(
+        ? createProxy<F>(
             (...args) => {
                 const now = new Date().getTime();
                 const cached = cacheMapWithExpire.get(args);
@@ -81,7 +81,7 @@ export function memoryCache<F extends (...args: any[]) => any>(
                     }
                 })
                 if (isVoid(cached, [undefined]) || now - cached.createdAt >= expire) {
-                    return [args, (value) => {
+                    return [args, (value: ReturnType<F>) => {
                         cacheMapWithExpire.set(args, {
                             createdAt: new Date().getTime(),
                             value,
@@ -93,7 +93,7 @@ export function memoryCache<F extends (...args: any[]) => any>(
                 }
             },
         )(fn)
-        : createWrapper<F>(
+        : createProxy<F>(
             (...args) => {
                 const cached = cacheMapWithoutExpire.get(args);
                 if(isVoid(cached, [undefined])) {
