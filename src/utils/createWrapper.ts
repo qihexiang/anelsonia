@@ -68,7 +68,8 @@ export function echo<T>(value: T): T {
 }
 
 /**
- * @deprecated will be removed in 2.0.0, use `createProxy` instead
+ * @deprecated will be removed in 2.0.0, use `createProxy` instead.
+ * 
  * Add hooks to a synchronous original function, while the beforeHook is
  * synchrous too. The default type of target function is the same as
  * original function.
@@ -80,7 +81,8 @@ export function createWrapper<O extends Fn, T extends Fn | AsyncFn = O>(
     hook: (...args: Parameters<T>) => BeforeHookTuple<O, T>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
- * @deprecated will be removed in 2.0.0, use `createProxy` instead
+ * @deprecated will be removed in 2.0.0, use `createProxy` instead.
+ * 
  * Add hooks to a synchronous original function, while the beforeHook is
  * asynchronous. The target function is a asynchronous function, which is
  * different from the original one, so you need to declare it.
@@ -92,7 +94,8 @@ export function createWrapper<O extends Fn, T extends AsyncFn>(
     hook: (...args: Parameters<T>) => Promise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
- * @deprecated will be removed in 2.0.0, use `createProxy` instead
+ * @deprecated will be removed in 2.0.0, use `createProxy` instead.
+ * 
  * Add hooks to an asynchronous original function, while the beforeHook is
  * asynchronous too. The default type of target function is the same as the
  * original function.
@@ -104,7 +107,8 @@ export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
     hook: (...args: Parameters<T>) => Promise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
- * @deprecated will be removed in 2.0.0, use `createProxy` instead
+ * @deprecated will be removed in 2.0.0, use `createProxy` instead.
+ * 
  * Add hooks to an asynchronous original function, while the beforeHook is
  * synchronous. The default type of target function is the same as the
  * original function.
