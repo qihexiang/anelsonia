@@ -14,12 +14,12 @@ export function createProxy<F extends AsyncFn>(
     hook: (
         ...args: Parameters<F>
     ) => MaybePromise<BeforeHookTuple<F, F>>
-): (fn: F) => (...args: Parameters<F>) => ReturnType<F>;
+): (fn: F) => F;
 export function createProxy<F extends Fn>(
     hook: (
         ...args: Parameters<F>
     ) => BeforeHookTuple<F, F>
-): (fn: F) => (...args: Parameters<F>) => ReturnType<F>;
+): (fn: F) => F;
 export function createProxy<Origin extends Fn, Target extends Fn>(
     hook: (
         ...args: Parameters<Target>
@@ -31,14 +31,14 @@ export function createProxy<Origin extends Fn, Target extends Fn>(
             : (Target extends AsyncFn
                 ? MaybePromise<BeforeHookTuple<Origin, Target>>
                 : BeforeHookTuple<Origin, Target>)),
-): (fn: Origin) => (...args: Parameters<Target>) => ReturnType<Target>;
+): (fn: Origin) => Target;
 export function createProxy<Origin extends Fn, Target extends Fn>(
     hook: (
         ...args: Parameters<Target>
     ) => MaybePromise<BeforeHookTuple<Origin, Target>>,
-): (fn: Origin) => (...args: Parameters<Target>) => ReturnType<Target> {
+): (fn: Origin) => Target {
     return (fn) =>
-        (...args) => {
+        ((...args: Parameters<Target>) => {
             const mayPromiseTuple = hook(...args);
             if (mayPromiseTuple instanceof Promise) {
                 const promiseTuple = mayPromiseTuple;
@@ -54,7 +54,7 @@ export function createProxy<Origin extends Fn, Target extends Fn>(
                     ? (afterHook as () => ReturnType<Target>)()
                     : afterHook(fn(...originArgs));
             }
-        };
+        }) as Target;
 }
 
 /**
@@ -65,6 +65,16 @@ export function createProxy<Origin extends Fn, Target extends Fn>(
  */
 export function echo<T>(value: T): T {
     return value;
+}
+
+/**
+ * Wrap a value into a Promise
+ * 
+ * @param value the value to be wrapped
+ * @returns a Promisified value
+ */
+export function asyncEcho<T>(value: T): Promise<T> {
+    return Promise.resolve(value);
 }
 
 /**
