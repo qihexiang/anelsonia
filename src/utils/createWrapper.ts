@@ -166,14 +166,14 @@ export function createEffect<F extends (...args: any[]) => any>(
     ) => (r: Readonly<ReturnType<F>>) => void,
 ): (
         fn: (...args: Parameters<F>) => ReturnType<F>,
-    ) => (...args: Parameters<F>) => ReturnType<F> {
+    ) => F {
     return (fn) =>
-        (...p) => {
+        ((...p: Parameters<F>) => {
             const hookAfter = hook(...p);
             const r = fn(...p);
             hookAfter(r);
             return r;
-        };
+        }) as F;
 }
 
 /**
@@ -186,10 +186,10 @@ export function createEffect<F extends (...args: any[]) => any>(
  */
 export function createEffect4Any(hook: () => () => void) {
     return <F extends Fn>(fn: F): ((...args: Parameters<F>) => ReturnType<F>) =>
-        (...args: Parameters<F>) => {
+        ((...args: Parameters<F>) => {
             const hookAfter = hook();
             const r = fn(...args);
             hookAfter();
             return r as ReturnType<F>;
-        };
+        }) as F;
 }
