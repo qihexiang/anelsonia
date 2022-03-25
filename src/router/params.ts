@@ -1,9 +1,9 @@
 export type Empty = Record<never, never>;
 /**
- * Pattern `<T>` matches with symbol +, which means there must be at least one character,
- * Pattern `{T}` matches with symbol + like pattern `<T>`, but it's greedy.
- * Pattern `[T]` matches with symbol *, which means there can be 0 character, it's greedy too.
- * Pattern `[?T]` matches with symbol *, while `/` before it can be not existed if it's empty.
+ * Pattern `:<T>` matches with symbol +, which means there must be at least one character,
+ * Pattern `:{T}` matches with symbol + like pattern `<T>`, but it's greedy.
+ * Pattern `:[T]` matches with symbol *, which means there can be 0 character, it's greedy too.
+ * Pattern `:(T)` matches with symbol *, while `/` before it can be not existed if it's empty.
  */
 type NonGreedy<T extends string> = `:<${T}>`;
 type GreedyAtLeastOne<T extends string> = `:{${T}}`;
@@ -18,5 +18,3 @@ export type RouteParam<U extends string> = U extends RoutePattern<
     : RouteParam<R>
     : U extends ParamFlag<infer T> ? { [key in T]: U extends GreedyAtLeastZeroRemoveSlash<infer _N> ? string | undefined : string }
     : Empty;
-
-type Example = RouteParam<"/hello/:<username>/:(operation)">;
