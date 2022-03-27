@@ -289,6 +289,6 @@ export function computeStreamLazy<T>(initFn: () => T): ComputeStream<T> {
     };
 }
 
-export function fillNullable<T>(defaultValue: T): (value: T | undefined | null) => T {
+export function fillNullable<T>(defaultValue: NonNullable<T>): (value: T | undefined | null) => NonNullable<T> {
     return (value: T | undefined | null) => isVoid(value) ? defaultValue : value as NonNullable<T>;
 }
