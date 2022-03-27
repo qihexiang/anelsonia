@@ -241,8 +241,7 @@ export function computeLazy<T>(initValue: T): Computation<T> {
 
 type ComputeStream<T> = {
     map<R>(callbackFn: (value: Awaited<T>) => R): ComputeStream<T extends Promise<infer _M> ? R extends Promise<infer _AwaitedR> ? R : Promise<R> : R>;
-    mapNN<R>(callbackFn: (value: NonNullable<Awaited<T>>) => R): ComputeStream<T extends Promise<infer _N> ? R extends Promise<infer AwaitedR> ? Promise<AwaitedR | Extract<Awaited<T>, undefined | null>> : Promise<R | Extract<Awaited<T>, undefined | null>> : R | Extract<Awaited<T>, undefined | null>>;
-    get value(): T;
+    mapNN<R>(callbackFn: (value: NonNullable<Awaited<T>>) => R): ComputeStream<T extends Promise<infer _N> ? R extends Promise<infer AwaitedR> ? Promise<AwaitedR | Extract<Awaited<T>, undefined | null>> : Promise<R | Extract<Awaited<T>, undefined | null>> : R | Extract<Awaited<T>, undefined | null>>; get value(): T;
 };
 
 /**
@@ -261,7 +260,7 @@ export function computeStream<T>(initValue: T): ComputeStream<T> {
         return computeStream(initValue instanceof Promise ? initValue.then((value: Awaited<T>) => isVoid(value) ? value : callbackFn(value as NonNullable<Awaited<T>>)) : (isVoid(initValue) ? initValue as Extract<Awaited<T>, undefined | null> : callbackFn(initValue as NonNullable<Awaited<T>>)));
     }
     return {
-        map, mapNN, get value() {return initValue}
+        map, mapNN, get value() { return initValue; }
     };
 }
 
@@ -288,4 +287,8 @@ export function computeStreamLazy<T>(initFn: () => T): ComputeStream<T> {
     return {
         map, mapNN, get value() { return initFn(); }
     };
+}
+
+export function fillNullable<T>(defaultValue: T): (value: T | undefined | null) => T {
+    return (value: T | undefined | null) => isVoid(value) ? defaultValue : value as NonNullable<T>;
 }
