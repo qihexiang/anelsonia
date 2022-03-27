@@ -73,9 +73,10 @@ export function createRouteX<P extends string, X, R>(
 
 export function createRegExp<P extends string>(pattern: P, flags = "i") {
     const parsedPattern = pattern
-        .replaceAll(/:<.+?>/g, (matched) => `(?${matched.slice(1)}.+?)`)
+        .replaceAll(/:<.+?>/g, (matched) => `(?${matched.slice(1)}[^\/]+?)`)
         .replaceAll(/:\{.+?\}/g, (matched) => `(?${matched.slice(1).replace("{", "<").replace("}", ">")}.+)`)
         .replaceAll(/\/:\(?.+?\)/g, (matched) => `((/(?${matched.slice(2).replace("(", "<").replace(")", ">")}.*))?)`)
-        .replaceAll(/:\[.+?\]/g,  (matched) => `(?${matched.slice(1).replace("[", "<").replace("]", ">")}.*)`)
-    return new RegExp(`^${parsedPattern}$`, flags);
+        .replaceAll(/:\[.+?\]/g, (matched) => `(?${matched.slice(1).replace("[", "<").replace("]", ">")}.*)`);
+    const endsWithSlash = parsedPattern.endsWith("/");
+    return new RegExp(`^${parsedPattern}${endsWithSlash ? "" : "(\/?)"}$`, flags);
 }

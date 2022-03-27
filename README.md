@@ -25,9 +25,9 @@ import {
 } from "https://deno.land/x/freesia";
 import { serve } from "https://deno.land/std@0.127.0/http/server.ts";
 
-const { switcher } = createSwRtX
+const { switcher } = createSwRtX<string, Request>()
     .route(
-        "/hello/<username>/",
+        "/hello/:<username>",
         Get(async ({ username }) => createRes(`hello, ${username}`)),
     )
     .fallback(async (url, req) => createRes(404, `Can't ${req.method} ${url}`));
@@ -164,25 +164,30 @@ With `createRoute` function, you can create such a route like this:
 
 ```ts
 export const helloRoute = createRoute(
-    "/hello/<username>",
+    "/hello/:<username>",
     ({ username }) => createRes(`hello, ${username}`),
 );
 ```
 
-The handler parameters will be inferred automatically by the path patter you
+The handler parameters will be inferred automatically by the path pattern you
 give. Route params can be described in such ways:
 
-- `<ParamName>` non-greedily match at least one characters:
-  - `/user/<username>` can match `/user/hexiang` `(username` is `"hexiang"`) and
-    `/user/hexiang/avatar` (`username` is `"hexiang/avatar"`)
-  - `/user/<username>/` can match `/user/hexiang/` (`username` is `"hexiang"`)
-    but can't match `/user/hexiang/avatar` (un-matched after the third slash).
-- `<[ParamName]>` greedily match at least one characters:
-  - `/user/<username>/<[rest]>/` can match `/user/hexiang/avatar/` (`rest` is
+- `:<ParamName>` match at least one characters and stop at the first `/` found:
+  - `/user/:<username>` can match `/user/hexiang` `(username` is `"hexiang"`) and
+    `/user/hexiang/` (`username` is `"hexiang"`), but can't match `/user/hexiang/avatar`
+  - `/user/<username>/` can match `/user/hexiang/` (`username` is `"hexiang"`), and can't match `/user/hexiang`
+- `:{ParamName}` greedily match at least one characters:
+  - `/user/:<username>/:{rest}/` can match `/user/hexiang/avatar/` (`rest` is
     `"avatar"`) and `/user/hexiang/info/gender/` (`rest` is `"info/gender"`)
-- `[ParamName]` greedily match at least zero characters:
-  - `/files/[filepath]` can match `/files/README.md` and `/files/` (`filepath`
+  - `/user/:<username>/:{rest}` can match `/user/hexiang/avatar/` (`rest` is
+    `"avatar/"`) and `/user/hexiang/info/gender/` (`rest` is `"info/gender/"`)
+- `:[ParamName]` greedily match at least zero characters:
+  - `/files/:[filepath]` can match `/files/README.md` and `/files/` (`filepath`
     is `""`, and you may like to give a list of files under root directory under
+    this situation).
+- `:(ParamName)` greedily match at least zero characters, the slash before it can be non-existed:
+  - `/files/:(filepath)` can match `/files/README.md` and `/files` (`filepath`
+    is `undefied`, and you may like to give a list of files under root directory under
     this situation).
 
 `createRoute` returns a function that receive a string as paramters, and can
@@ -192,11 +197,11 @@ will return `null`. You can define many routes in practice:
 
 ```ts
 const helloRoute = createRoute(
-    "/hello/<username>",
+    "/hello/:<username>",
     ({ username }) => `hello, ${username}`,
 );
 const goodByeRoute = createRoute(
-    "/goodbye/<username>",
+    "/goodbye/:<username>",
     ({ username }) => `goodbye, ${username}`,
 );
 
@@ -226,11 +231,11 @@ can connect many routes together:
 
 ```ts
 const helloRoute = createRoute(
-    "/hello/<username>",
+    "/hello/:<username>",
     ({ username }) => `hello, ${username}`,
 );
 const goodByeRoute = createRoute(
-    "/goodbye/<username>",
+    "/goodbye/:<username>",
     ({ username }) => `goodbye, ${username}`,
 );
 const switcher = createSwitcher(helloRoute, goodByeRoute);
@@ -256,13 +261,10 @@ can specify the Union-Type in `createSwitcher<T>`.
 Another way to create switchers is using `createSwRt`, you can create routes and
 connect them to switcher at the same time.
 
-`createSwRt` is both a function and a namespace, `createSwRt()` is equals to
-`createSwRt`.
-
 ```ts
-const { switcher } = createSwRt
-    .route("/hello/<username>", ({ username }) => `hello, ${username}`)
-    .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
+const { switcher } = createSwRt<string, Request>()
+    .route("/hello/:<username>", ({ username }) => `hello, ${username}`)
+    .route("/goodbye/:<username>", ({ username }) => `goodbye, ${username}`)
     /**
      * fallback method will return a route function that will not return null,
      * if no patter matched, it will execute the fallback handler. If you don't
@@ -277,9 +279,6 @@ const main = async (req: HttpReq) => {
 };
 ```
 
-The return type is inferred by the first called `route` method, if you'd like to
-specify a union-type as generic type, use `route<T>`.
-
 ### X series route creators
 
 In practice, we need always pass `req` object as parameters, but either route
@@ -293,7 +292,7 @@ import goodByeRoute from "./route/goodBye";
 
 const main = async (req: HttpReq) => {
     const helloRoute = createRoute(
-        "/hello/<username>",
+        "/hello/:<username>",
         ({ username }) => helloHandler(username, req),
     );
     const switcher = createSwitcher(helloRoute, goodByeRoute);
@@ -316,12 +315,12 @@ argument and pass it to handlers on routing.
  * here, helloRoute can receive an extra parameter of HttpReq type.
  */
 const helloRoute = createRouteX(
-    "/hello/<username>",
+    "/hello/:<username>",
     async ({ username }, req: HttpReq) =>
         `hello, ${username} from, you send content: ${await req.text()}`,
 );
 const goodByeRoute = createRouteX(
-    "/goodbye/<username>",
+    "/goodbye/:<username>",
     /**
      * It's no problem ignore the extra parameter, it just
      * declare the same type with helloRoute.
@@ -342,14 +341,14 @@ const main = async (req: HttpReq) => {
 Example for `createSwRtX`:
 
 ```ts
-const { switcher } = createSwRtX
+const { switcher } = createSwRtX<string, Request>()
     .route(
-        "/hello/<username>",
+        "/hello/:<username>",
         ({ username }, req: HttpReq) =>
             `hello, ${username} from, you send content: ${await req.text()}`,
     )
     // No problem ignore extra parameter
-    .route("/goodbye/<username>", ({ username }) => `goodbye, ${username}`)
+    .route("/goodbye/:<username>", ({ username }) => `goodbye, ${username}`)
     // fallback handler will also  receive the extra parameter
     .fallback(
         (url, req) =>
@@ -370,9 +369,9 @@ limit in routing is supported with X series routes only, and the extra parameter
 must be `HttpReq`.
 
 ```ts
-const { switcher } = createSwRtX
+const { switcher } = createSwRtX<string, Request>()
     .route(
-        "/hello/<username>",
+        "/hello/:<username>",
         // As you use Get function to wrap the handler, the second parameter of handler is inferred as HttpReq
         Get(
             ({ username }, req) =>
