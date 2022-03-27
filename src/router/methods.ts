@@ -12,9 +12,9 @@ export function allowMethods<P extends string, X extends { method: string; }, R>
     handler: RouteHandlerX<P, X, R>,
     methods: string[],
 ): RouteHandlerX<P, X, R> {
-    return (params, req) => {
-        if (!methods.includes(req.method ?? "UNKNOWN")) return null;
-        return handler(params, req);
+    return (params, extra) => {
+        if (!methods.includes(extra.method)) return null;
+        return handler(params, extra);
     };
 }
 
