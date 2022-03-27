@@ -8,10 +8,10 @@ import { RouteHandlerX } from "./createRoute.ts";
  * @param methods all methods that can be use with this handler
  * @returns a handler that may return null if methods out of limitation
  */
-export function allowMethods<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function allowMethods<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
     methods: string[],
-): RouteHandlerX<P, Request, R> {
+): RouteHandlerX<P, X, R> {
     return (params, req) => {
         if (!methods.includes(req.method ?? "UNKNOWN")) return null;
         return handler(params, req);
@@ -26,8 +26,8 @@ export function allowMethods<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function All<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function All<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, [
         "GET",
@@ -47,8 +47,8 @@ export function All<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Get<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Get<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["GET"]);
 }
@@ -58,8 +58,8 @@ export function Get<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Head<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Head<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["HEAD"]);
 }
@@ -69,8 +69,8 @@ export function Head<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Post<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Post<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["POST"]);
 }
@@ -80,8 +80,8 @@ export function Post<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Put<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Put<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["PUT"]);
 }
@@ -91,8 +91,8 @@ export function Put<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Delete<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Delete<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["DELETE"]);
 }
@@ -102,8 +102,8 @@ export function Delete<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Connect<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Connect<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["CONNECT"]);
 }
@@ -113,8 +113,8 @@ export function Connect<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Options<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Options<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["OPTIONS"]);
 }
@@ -124,8 +124,8 @@ export function Options<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Trace<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Trace<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["TRACE"]);
 }
@@ -135,8 +135,8 @@ export function Trace<P extends string, R>(
  * @param handler the handler to be wrap.
  * @returns a wrapped handler.
  */
-export function Patch<P extends string, R>(
-    handler: RouteHandlerX<P, Request, R>,
+export function Patch<P extends string, X extends { method: string; }, R>(
+    handler: RouteHandlerX<P, X, R>,
 ) {
     return allowMethods(handler, ["PATCH"]);
 }
