@@ -372,7 +372,7 @@ must be `HttpReq`.
 const { switcher } = createSwRtX<string, Request>()
     .route(
         "/hello/:<username>",
-        // As you use Get function to wrap the handler, the second parameter of handler is inferred as HttpReq
+        // Using Get function means the extra arugment must have a method property with string type.
         Get(
             ({ username }, req) =>
                 `hello, ${username} from, you send content: ${await req
