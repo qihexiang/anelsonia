@@ -13,12 +13,12 @@ export type BeforeHookTuple<Origin extends Fn, Target extends Fn> = [
 export function createProxy<F extends AsyncFn>(
     hook: (
         ...args: Parameters<F>
-    ) => MaybePromise<BeforeHookTuple<F, F>>
+    ) => MaybePromise<BeforeHookTuple<F, F>>,
 ): (fn: F) => F;
 export function createProxy<F extends Fn>(
     hook: (
         ...args: Parameters<F>
-    ) => BeforeHookTuple<F, F>
+    ) => BeforeHookTuple<F, F>,
 ): (fn: F) => F;
 export function createProxy<Origin extends Fn, Target extends Fn>(
     hook: (
@@ -69,7 +69,7 @@ export function echo<T>(value: T): T {
 
 /**
  * Wrap a value into a Promise
- * 
+ *
  * @param value the value to be wrapped
  * @returns a Promisified value
  */
@@ -79,7 +79,7 @@ export function asyncEcho<T>(value: T): Promise<T> {
 
 /**
  * @deprecated will be removed in 2.0.0, use `createProxy` instead.
- * 
+ *
  * Add hooks to a synchronous original function, while the beforeHook is
  * synchrous too. The default type of target function is the same as
  * original function.
@@ -92,7 +92,7 @@ export function createWrapper<O extends Fn, T extends Fn | AsyncFn = O>(
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * @deprecated will be removed in 2.0.0, use `createProxy` instead.
- * 
+ *
  * Add hooks to a synchronous original function, while the beforeHook is
  * asynchronous. The target function is a asynchronous function, which is
  * different from the original one, so you need to declare it.
@@ -105,7 +105,7 @@ export function createWrapper<O extends Fn, T extends AsyncFn>(
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * @deprecated will be removed in 2.0.0, use `createProxy` instead.
- * 
+ *
  * Add hooks to an asynchronous original function, while the beforeHook is
  * asynchronous too. The default type of target function is the same as the
  * original function.
@@ -118,7 +118,7 @@ export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T>;
 /**
  * @deprecated will be removed in 2.0.0, use `createProxy` instead.
- * 
+ *
  * Add hooks to an asynchronous original function, while the beforeHook is
  * synchronous. The default type of target function is the same as the
  * original function.
@@ -132,8 +132,8 @@ export function createWrapper<O extends AsyncFn, T extends AsyncFn = O>(
 export function createWrapper<
     O extends Fn | AsyncFn,
     T extends Fn | AsyncFn = O,
-    >(
-        hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
+>(
+    hook: (...args: Parameters<T>) => MaybePromise<BeforeHookTuple<O, T>>,
 ): (fn: O) => (...args: Parameters<T>) => ReturnType<T> {
     return (fn) =>
         (...args) => {
@@ -165,8 +165,8 @@ export function createEffect<F extends (...args: any[]) => any>(
         ...args: Readonly<Parameters<F>>
     ) => (r: Readonly<ReturnType<F>>) => void,
 ): (
-        fn: (...args: Parameters<F>) => ReturnType<F>,
-    ) => F {
+    fn: (...args: Parameters<F>) => ReturnType<F>,
+) => F {
     return (fn) =>
         ((...p: Parameters<F>) => {
             const hookAfter = hook(...p);

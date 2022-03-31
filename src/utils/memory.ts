@@ -8,7 +8,9 @@ export const CacheMap = <K extends Array<any>, V>() => {
     const has = (key: K) => {
         const element = keyArray.find((k) => {
             return k.reduce(
-                (result, next, index) => result && (next === key[index] || Object.is(next, key[index])),
+                (result, next, index) =>
+                    result &&
+                    (next === key[index] || Object.is(next, key[index])),
                 true,
             );
         });
@@ -48,7 +50,7 @@ export const CacheMap = <K extends Array<any>, V>() => {
         },
         entries(): Readonly<K[]> {
             return keyArray;
-        }
+        },
     };
 };
 
@@ -61,7 +63,7 @@ export function memoryCache<F extends (...args: any[]) => any>(
     type ReturnValue = ReturnType<F>;
     const cacheMapWithExpire = CacheMap<
         FnParams,
-        { createdAt: number; value: ReturnValue; }
+        { createdAt: number; value: ReturnValue }
     >();
     const cacheMapWithoutExpire = CacheMap<
         FnParams,
@@ -75,12 +77,18 @@ export function memoryCache<F extends (...args: any[]) => any>(
                 setTimeout(() => {
                     const entries = cacheMapWithExpire.entries();
                     for (const entry of entries) {
-                        if (now - cacheMapWithExpire.get(entry)!.createdAt <= expire) {
+                        if (
+                            now - cacheMapWithExpire.get(entry)!.createdAt <=
+                                expire
+                        ) {
                             cacheMapWithExpire.delete(entry);
                         }
                     }
                 });
-                if (isVoid(cached, [undefined]) || now - cached.createdAt >= expire) {
+                if (
+                    isVoid(cached, [undefined]) ||
+                    now - cached.createdAt >= expire
+                ) {
                     return [args, (value: ReturnType<F>) => {
                         cacheMapWithExpire.set(args, {
                             createdAt: new Date().getTime(),
