@@ -255,7 +255,7 @@ function getResponser(
         if (longestConnection !== undefined)
             connectionTimer = setTimeout(() => res.end(), longestConnection)[Symbol.toPrimitive]();
         try {
-            const [body, status, ...headers] = await entry(req);
+            const [status, body, ...headers] = await entry(req);
             const statusCode = status instanceof Array ? status[0] : status;
             const statusText = status instanceof Array ? status[1] : undefined;
             const httpHeader = headers.reduce((current, next) => {
