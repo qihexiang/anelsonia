@@ -1,5 +1,4 @@
 export * from "./composeFn.js";
-export * from "./createEffect.js";
 export * from "./createWrapper.js";
 export * from "./MaybePromise.js";
 export * from "./jsonType.js";

@@ -1,41 +1,33 @@
 import { isVoid } from "./isVoid.js";
 import { MaybePromise } from "./MaybePromise.js";
 
-// deno-lint-ignore no-explicit-any
 export type Fn = (...args: any[]) => any;
-// deno-lint-ignore no-explicit-any
 export type AsyncFn = (...args: any[]) => Promise<any>;
-export type BeforeHookTuple<Origin extends Fn, Target extends Fn> = [
-    Parameters<Origin>,
-    (result: ReturnType<Origin>) => ReturnType<Target>,
-] | [null, () => ReturnType<Target>];
+export type BeforeHookTuple<Origin extends Fn, Target extends Fn> =
+    | [Parameters<Origin>, (result: ReturnType<Origin>) => ReturnType<Target>]
+    | [null, () => ReturnType<Target>];
 
 export function createProxy<F extends AsyncFn>(
-    hook: (
-        ...args: Parameters<F>
-    ) => MaybePromise<BeforeHookTuple<F, F>>
+    hook: (...args: Parameters<F>) => MaybePromise<BeforeHookTuple<F, F>>
 ): (fn: F) => F;
 export function createProxy<F extends Fn>(
-    hook: (
-        ...args: Parameters<F>
-    ) => BeforeHookTuple<F, F>
+    hook: (...args: Parameters<F>) => BeforeHookTuple<F, F>
 ): (fn: F) => F;
 export function createProxy<Origin extends Fn, Target extends Fn>(
     hook: (
         ...args: Parameters<Target>
-    ) =>
-        (Origin extends AsyncFn
-            ? (Target extends AsyncFn
-                ? MaybePromise<BeforeHookTuple<Origin, Target>>
-                : never)
-            : (Target extends AsyncFn
-                ? MaybePromise<BeforeHookTuple<Origin, Target>>
-                : BeforeHookTuple<Origin, Target>)),
+    ) => Origin extends AsyncFn
+        ? Target extends AsyncFn
+            ? MaybePromise<BeforeHookTuple<Origin, Target>>
+            : never
+        : Target extends AsyncFn
+        ? MaybePromise<BeforeHookTuple<Origin, Target>>
+        : BeforeHookTuple<Origin, Target>
 ): (fn: Origin) => Target;
 export function createProxy<Origin extends Fn, Target extends Fn>(
     hook: (
         ...args: Parameters<Target>
-    ) => MaybePromise<BeforeHookTuple<Origin, Target>>,
+    ) => MaybePromise<BeforeHookTuple<Origin, Target>>
 ): (fn: Origin) => Target {
     return (fn) =>
         ((...args: Parameters<Target>) => {
@@ -69,7 +61,7 @@ export function echo<T>(value: T): T {
 
 /**
  * Wrap a value into a Promise
- * 
+ *
  * @param value the value to be wrapped
  * @returns a Promisified value
  */
@@ -87,13 +79,11 @@ export function asyncEcho<T>(value: T): Promise<T> {
  * with side effect.
  */
 // deno-lint-ignore no-explicit-any
-export function createEffect<F extends (...args: any[]) => any>(
+export function createEffect<F extends Fn>(
     hook: (
         ...args: Readonly<Parameters<F>>
-    ) => (r: Readonly<ReturnType<F>>) => void,
-): (
-        fn: (...args: Parameters<F>) => ReturnType<F>,
-    ) => F {
+    ) => (r: Readonly<ReturnType<F>>) => void
+): (fn: (...args: Parameters<F>) => ReturnType<F>) => F {
     return (fn) =>
         ((...p: Parameters<F>) => {
             const hookAfter = hook(...p);
