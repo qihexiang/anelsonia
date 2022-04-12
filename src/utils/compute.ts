@@ -1,150 +1,57 @@
-import { baseCompose } from "./composeFn.js";
-import { isVoid } from "./isVoid.js";
+import { baseCompose } from "./composeFn.ts";
+import { isVoid } from "./isVoid.ts";
+import { MaybePromise } from "./MaybePromise.ts";
 
-export interface Computation<T> {
-    readonly map: <R>(fn: (t: T) => R) => Computation<R>;
-    readonly mapSkipNull: <R>(
-        nextFn: (r: NonNullable<T>) => R
-    ) => Computation<R | Extract<T, undefined | null>>;
-    readonly aMap: <R>(
-        fn: (t: Awaited<T>) => R
-    ) => Computation<Promise<Awaited<R>>>;
-    readonly aMapSkipNull: <R>(
-        fn: (t: NonNullable<Awaited<T>>) => R
-    ) => Computation<
-        Promise<Awaited<R> | Extract<Awaited<T>, undefined | null>>
-    >;
-    get value(): T;
+type ComputeStream<T> = {
+    map<R>(callbackFn: (value: Awaited<T>) => R): ComputeStream<T extends Promise<infer _M> ? R extends Promise<infer _AwaitedR> ? R : Promise<R> : R>;
+    mapNN<R>(callbackFn: (value: NonNullable<Awaited<T>>) => R): ComputeStream<T extends Promise<infer _N> ? R extends Promise<infer AwaitedR> ? Promise<AwaitedR | Extract<Awaited<T>, undefined | null>> : Promise<R | Extract<Awaited<T>, undefined | null>> : R | Extract<Awaited<T>, undefined | null>>; get value(): T;
+};
+
+/**
+ * @experimental will be stablized in v2.0.0
+ * 
+ * @param initValue Give a initial value to start the computation stream.
+ * @returns a container that contains the value.
+ */
+export function computeStream<T>(initValue: T): ComputeStream<T> {
+    function map<R>(callbackFn: T extends Promise<infer N> ? (value: N) => R : (value: T) => R): ComputeStream<T extends Promise<infer _M> ? R extends Promise<infer _AwaitedR> ? R : Promise<R> : R>;
+    function map<R>(callbackFn: (value: Awaited<T>) => R): ComputeStream<MaybePromise<R>> {
+        return computeStream(initValue instanceof Promise ? initValue.then((value: Awaited<T>) => callbackFn(value)) : callbackFn(initValue as Awaited<T>));
+    }
+    function mapNN<R>(callbackFn: T extends Promise<infer N> ? (value: NonNullable<N>) => R : (value: NonNullable<T>) => R): ComputeStream<T extends Promise<infer _N> ? R extends Promise<infer AwaitedR> ? Promise<AwaitedR | Extract<Awaited<T>, undefined | null>> : Promise<R | Extract<Awaited<T>, undefined | null>> : R | Extract<Awaited<T>, undefined | null>>;
+    function mapNN<R>(callbackFn: (value: NonNullable<Awaited<T>>) => R): ComputeStream<MaybePromise<R | Extract<Awaited<T>, undefined | null>>> {
+        return computeStream(initValue instanceof Promise ? initValue.then((value: Awaited<T>) => isVoid(value) ? value : callbackFn(value as NonNullable<Awaited<T>>)) : (isVoid(initValue) ? initValue as Extract<Awaited<T>, undefined | null> : callbackFn(initValue as NonNullable<Awaited<T>>)));
+    }
+    return {
+        map, mapNN, get value() { return initValue; }
+    };
 }
 
 /**
- * Compute a value in a chain.
- *
- * @param initValue The initial value
- * @returns Computation<T>
+ * @experimental will be stablized in v2.0.0
+ * 
+ * @param initFn Give a function that can return the value to start a lazy computation stream.
+ * @returns a container that contains the value.
  */
-export const compute = <T>(initValue: T): Computation<T> => {
+export function computeStreamLazy<T>(initFn: () => T): ComputeStream<T> {
+    function map<R>(callbackFn: T extends Promise<infer N> ? (value: N) => R : (value: T) => R): ComputeStream<T extends Promise<infer _M> ? R extends Promise<infer _AwaitedR> ? R : Promise<R> : R>;
+    function map<R>(callbackFn: (value: Awaited<T>) => R): ComputeStream<MaybePromise<R>> {
+        return computeStreamLazy(baseCompose<void, T, MaybePromise<R>>(initFn, (value: T) => {
+            return value instanceof Promise ? value.then((awaited: Awaited<T>) => callbackFn(awaited)) : callbackFn(value as Awaited<T>);
+        }));
+    }
+    function mapNN<R>(callbackFn: T extends Promise<infer N> ? (value: NonNullable<N>) => R : (value: NonNullable<T>) => R): ComputeStream<T extends Promise<infer _N> ? R extends Promise<infer AwaitedR> ? Promise<AwaitedR | Extract<Awaited<T>, undefined | null>> : Promise<R | Extract<Awaited<T>, undefined | null>> : R | Extract<Awaited<T>, undefined | null>>;
+    function mapNN<R>(callbackFn: (value: NonNullable<Awaited<T>>) => R): ComputeStream<MaybePromise<R | Extract<Awaited<T>, undefined | null>>> {
+        return computeStreamLazy(baseCompose<void, T, MaybePromise<R | Extract<Awaited<T>, undefined | null>>>(initFn, (value: T) => {
+            return value instanceof Promise ? value.then((awaited: Awaited<T>) => isVoid(awaited) ? awaited : callbackFn(awaited as NonNullable<Awaited<T>>)) :
+                isVoid(value) ? value as Extract<Awaited<T>, undefined | null> : callbackFn(value as NonNullable<Awaited<T>>);
+        }));
+    }
     return {
-        map: (fn) => compute(fn(initValue)),
-        mapSkipNull: (fn) =>
-            compute(
-                isVoid(initValue)
-                    ? (initValue as Extract<T, undefined | null>)
-                    : fn(initValue as NonNullable<T>)
-            ),
-        aMap: (fn) => {
-            type R = ReturnType<typeof fn>;
-            if (initValue instanceof Promise)
-                return compute(
-                    initValue.then((t: Awaited<T>) =>
-                        fn(t as Awaited<T>)
-                    ) as Promise<Awaited<R>>
-                );
-            return compute(
-                Promise.resolve(fn(initValue as Awaited<T>)) as Promise<
-                    Awaited<R>
-                >
-            );
-        },
-        aMapSkipNull: (fn) => {
-            type R = ReturnType<typeof fn>;
-            if (initValue instanceof Promise)
-                return compute(
-                    initValue.then((t: Awaited<T>) =>
-                        isVoid(t) ? t : fn(t as NonNullable<Awaited<T>>)
-                    ) as Promise<
-                        Awaited<R> | Extract<Awaited<T>, undefined | null>
-                    >
-                );
-            return compute(
-                Promise.resolve(
-                    fn(initValue as NonNullable<Awaited<T>>)
-                ) as Promise<Awaited<R>>
-            );
-        },
-        get value() {
-            return initValue;
-        },
+        map, mapNN, get value() { return initFn(); }
     };
-};
-
-export default compute;
-
-export interface Lazy<T> {
-    readonly map: <N>(nextFn: (r: T) => N) => Lazy<N>;
-    readonly mapSkipNull: <N>(
-        nextFn: (r: NonNullable<T>) => N
-    ) => Lazy<N | Extract<T, undefined | null>>;
-    readonly aMap: <N>(
-        nextFn: (t: Awaited<T>) => N
-    ) => Lazy<Promise<Awaited<N>>>;
-    readonly aMapSkipNull: <N>(
-        nextFn: (t: NonNullable<Awaited<T>>) => N
-    ) => Lazy<Promise<Awaited<N> | Extract<Awaited<T>, undefined | null>>>;
-    get value(): T;
 }
 
-export const lazy = <T>(fn: () => T): Lazy<T> => {
-    return {
-        map: (nextFn) =>
-            lazy(baseCompose<void, T, ReturnType<typeof nextFn>>(fn, nextFn)),
-        mapSkipNull: (nextFn) =>
-            lazy(
-                baseCompose<
-                    void,
-                    T,
-                    ReturnType<typeof nextFn> | Extract<T, undefined | null>
-                >(fn, (t: T) =>
-                    isVoid(t)
-                        ? (t as Extract<T, undefined | null>)
-                        : nextFn(t as NonNullable<T>)
-                )
-            ),
-        aMap: (nextFn) =>
-            lazy(
-                baseCompose<
-                    void,
-                    T,
-                    Promise<Awaited<ReturnType<typeof nextFn>>>
-                >(
-                    fn,
-                    async (
-                        t: T
-                    ): Promise<Awaited<ReturnType<typeof nextFn>>> => {
-                        const value = await t;
-                        return await nextFn(value as Awaited<T>);
-                    }
-                )
-            ),
-        aMapSkipNull: (nextFn) =>
-            lazy(
-                baseCompose<
-                    void,
-                    T,
-                    Promise<
-                        | Awaited<ReturnType<typeof nextFn>>
-                        | Extract<Awaited<T>, undefined | null>
-                    >
-                >(
-                    fn,
-                    async (
-                        t: T
-                    ): Promise<
-                        | Awaited<ReturnType<typeof nextFn>>
-                        | Extract<Awaited<T>, undefined | null>
-                    > => {
-                        const value = await t;
-                        if (isVoid(value)) return value;
-                        return await nextFn(value as NonNullable<Awaited<T>>);
-                    }
-                )
-            ),
-        get value() {
-            return fn();
-        },
-    };
-};
-
-export const computeLazy = <T>(initValue: T): Lazy<T> => {
-    return lazy(() => initValue);
-};
+export function fillNullable<T>(defaultValue: NonNullable<T>): (value: T | undefined | null) => NonNullable<T> {
+    return (value: T | undefined | null) => isVoid(value) ? defaultValue : value as NonNullable<T>;
+}
