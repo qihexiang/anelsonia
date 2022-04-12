@@ -1,14 +1,15 @@
 import { AsyncLocalStorage } from "async_hooks";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
-import { Stream } from "stream";
-import { ResponseProps } from "./Respond.js";
+import { Readable } from "stream";
+import { BinaryRespond } from "./Respond.js";
 import { Route } from "../router/createRoute.js";
+import MaybePromise from "../utils/MaybePromise.js";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;
 export type ReqHandler = (req: HttpReq, res: HttpRes) => void;
-export type EntryPoint = (req: HttpReq) => Promise<ResponseProps>;
+export type EntryPoint = (req: HttpReq) => MaybePromise<BinaryRespond>;
 
 const requests = new AsyncLocalStorage<HttpReq>();
 
@@ -250,16 +251,20 @@ function getResponser(
 ): () => Promise<void> {
     const { longestConnection, errHandler } = extraOptions;
     return async () => {
-        let connectionTimer: NodeJS.Timeout;
+        let connectionTimer: number | undefined;
         if (longestConnection !== undefined)
-            connectionTimer = setTimeout(() => res.end(), longestConnection);
+            connectionTimer = setTimeout(() => res.end(), longestConnection)[Symbol.toPrimitive]();
         try {
-            const { status, statusText, body, headers } = await entry(req);
-            if (res instanceof IncomingMessage && statusText !== undefined)
-                res.writeHead(status, statusText, headers);
-            res.writeHead(status, headers);
-            if (body instanceof Stream) {
-                body.pipe(res);
+            const [body, status, ...headers] = await entry(req);
+            const statusCode = status instanceof Array ? status[0] : status;
+            const statusText = status instanceof Array ? status[1] : undefined;
+            const httpHeader = headers.reduce((current, next) => {
+                return { ...current, ...next }
+            }, {})
+            if (statusText === undefined) res.writeHead(statusCode, httpHeader)
+            else res.writeHead(statusCode, statusText, httpHeader)
+            if (body instanceof Readable) {
+                body.pipe(res)
                 body.on("error", (err) => {
                     if (errHandler !== undefined) errHandler(err);
                     res.end(() => clearTimeout(connectionTimer));
@@ -269,9 +274,8 @@ function getResponser(
                     body.destroy();
                 });
             } else {
-                body
-                    ? res.end(body as Buffer | string)
-                    : res.end(() => clearTimeout(connectionTimer));
+                clearTimeout(connectionTimer)
+                body === null ? res.end() : res.end(body)
             }
         } catch (err) {
             if (errHandler !== undefined) errHandler(err);

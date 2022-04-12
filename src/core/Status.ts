@@ -1,4 +1,4 @@
-export enum Status {
+export enum StatusCode {
     Continue = 100,
     SwitchingProtocols = 101,
     Processing = 102,
@@ -59,4 +59,4 @@ export enum Status {
     NetworkAuthenticationRequired = 511,
 }
 
-export default Status;
+export default StatusCode;
