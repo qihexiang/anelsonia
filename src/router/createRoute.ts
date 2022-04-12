@@ -71,14 +71,30 @@ export function createRouteX<P extends string, X, R>(
     };
 }
 
-function createRegExp<P extends string>(pattern: P, flags = "i") {
+export function createRegExp<P extends string>(pattern: P, flags = "i") {
     const parsedPattern = pattern
-        .replace(/<.+?>/g, "(?$&.+?)")
-        .replace(/\]>\.\+\?/g, "]>.+")
-        .replace(/<\[/g, "<")
-        .replace(/\]>/, ">")
-        .replace(/\[.+?\]/g, "(?$&.*)")
-        .replace("[", "<")
-        .replace("]", ">");
-    return new RegExp(`^${parsedPattern}$`, flags);
+        .replaceAll(/:<.+?>/g, (matched) => `(?${matched.slice(1)}[^/]+?)`)
+        .replaceAll(
+            /:\{.+?\}/g,
+            (matched) =>
+                `(?${matched.slice(1).replace("{", "<").replace("}", ">")}.+)`
+        )
+        .replaceAll(
+            /\/:\(?.+?\)/g,
+            (matched) =>
+                `((/(?${matched
+                    .slice(2)
+                    .replace("(", "<")
+                    .replace(")", ">")}.*))?)`
+        )
+        .replaceAll(
+            /:\[.+?\]/g,
+            (matched) =>
+                `(?${matched.slice(1).replace("[", "<").replace("]", ">")}.*)`
+        );
+    const endsWithSlash = parsedPattern.endsWith("/");
+    return new RegExp(
+        `^${parsedPattern}${endsWithSlash ? "" : "(/?)"}$`,
+        flags
+    );
 }
