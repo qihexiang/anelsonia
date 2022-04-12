@@ -253,18 +253,20 @@ function getResponser(
     return async () => {
         let connectionTimer: number | undefined;
         if (longestConnection !== undefined)
-            connectionTimer = setTimeout(() => res.end(), longestConnection)[Symbol.toPrimitive]();
+            connectionTimer = setTimeout(() => res.end(), longestConnection)[
+                Symbol.toPrimitive
+            ]();
         try {
             const [status, body, ...headers] = await entry(req);
             const statusCode = status instanceof Array ? status[0] : status;
             const statusText = status instanceof Array ? status[1] : undefined;
             const httpHeader = headers.reduce((current, next) => {
-                return { ...current, ...next }
-            }, {})
-            if (statusText === undefined) res.writeHead(statusCode, httpHeader)
-            else res.writeHead(statusCode, statusText, httpHeader)
+                return { ...current, ...next };
+            }, {});
+            if (statusText === undefined) res.writeHead(statusCode, httpHeader);
+            else res.writeHead(statusCode, statusText, httpHeader);
             if (body instanceof Readable) {
-                body.pipe(res)
+                body.pipe(res);
                 body.on("error", (err) => {
                     if (errHandler !== undefined) errHandler(err);
                     res.end(() => clearTimeout(connectionTimer));
@@ -274,8 +276,8 @@ function getResponser(
                     body.destroy();
                 });
             } else {
-                clearTimeout(connectionTimer)
-                body === null ? res.end() : res.end(body)
+                clearTimeout(connectionTimer);
+                body === null ? res.end() : res.end(body);
             }
         } catch (err) {
             if (errHandler !== undefined) errHandler(err);
