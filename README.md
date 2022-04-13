@@ -21,7 +21,7 @@ import { shimHTTP, createRes } from "freesia";
 import { createServer } from "http";
 
 createServer(
-    shimHTTP(async (req: HttpReq) => createRes("hello, world"))
+    shimHTTP(async (req: HttpReq) => [200, 'hello, world', {'Content-Type': 'text/plain; charset=UTF-8'}])
 ).listen(8000);
 ```
 
@@ -31,54 +31,23 @@ It was clear and fully typed.
 
 When using Freesia, there is nothing like `app` object in express or koa. You need to write the entry function to handle request by your self. It should receive a parameter in type `HttpReq` (it's the union type of http and http2 request type), and return an object of `ResponseProps` type in asynchorous way. After that, you can use `shimHTTP` to transform it to a handler for `createServer` in `http` or `createSecureServer` in `http2`.
 
-### EntryPoint: main function
+### main function
 
-`EntryPoint` is a type that describe a main function in `Freesia`, it is defined as:
+Main function is a function that will handle a response, it receive a `HttpReq` as parameter, and return a `BinaryResponse` or `Promise<BinaryResponse>`. For example, a hello world response is `[200, 'hello, world', {'Content-Type': 'text/plain; charset=UTF-8'}]`, `200` is a status code, in full pattern, you can also specify a status message in this way: `[200, 'Ok']`; `'hello, world'` is the response body, it can be a string or `Uint8Array` (notice that `Buffer` in Node.js is extended from `Uint8Array`); `{'Content-Type': 'text/plain; charset=UTF-8'}` is the http headers.
 
-```ts
-type EntryPoint = (req: HttpReq) => Promise<ResponseProps>;
-```
-
-You need to implement a function of this type, to describe how you deal with a request.
-
-Process of this function and all function called by it (directly and indirectly) is a request handling process. Some special functions provided by freesia can be called only inside of this process.
-
-### ResponseProps and Respond
-
-`ResponseProps` is a interface of response object, it includes 4 properties:
-
--   `statusCode` valid http status code
--   `statusMessage` status message, can be set to `undefined`, and it's not work with HTTP/2
--   `body` response body, can be a `string`, `Buffer` or a `Readable` stream, or `undefined`
--   `headers` response headers, type of it is `Record<string, string>`
-
-It's difficult to create and operate such an object manually, and Freesia provides a interface `Respond` which has some methods to modify the object.
+You can create a fully-typed response with type `Respond<T>`, for example: 
 
 ```ts
-const response = createRes()
-    .setStatusCode(200)
-    .setStatusMessage("Ok")
-    .setBody("hello, world.")
-    .setHeaders("Content-Type", "text/plain; charset=UTF-8")
-    .setHeaders("Content-Length", 13);
+const response: Respond<{username: string, age: number, gender: "F" | "M"}> = [
+    200, {username: "SanZhang", age: 22, gender: "F"}, {"Content-Type": "application/json"}
+]
 ```
 
-The interface of `Respond` is extended from `ResponseProps` interface, and you can use `setXXX` methods to operate it.
-
-Except `setHeaders`, all other `setXXX` functions will replace existed value in the object and `setHeaders` will merge headers set newly into the existed headers. `setHeaders` provides many format of input, you can learn from [API document](https://qihexiang.github.io/freesia/classes/Respond.html#setHeaders)
-
-`createRes` function provides many overloads to help developers create such an object easily:
+Use `binarizeRes` function with a transformer to transform such a typed-responsd to a `BinaryResponse`:
 
 ```ts
-export function createRes(): Respond; // This will give you an empty response with 404
-export function createRes(code: Status): Respond; // This will give you a response with specified status
-export function createRes(body: ResponseBody): Respond; // This will give a response with specify body and status 200
-export function createRes(code: Status, body: ResponseBody): Respond; // specify status and body
-export function createRes(code: Status, headers: Headers): Respond; // specify status and headers
-export function createRes(body: ResponseBody, headers: Headers): Respond; // specify body and headers, default status is 200
+const bRes = binarizeRes(response, JSON.stringify)
 ```
-
-`Status` is a enum of HTTP status codes, for example, `Status.NotFound` is `404`, `Status.Ok` is `200`. If you think this is more Readable, you can use it to set status code instead of numbers.
 
 ### shimHTTP
 
