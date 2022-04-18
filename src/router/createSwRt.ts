@@ -20,13 +20,11 @@ export type RouteChainAdder<R> = <P extends string>(
     handler: RouteHandler<P, R>,
     flags?: string
 ) => RouteChain<R>;
-export type RouteChainFallback<R> = (handler: (url: string) => R) => {
-    switcher: (url: string) => R;
-};
+export type RouteChainFallback<R> = (handler: (url: string) => R) => (url: string) => R;
 export type RouteChain<R> = {
     route: RouteChainAdder<R>;
     fallback: RouteChainFallback<NonNullable<R>>;
-    switcher: Route<R>;
+    build: () => Route<R>;
 };
 
 export type RouteChainInitX<R, X> = {
@@ -43,13 +41,11 @@ export type RouteChainAdderX<R, X> = <P extends string>(
 ) => RouteChainX<R, X>;
 export type RouteChainFallbackX<R, X> = (
     handler: (url: string, extra: X) => R
-) => {
-    switcher: (url: string, extra: X) => R;
-};
+) => (url: string, extra: X) => R;
 export type RouteChainX<R, X> = {
     route: RouteChainAdderX<R, X>;
     fallback: RouteChainFallbackX<NonNullable<R>, X>;
-    switcher: RouteX<R, X>;
+    build: () => RouteX<R, X>;
 };
 
 /**
@@ -88,13 +84,11 @@ export function createSwRt<R>(): RouteChainInit<R> {
              * @param handler a handler receives url and return value
              * @returns object only contains the switcher
              */
-            const fallback: RouteChainFallback<NonNullable<R>> = (handler) => ({
-                switcher: (url) =>
-                    (createSwitcher(...routes)(url) as
-                        | NonNullable<R>
-                        | null
-                        | undefined) ?? handler(url),
-            });
+            const fallback: RouteChainFallback<NonNullable<R>> = (handler) => (url) =>
+                (createSwitcher(...routes)(url) as
+                    | NonNullable<R>
+                    | null
+                    | undefined) ?? handler(url)
             /**
              * Add another route to the switcher.
              *
@@ -104,9 +98,9 @@ export function createSwRt<R>(): RouteChainInit<R> {
              */
             const route: RouteChainAdder<R> = (pattern, handler, flags) => {
                 routes = [...routes, createRoute(pattern, handler, flags)];
-                return { route, switcher: createSwitcher(...routes), fallback };
+                return { route, build: () => createSwitcher(...routes), fallback };
             };
-            return { route, switcher: createSwitcher(...routes), fallback };
+            return { route, build: () => createSwitcher(...routes), fallback };
         },
     };
 }
@@ -149,15 +143,11 @@ export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
              */
             const fallback: RouteChainFallbackX<NonNullable<R>, X> = (
                 handler
-            ) => {
-                return {
-                    switcher: (url, extra) =>
-                        (createSwitcherX(...routes)(url, extra) as
-                            | NonNullable<R>
-                            | null
-                            | undefined) ?? handler(url, extra),
-                };
-            };
+            ) => (url, extra) =>
+                    (createSwitcherX(...routes)(url, extra) as
+                        | NonNullable<R>
+                        | null
+                        | undefined) ?? handler(url, extra)
             /**
              * Add another extend route to the switcher.
              *
@@ -170,13 +160,13 @@ export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
                 return {
                     route,
                     fallback,
-                    switcher: createSwitcherX(...routes),
+                    build: () => createSwitcherX(...routes),
                 };
             };
             return {
                 route,
                 fallback,
-                switcher: createSwitcherX(...routes),
+                build: () => createSwitcherX(...routes),
             };
         },
     };
