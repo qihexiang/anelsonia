@@ -8,10 +8,11 @@ import { Respond } from "./Respond.js";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;
+export type BasicRespond = MaybePromise<Respond<string | Uint8Array | Readable>>
 export type ReqHandler = (req: HttpReq, res: HttpRes) => void;
 export type EntryPoint = (
     req: HttpReq
-) => MaybePromise<Respond<string | Uint8Array | Readable | undefined>>;
+) => BasicRespond;
 
 const requests = new AsyncLocalStorage<HttpReq>();
 
