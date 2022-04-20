@@ -79,7 +79,7 @@ export function useURL<T>(
     const url = new URL(path, `http://${host}`);
     if (prop === "query") return url.searchParams;
     if (prop === undefined) return url;
-    return prop(path);
+    return prop(url.pathname);
 }
 
 interface CreateContext {
