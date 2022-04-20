@@ -2,14 +2,14 @@ import { AsyncLocalStorage } from "async_hooks";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Readable } from "stream";
-import { BinaryRespond } from "./Respond.js";
 import { Route } from "../router/createRoute.js";
 import MaybePromise from "../utils/MaybePromise.js";
+import { Respond } from "./Respond.js";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;
 export type ReqHandler = (req: HttpReq, res: HttpRes) => void;
-export type EntryPoint = (req: HttpReq) => MaybePromise<BinaryRespond>;
+export type EntryPoint = (req: HttpReq) => MaybePromise<Respond<string | Uint8Array | Readable | undefined>>;
 
 const requests = new AsyncLocalStorage<HttpReq>();
 
@@ -257,7 +257,7 @@ function getResponser(
                 Symbol.toPrimitive
             ]();
         try {
-            const [status, body, ...headers] = await entry(req);
+            const [body, status, ...headers] = await entry(req);
             const statusCode = status instanceof Array ? status[0] : status;
             const statusText = status instanceof Array ? status[1] : undefined;
             const httpHeader = headers.reduce((current, next) => {
@@ -277,7 +277,7 @@ function getResponser(
                 });
             } else {
                 clearTimeout(connectionTimer);
-                body === null ? res.end() : res.end(body);
+                body === undefined ? res.end() : res.end(body);
             }
         } catch (err) {
             if (errHandler !== undefined) errHandler(err);

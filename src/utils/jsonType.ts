@@ -17,5 +17,5 @@ export type JsonType = JsonObject | JsonArray | BasicJSONTypes | HasToJSON;
  * @returns Respond with json content
  */
 export const resJson = <T extends JsonType>(json: T): Respond<T> => {
-    return [200, json];
+    return [json, 200];
 };
