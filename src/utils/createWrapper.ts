@@ -7,12 +7,34 @@ export type BeforeHookTuple<Origin extends Fn, Target extends Fn> =
     | [Parameters<Origin>, (result: ReturnType<Origin>) => ReturnType<Target>]
     | [null, () => ReturnType<Target>];
 
+/**
+ * Create a proxy for an asynchronous function.
+ *
+ * @param hook is a function that executed before original function which
+ * returns arguments of original function, and a function executed after
+ * the original function, and returns a handled return value.
+ */
 export function createProxy<F extends AsyncFn>(
     hook: (...args: Parameters<F>) => MaybePromise<BeforeHookTuple<F, F>>
 ): (fn: F) => F;
+/**
+ * Create a proxy for an synchronous function.
+ *
+ * @param hook is a function that executed before original function which
+ * returns arguments of original function, and a function executed after
+ * the original function, and returns a handled return value.
+ */
 export function createProxy<F extends Fn>(
     hook: (...args: Parameters<F>) => BeforeHookTuple<F, F>
 ): (fn: F) => F;
+/**
+ * Create a proxy that will change parameters type or returns type from
+ * the origin one.
+ *
+ * @param hook is a function that receive the parameters of the new function,
+ * and returns arguments of the original function and an after-hook that
+ * returns the value of new function.
+ */
 export function createProxy<Origin extends Fn, Target extends Fn>(
     hook: (
         ...args: Parameters<Target>

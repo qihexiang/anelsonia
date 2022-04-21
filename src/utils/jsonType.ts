@@ -8,6 +8,10 @@ export type JsonObject = {
     [key: string | number]: JsonType;
 };
 export type JsonArray = JsonType[];
+/**
+ * JSON type is something that can be serialize with JSON.stringify without
+ * dropping anything.
+ */
 export type JsonType = JsonObject | JsonArray | BasicJSONTypes | HasToJSON;
 
 /**

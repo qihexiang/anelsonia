@@ -14,7 +14,7 @@ export type RouteX<R, X> = (url: string, extra: X) => R | null;
  * Create a route that request can get in.
  *
  * @param pattern specify the url matching pattern,
- * like `/user/<username>/<age>/<[extra]>/` can match url
+ * like `/user/:<username>/:<age>/:{extra}/` can match url
  * `/user/miku/10/other/many/arguments/?timestamp=1641891955803`.
  *
  * @param handler is a function that can receive route matched
@@ -44,7 +44,7 @@ export function createRoute<P extends string, R>(
  * Create a route that request can get in.
  *
  * @param pattern specify the url matching pattern,
- * like `/user/<username>/<age>/<[extra]>` can match url
+ * like `/user/:<username>/:<age>/:{extra}/` can match url
  * `/user/miku/10/other/many/arguments/?timestamp=1641891955803`.
  *
  * @param handler is a function that can receive route matched

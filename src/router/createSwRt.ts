@@ -51,23 +51,8 @@ export type RouteChainX<R, X> = {
 };
 
 /**
- * Create a extended switcher and extended routes connect to it at the same time.
- *
- * It returns an object include a `switcher` function and a `route` function, you can
- * use `switcher` function as a switcher, or use `route` function to add one more
- * route to the switcher.
- *
- * For example, you can use it like this:
- *
- * ```js
- * const { switcher } = createSwRt()
- *     .route('/user/<username>/<age>', (p, q) => `User ${p.username} is ${p.age}`)
- *     .route('/user/<username>/hello', (p, q) => `hello, ${p.username}`)
- *
- * const reuslt = switcher(url)
- * ```
- *
- * @returns a route function and switcher function.
+ * Create a switcher and registry some routes to it.
+ * @returns
  */
 export function createSwRt<R>(): RouteChainInit<R> {
     return {
@@ -113,23 +98,8 @@ export function createSwRt<R>(): RouteChainInit<R> {
 }
 
 /**
- * Create a extended switcher and extended routes connect to it at the same time.
- *
- * It returns an object include a `switcher` function and a `route` function, you can
- * use `switcher` function as a switcher, or use `route` function to add one more
- * route to the switcher.
- *
- * For example, you can use it like this:
- *
- * ```ts
- * const { switcher } = createExtendSwRt<string, Request>()
- *     .route('/user/<username>/<age>', (p, q, x) => `User ${p.username} is ${p.age}, request from ${x.ip}`)
- *     .route('/user/<username>/hello', (p, q, x) => `hello, ${p.username}, request from ${x.ip}`)
- *
- * const reuslt = switcher(url, req)
- * ```
- *
- * @returns a route function and switcher function.
+ * Create a extended switcher and registry some routes to it.
+ * @returns
  */
 export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
     return {

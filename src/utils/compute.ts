@@ -25,7 +25,7 @@ type ComputeStream<T> = {
 };
 
 /**
- * @experimental will be stablized in v2.0.0
+ * Create a computation stream.
  *
  * @param initValue Give a initial value to start the computation stream.
  * @returns a container that contains the value.
@@ -87,7 +87,7 @@ export function computeStream<T>(initValue: T): ComputeStream<T> {
 }
 
 /**
- * @experimental will be stablized in v2.0.0
+ * Create a computation stream with lazy-computation features
  *
  * @param initFn Give a function that can return the value to start a lazy computation stream.
  * @returns a container that contains the value.
