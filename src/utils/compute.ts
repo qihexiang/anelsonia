@@ -1,6 +1,6 @@
-import { baseCompose } from "./composeFn.js";
-import { isVoid } from "./isVoid.js";
-import { MaybePromise } from "./MaybePromise.js";
+import { baseCompose } from "./composeFn";
+import { isVoid } from "./isVoid";
+import { MaybePromise } from "./MaybePromise";
 
 type ComputeStream<T> = {
     map<R>(

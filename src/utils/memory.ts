@@ -1,5 +1,5 @@
-import { createProxy } from "./createWrapper.js";
-import { isVoid } from "./isVoid.js";
+import { createProxy } from "./createWrapper";
+import { isVoid } from "./isVoid";
 
 export const CacheMap = <K extends Array<any>, V>() => {
     let keyArray: K[] = [];

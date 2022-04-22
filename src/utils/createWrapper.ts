@@ -1,5 +1,5 @@
-import { isVoid } from "./isVoid.js";
-import { MaybePromise } from "./MaybePromise.js";
+import { isVoid } from "./isVoid";
+import { MaybePromise } from "./MaybePromise";
 
 export type Fn = (...args: any[]) => any;
 export type AsyncFn = (...args: any[]) => Promise<any>;

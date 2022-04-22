@@ -1,4 +1,4 @@
-import { Route, RouteX } from "./createRoute.js";
+import { Route, RouteX } from "./createRoute";
 
 /**
  * Create a switcher connected to many routes.

@@ -2,9 +2,9 @@ import { AsyncLocalStorage } from "async_hooks";
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Readable } from "stream";
-import { Route } from "../router/createRoute.js";
-import MaybePromise from "../utils/MaybePromise.js";
-import { Respond } from "./Respond.js";
+import { Route } from "../router/createRoute";
+import MaybePromise from "../utils/MaybePromise";
+import { Respond } from "./Respond";
 
 export type HttpReq = IncomingMessage | Http2ServerRequest;
 export type HttpRes = ServerResponse | Http2ServerResponse;
@@ -216,14 +216,14 @@ export const createContextN: CreateContextN = <T>(
 };
 
 /**
- * Transform an entry function to Node.js HTTP request handler
+ * Transform an entry function to Node HTTP request handler
  *
  * @param entry a function receives request object and return a reponse object.
  * @param extraOptions {errHandler, longestConnection}
  * - errHandler is a function that can handler errors on request,
  * - longestConnection is the longest timeout for a response handling and transporting, unit is ms.
  * - noMagical is a boolean. It it's true, all magical functions will be disabled. This may provides better performance.
- * @returns a handler function for Node.js `http`、`https`、`http2` modules
+ * @returns a handler function for Node `http`、`https`、`http2` modules
  */
 export function shimHTTP(
     entry: EntryPoint,

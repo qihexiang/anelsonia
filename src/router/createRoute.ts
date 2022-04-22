@@ -1,4 +1,4 @@
-import { RouteParam } from "./params.js";
+import { RouteParam } from "./params";
 
 export type RouteHandler<P extends string, R> = (
     params: RouteParam<P>
