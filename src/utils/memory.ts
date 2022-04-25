@@ -57,11 +57,11 @@ export const CacheMap = <K extends Array<any>, V>() => {
  * Create a cache wrapper for a function. The wrapped function
  * will return the cached value if found the same arguments. Comparation
  * rule is same-value-zero.
- * 
+ *
  * ***Be carefull! This may lead to OOM!*** You should only employ this
  * wrapper to a simple caculation function, and do not use Inifity as the
  * expire time.
- * 
+ *
  * @param fn the original function.
  * @param expire the time that a cached expired. Default to Inifinity
  * @returns a wrapped function.
