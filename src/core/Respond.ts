@@ -26,7 +26,9 @@ export type HttpHeader = { [headerName: string]: string | string[] };
 export type Respond<T> = [T | undefined, Status, ...HttpHeader[]];
 export type Trasnformer<T, N> = (
     body: T | undefined,
-) => MaybePromise<N | undefined>;
+    status: Status,
+    headers: HttpHeader[]
+) => MaybePromise<Respond<N>>;
 
 /**
  * Create a Respond with a body.
@@ -62,29 +64,33 @@ export function response<T>(
     ...headers: HttpHeader[]
 ): Respond<T>;
 /**
- * Convert the body type of a Respond
- *
- * @param res
- * @param transformer
+ * Rebuild a response with a synchronous function
+ * 
+ * @param res 
+ * @param transformer 
  */
 export function response<T, N>(
     res: Respond<T>,
     transformer: (
         body: T | undefined,
-    ) => N | undefined
-): N extends Promise<infer R> ? Promise<Respond<R>> : Respond<N>;
-// /**
-//  * Convert the body type of a Respond with an asynchronous function
-//  *
-//  * @param res
-//  * @param transformer
-//  */
-// export function response<T, N>(
-//     res: Respond<T>,
-//     transformer: (
-//         body: T | undefined
-//     ) => Promise<N>
-// ): Promise<Respond<N>>;
+        status: Status,
+        headers: HttpHeader[]
+    ) => Respond<N>
+): Respond<N>;
+/**
+ * Rebuild a response with a asynchronous function
+ * 
+ * @param res 
+ * @param transformer 
+ */
+export function response<T, N>(
+    res: Respond<T>,
+    transformer: (
+        body: T | undefined,
+        status: Status,
+        headers: HttpHeader[]
+    ) => Promise<Respond<N>>
+): Promise<Respond<N>>;
 export function response<T, N>(
     arg1: T | undefined | Respond<T>,
     arg2?: Status | Trasnformer<T, N> | HttpHeader,
@@ -99,9 +105,7 @@ export function response<T, N>(
             const res = arg1 as Respond<T>;
             const transformer = arg2;
             const [body, status, ...headers] = res;
-            const transformed = transformer(body)
-            if(transformed instanceof Promise) return transformed.then(nBody => ([nBody, status, ...headers]))
-            else return [transformed, status, ...headers]
+            return transformer(body, status, headers);
         } else if (typeof arg2 === "number" || arg2 instanceof Array) {
             const body = arg1 as T | undefined;
             const status = arg2 as Status;
