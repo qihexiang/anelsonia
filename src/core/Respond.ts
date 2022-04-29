@@ -65,9 +65,9 @@ export function response<T>(
 ): Respond<T>;
 /**
  * Rebuild a response with a synchronous function
- * 
- * @param res 
- * @param transformer 
+ *
+ * @param res
+ * @param transformer
  */
 export function response<T, N>(
     res: Respond<T>,
@@ -79,9 +79,9 @@ export function response<T, N>(
 ): Respond<N>;
 /**
  * Rebuild a response with a asynchronous function
- * 
- * @param res 
- * @param transformer 
+ *
+ * @param res
+ * @param transformer
  */
 export function response<T, N>(
     res: Respond<T>,

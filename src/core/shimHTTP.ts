@@ -222,7 +222,6 @@ export const createContextN: CreateContextN = <T>(
  * @param extraOptions {errHandler, longestConnection}
  * - errHandler is a function that can handler errors on request,
  * - longestConnection is the longest timeout for a response handling and transporting, unit is ms.
- * - noMagical is a boolean. It it's true, all magical functions will be disabled. This may provides better performance.
  * @returns a handler function for Node `http`、`https`、`http2` modules
  */
 export function shimHTTP(
@@ -230,17 +229,10 @@ export function shimHTTP(
     extraOptions?: {
         errHandler?: (err: any) => void;
         longestConnection?: number;
-        noMagical?: boolean;
     }
 ): ReqHandler {
-    if (extraOptions?.noMagical === true)
-        return (req, res) => getResponser(req, res, entry, extraOptions)();
-    else
-        return (req, res) =>
-            requests.run(
-                req,
-                getResponser(req, res, entry, extraOptions ?? {})
-            );
+    return (req, res) =>
+        requests.run(req, getResponser(req, res, entry, extraOptions ?? {}));
 }
 
 function getResponser(
