@@ -1,5 +1,5 @@
-type Void = undefined | null;
-type Voids<T extends Void> = T[];
+export type Void = undefined | null;
+export type Voids<T extends Void> = T[];
 
 /**
  * Find out if the value is null or undefined.

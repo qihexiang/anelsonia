@@ -252,37 +252,31 @@ const res = switcher(pathname);
 
 ### Methods limit
 
-`allowMethods` wrapper can limit request method of a route handler, for example:
+Use an object instead of a function to dispatch requests to different handlers by request methods. For example, 
 
 ```ts
-const getUserInfoRt = createRoute(
-    "/user/:<username>/info",
-    allowMethods(userInfoHandler, ["GET"])
-);
+const getUserInfoRt = createRoute("/user/:<username>/info", {
+    GET: getUserInfoHandler,
+    PUT: updateUserInfoHandler
+});
 ```
 
-The wrapped function will return `null` if request method is not included in the list.
-
-Wrappers named `Get`, `Post`, `Put`, etc provides a shortcut of limit single method for a handler:
-
 ```ts
-const getUserInfoRt = createRoute(
-    "/user/:<username>/info",
-    Get(userInfoHandler)
-);
+const getUserInfoRt = createRoute("/user/:<username>/info", {
+    GET: userInfoHandler,
+});
 ```
 
 It also works in `createSwRt`:
 
 ```ts
 const switcher = createSwRt<Respond<BinaryLike>>()
-    .route("/hello/:<username>", Get(helloHandler))
-    .route("/goodbye/:<username>", Get(goodbyeHandler))
-    .route(
-        "/update_info/:<username>/:<operate>/:[restArgs]",
-        Put(updateInfoHandler)
-    )
-    .route("/user/:<usrename>/disable", Put(disableUserHandler))
+    .route("/hello/:<username>", { GET: helloHandler })
+    .route("/goodbye/:<username>", { GET: goodbyeHandler })
+    .route("/update_info/:<username>/:<operate>/:[restArgs]", {
+        PUT: updateInfoHandler,
+    })
+    .route("/user/:<usrename>/disable", { Put: disableUserHandler })
     .fallback((url) => response(`No route matched url ${url}`, 404));
 const res = switcher(pathname);
 ```
@@ -434,9 +428,9 @@ Look at docs of [createProxy](https://qihexiang.github.io/freesia/modules.html#c
 
 ### Others
 
-- resJson
-- isVoid
-- memoryCache
-- rateLimiter
+-   resJson
+-   isVoid
+-   memoryCache
+-   rateLimiter
 
 Find their docs in the [GitHub Pages](https://qihexiang.github.io/freesia/)

@@ -2,7 +2,7 @@ import { baseCompose } from "./composeFn";
 import { isVoid } from "./isVoid";
 import { MaybePromise } from "./MaybePromise";
 
-type ComputeStream<T> = {
+export type ComputeStream<T> = {
     map<R>(
         callbackFn: (value: Awaited<T>) => R
     ): ComputeStream<

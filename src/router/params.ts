@@ -1,9 +1,9 @@
 export type Empty = Record<never, never>;
 
-type NonGreedy<T extends string> = `:<${T}>`;
-type GreedyAtLeastOne<T extends string> = `:{${T}}`;
-type GreedyAtLeastZero<T extends string> = `:[${T}]`;
-type GreedyAtLeastZeroRemoveSlash<T extends string> = `:(${T})`;
+export type NonGreedy<T extends string> = `:<${T}>`;
+export type GreedyAtLeastOne<T extends string> = `:{${T}}`;
+export type GreedyAtLeastZero<T extends string> = `:[${T}]`;
+export type GreedyAtLeastZeroRemoveSlash<T extends string> = `:(${T})`;
 export type ParamFlag<T extends string> =
     | NonGreedy<T>
     | GreedyAtLeastOne<T>
