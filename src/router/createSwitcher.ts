@@ -11,13 +11,13 @@ import { Route, RouteX } from "./createRoute";
  *
  * @returns a function that receive a string as argument, if the
  * string matched the pattern, call the handler and return its
- * result, otherwise return null.
+ * result, otherwise return undefined.
  */
 export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
-    return (url: string): R | null =>
-        routes.reduce<R | null>(
+    return (url: string): R | undefined =>
+        routes.reduce<R | undefined>(
             (lastRouted, nextRoute) => lastRouted ?? nextRoute(url),
-            null
+            undefined
         );
 }
 
@@ -33,12 +33,12 @@ export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
  * @returns a function that receive a string argument and
  * a extra arugment, if the string matched the pattern,
  * call the handler and return its result, otherwise return
- * null.
+ * undefined.
  */
 export function createSwitcherX<R, X>(...routes: RouteX<R, X>[]): RouteX<R, X> {
-    return (url: string, extra: X): R | null =>
-        routes.reduce<R | null>(
+    return (url: string, extra: X): R | undefined =>
+        routes.reduce<R | undefined>(
             (lastRouted, nextRoute) => lastRouted ?? nextRoute(url, extra),
-            null
+            undefined
         );
 }

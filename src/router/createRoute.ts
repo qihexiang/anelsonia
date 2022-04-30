@@ -3,16 +3,16 @@ import { RouteParam } from "./params";
 
 export type RouteHandler<P extends string, R> =
     | {
-          [method: string]: (params: RouteParam<P>) => R | null;
+          [method: string]: (params: RouteParam<P>) => R | undefined;
       }
-    | ((params: RouteParam<P>) => R | null);
-export type Route<R> = (url: string) => R | null;
+    | ((params: RouteParam<P>) => R | undefined);
+export type Route<R> = (url: string) => R | undefined;
 export type RouteHandlerX<P extends string, X, R> =
     | {
-          [method: string]: (params: RouteParam<P>, extra: X) => R | null;
+          [method: string]: (params: RouteParam<P>, extra: X) => R | undefined;
       }
-    | ((params: RouteParam<P>, extra: X) => R | null);
-export type RouteX<R, X> = (url: string, extra: X) => R | null;
+    | ((params: RouteParam<P>, extra: X) => R | undefined);
+export type RouteX<R, X> = (url: string, extra: X) => R | undefined;
 
 /**
  * Create a route that request can get in.
@@ -27,7 +27,7 @@ export type RouteX<R, X> = (url: string, extra: X) => R | null;
  *
  * @returns a function that receive a string as argument, if the
  * string matched the pattern, call the handler and return its
- * result, otherwise return null.
+ * result, otherwise return undefined.
  */
 export function createRoute<P extends string, R>(
     pattern: P,
@@ -44,7 +44,7 @@ export function createRoute<P extends string, R>(
         if (matched && typeof handlers === "object" && method in handlers) {
             return handlers[method](matched.groups as RouteParam<P>);
         }
-        return null;
+        return undefined;
     };
 }
 
@@ -62,7 +62,7 @@ export function createRoute<P extends string, R>(
  * @returns a function that receive a string argument and
  * a extra arugment, if the string matched the pattern,
  * call the handler and return its result, otherwise return
- * null.
+ * undefined.
  */
 export function createRouteX<P extends string, X, R>(
     pattern: P,
@@ -79,7 +79,7 @@ export function createRouteX<P extends string, X, R>(
         if (matched && typeof handlers === "object" && method in handlers) {
             return handlers[method](matched.groups as RouteParam<P>, extra);
         }
-        return null;
+        return undefined;
     };
 }
 

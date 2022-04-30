@@ -11,7 +11,7 @@ export interface Condition<T, R extends string> {
         handler: (reality: R) => T
     ) => Condition<T, R>;
     withDefault: (handler: (reality: R) => T) => T;
-    getValue: () => T | null;
+    getValue: () => T | undefined;
 }
 
 export function condition<R extends string>(reality: R): ConditionInit<R> {
@@ -25,7 +25,7 @@ export function condition<R extends string>(reality: R): ConditionInit<R> {
          */
         match: (pattern, handler) => {
             type T = ReturnType<typeof handler>;
-            let result: T | null = null;
+            let result: T | undefined = undefined;
             if (pattern instanceof RegExp && pattern.exec(reality)) {
                 result = handler(reality);
             }
@@ -42,7 +42,7 @@ export function condition<R extends string>(reality: R): ConditionInit<R> {
              */
             const getValue: Condition<T, R>["getValue"] = () => result;
             /**
-             * Get the final value, if it's null, using a default
+             * Get the final value, if it's undefined, using a default
              * handler to generate one.
              *
              * @param handler a handler receives the condition value
