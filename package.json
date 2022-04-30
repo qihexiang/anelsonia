@@ -29,7 +29,7 @@
     "build:types": "tsc",
     "build:cjs": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=cjs --platform=node",
     "build:esm": "esbuild src/index.ts --bundle --outfile=dist/index.mjs --format=esm --platform=node",
-    "doc": "typedoc ./src/index.ts",
+    "build:doc": "typedoc ./src/index.ts",
     "check": "eslint ./src",
     "lint": "eslint --fix ./src",
     "fmt": "prettier --write ./src"
