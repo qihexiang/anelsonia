@@ -2,20 +2,6 @@
 
 Freesia is a library for building Node.js HTTP servers, it provides a way to describe you HTTP handling process in a functional way.
 
-For example, a hello world application in express is like this:
-
-```ts
-import express from "express";
-
-const app = express();
-app.use((req, res) => {
-    res.send("hello, world");
-});
-app.listen(8000);
-```
-
-The handler is a function that returns void, it's strange and un-typed in programming. Freesia is designed to provide a fully-typed and fp-styled programing expirence in building a web app.
-
 ## Installing
 
 Install freesia into your project by a package manager, like NPM:
@@ -34,7 +20,7 @@ In CommonJS
 const { shimHTTP } = require("freesia");
 ```
 
-In ESM
+In ESM and TypeScript
 
 ```js
 import { shimHTTP } from "freesia";
@@ -47,12 +33,25 @@ import { shimHTTP } from "freesia";
 import { shimHTTP, response } from "freesia";
 import { createServer } from "http";
 
-createServer(shimHTTP(async (req) => response("hello, world"))).listen(8080);
+const main = async (req) => response("hello, world");
+createServer(shimHTTP(main)).listen(8080);
 ```
 
 Run it with `node app.js`, and then visit <http://localhost:8080>, you'll see the `"hello, world"` message.
 
 In this example, we find that `shimHTTP` function transform a function into a http request handler, the function we give is the `EntryPoint` of a Freesia app. `EntryPoint` is the type of function which parameter is the request body from `http`/`https`/`http2` module, and return a `Respond<string|Uint8Array|Readable>` tuple.
+
+## Concepts
+
+### Bootstrap process
+
+Http servers are always designed in event-driven architecture, which means the code we write is in fact a "bootstrap code": it will be executed directly, create port listener, prepare resources(for example, connect to a database), define handler functions and bind them to events.
+
+In a bootstrap process, the handler function won't be called, they are used as values which tell the server what to do when requests come in.
+
+### Request handling process
+
+After the bootstrap process finished, the server will keep running and waiting requests come in. If a request comes in, it will call the handler function to deal with this request. [Freesia hooks](#hooks) and router functions created by [Routing](#routing) functions can be called only in request handling process.
 
 ## Respond
 
@@ -121,13 +120,15 @@ response(res, { "Content-Type": "text/plain", "Content-Length": "12" });
 // ]
 ```
 
-It also provide a way to transform response body type by using a `Respond` and a transformer callback as parameters, like this:
+It also provide a way to rebuild another Respond from existed Respond:
 
 ```ts
-const res = response<{ message: string }>({ message: `hello, world` }, 200, {
-    "Content-Type": "application/json",
+const res = response<{ message: string }>({ message: `hello, world` }, 200);
+response(res, (body, status, headers) => {
+    return response(JSON.stringify(body), status, ...headers, {
+        "Content-Type": "application/json",
+    });
 });
-response(res, JSON.stringify);
 // [
 //   '{"message":"hello, world"}',
 //   200,
@@ -135,17 +136,20 @@ response(res, JSON.stringify);
 // ]
 ```
 
-It's useful in `EntryPoint` function because the return type must be binary-like (`string | Uint8Array | Readable`).
+It's useful in `EntryPoint` function because the body type must be binary-like (`string | Uint8Array | Readable`).
 
-Asynchronous transformer will give a Promised Respond, but not a Respond with Promised body.
+Rebuild with asynchronous rebuilders will give a Promised Respond.
 
 ```ts
-const res = response("./README.md", 200, {
-    "Content-Type": "text/markdown",
-});
-const resAsync = response(res, (url: string) =>
-    fs.promises.readFile(url, { encoding: "utf-8" })
-); // Promise<[string, 200, { "Content-Type": "text/markdown" }]>
+const res = response("./README.md", 200);
+const resAsync = response(res, async (body, status, headers) => {
+    return response(
+        await fs.promises.readFile(url, { encoding: "utf-8" }),
+        status,
+        ...headers,
+        { "Content-Type": getType(url) }
+    );
+}); // Promise<[string, 200, { "Content-Type": "text/markdown" }]>
 ```
 
 ## Routing
@@ -177,7 +181,7 @@ In this example, we use `if else` block to get right value of response by callin
 
 `createRoute(pattern, handler, flags)` can define a route. For example:
 
-> `flags` is the RegExp flags, for example `"i"`
+> `flags` is the RegExp flags, default value is `"i"`
 
 ```ts
 const helloRt = createRoute(
@@ -252,12 +256,12 @@ const res = switcher(pathname);
 
 ### Methods limit
 
-Use an object instead of a function to dispatch requests to different handlers by request methods. For example, 
+Use an object instead of a function to dispatch requests to different handlers by request methods. For example,
 
 ```ts
 const getUserInfoRt = createRoute("/user/:<username>/info", {
     GET: getUserInfoHandler,
-    PUT: updateUserInfoHandler
+    PUT: updateUserInfoHandler,
 });
 ```
 
@@ -281,7 +285,7 @@ const switcher = createSwRt<Respond<BinaryLike>>()
 const res = switcher(pathname);
 ```
 
-## Magical Hooks
+## Hooks
 
 Some values might be used in many functions called during a request handling process, as a result it must be passed through many hierarchies. With Node.js AsyncStorage API, freesia provides some hooks to get values with out pass them in parameters.
 
@@ -426,11 +430,51 @@ const email = getUserEmail(username, token);
 
 Look at docs of [createProxy](https://qihexiang.github.io/freesia/modules.html#createProxy)
 
+### memoryCache
+
+memoryCache is a wrapper that can cache return value of a function.
+
+Example:
+
+```ts
+const fib = memoryCache((index: number): number => {
+    if (index === 1 || index === 2) return 1;
+    else return fib(index - 1) + fib(index - 2);
+});
+```
+
+This wrapper will receive origin parameters as an array, and compare with used parameters by `===` operator and `Object.is` function (same-zero-value comparation).
+
+> Be careful when using objects as parameters, `{a: 1} !== {a: 1}`, `[1,2,3] !== [1,2,3]`.
+
+### isVoid
+
+`isVoid` can return if a value is `null` or `undefined`.
+
+```ts
+declare let value: string | undefined | null;
+if (isVoid(value)) {
+    value; // => undefined | null
+}
+if (isVoid(value, [undefined])) {
+    value; // => undefined
+}
+if (isVoid(value, [null])) {
+    value; // => null
+}
+declare let mayNotDefined: string | undefined;
+if (isVoid(mayNotDefined)) {
+    mayNotDefined; // => undefined
+}
+declare let nullableValue: string | null;
+if (isVoid(nullableValue)) {
+    nullableValue; // => null
+}
+```
+
 ### Others
 
 -   resJson
--   isVoid
--   memoryCache
 -   rateLimiter
 
 Find their docs in the [GitHub Pages](https://qihexiang.github.io/freesia/)
