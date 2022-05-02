@@ -6,13 +6,26 @@ import { Route } from "../router/createRoute";
 import MaybePromise from "../utils/MaybePromise";
 import { Respond } from "./Respond";
 
+/**
+ * HttpReq is the request parameter of http or http2 request handler
+ */
 export type HttpReq = IncomingMessage | Http2ServerRequest;
+/**
+ * HttpRes is the response parameter of http or http2 request handler
+ */
 export type HttpRes = ServerResponse | Http2ServerResponse;
-export type BasicRespond = MaybePromise<
-    Respond<string | Uint8Array | Readable>
->;
+/**
+ * Request handler function of http or http2 module
+ */
 export type ReqHandler = (req: HttpReq, res: HttpRes) => void;
-export type EntryPoint = (req: HttpReq) => BasicRespond;
+/**
+ * BasicRespond is a Respond of binary-like (string, Uint8Array and Readable stream) body
+ */
+export type BasicRespond = Respond<string | Uint8Array | Readable>;
+/**
+ * Request handler function of Freesia
+ */
+export type EntryPoint = (req: HttpReq) => MaybePromise<BasicRespond>;
 
 const requests = new AsyncLocalStorage<HttpReq>();
 

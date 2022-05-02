@@ -475,6 +475,7 @@ if (isVoid(nullableValue)) {
 ### Others
 
 -   resJson
+-   isEnum
 -   rateLimiter
 
 Find their docs in the [GitHub Pages](https://qihexiang.github.io/freesia/)
