@@ -472,10 +472,23 @@ if (isVoid(nullableValue)) {
 }
 ```
 
+### isEnum
+
+`isEnum` provides a way to check if a value one of the enum values, for example, a user-input string:
+
+```ts
+// valid option can be "auto", "manual", "default"
+const option: string = await getUserInput();
+if (isEnum(option, ["auto", "manual", "default"])) {
+    option; // => "auto" | "manual" | "default"
+}
+```
+
+Support string and number as basic types.
+
 ### Others
 
 -   resJson
--   isEnum
 -   rateLimiter
 
 Find their docs in the [GitHub Pages](https://qihexiang.github.io/freesia/)
