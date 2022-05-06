@@ -38,5 +38,8 @@
     "import": "./dist/index.mjs",
     "require": "./dist/index.js",
     "default": "./dist/index.js"
+  },
+  "peerDependencies": {
+    "@types/node": "^14.18.12"
   }
 }
