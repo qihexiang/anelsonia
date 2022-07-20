@@ -1,5 +1,7 @@
 # Freesia for Deno: a TypeScript library for building HTTP servers.
 
+> This project is paused: As Deno runtime dosen't provide AsyncLocalStorage API, which used by hooks in Freesia v2 for Node.js, so I'll pause the progress of merging Freesia v2 into Deno. I'll restart if deno port this API or I find a way to build hooks without async_hooks APIs. 
+
 ![Deno](https://img.shields.io/badge/Deno-Freesia-000000?logo=Deno&style=flat-square)
 ![version](https://img.shields.io/github/v/tag/qihexiang/freesia?style=flat-square)
 ![language](https://img.shields.io/github/languages/top/qihexiang/freesia?style=flat-square)
