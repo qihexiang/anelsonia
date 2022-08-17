@@ -1,5 +1,5 @@
 export { composeFn, Composer } from "./composeFn";
-export { createEffect, createProxy, createEffect4Any } from "./createWrapper";
+export { createEffect, createProxy, createEffect4Any, Fn, AsyncFn } from "./createWrapper";
 export { MaybePromise } from "./MaybePromise";
 export {
     JsonArray,

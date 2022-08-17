@@ -1,5 +1,5 @@
 import { Route } from "../router";
-import { requests } from "./shimHTTP";
+import { requests } from "./freesia";
 
 /**
  * Get `HttpReq` from anywhere called by callback of shimHTTP
