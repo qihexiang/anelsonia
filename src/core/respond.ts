@@ -1,5 +1,5 @@
 import { MaybePromise } from "../utils";
-import StatusCode from "./Status";
+import StatusCode from "./status";
 
 /**
  * Describe http status. Follow patterns are valid:
@@ -24,7 +24,7 @@ export type HttpHeader = { [headerName: string]: string | string[] };
  * If body is undefined, server will response nothing.
  */
 export type Respond<T> = [T | undefined, Status, ...HttpHeader[]];
-export type Trasnformer<T, N> = (
+export type Transformer<T, N> = (
     body: T | undefined,
     status: Status,
     headers: HttpHeader[]
@@ -93,7 +93,7 @@ export function response<T, N>(
 ): Promise<Respond<N>>;
 export function response<T, N>(
     arg1: T | undefined | Respond<T>,
-    arg2?: Status | Trasnformer<T, N> | HttpHeader,
+    arg2?: Status | Transformer<T, N> | HttpHeader,
     ...headers: HttpHeader[]
 ) {
     if (arguments.length === 1) {

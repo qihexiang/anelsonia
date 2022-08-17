@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import { Readable } from "stream";
 import MaybePromise from "../utils/MaybePromise";
-import { Respond } from "./Respond";
+import { Respond } from "./respond";
 
 /**
  * HttpReq is the request parameter of http or http2 request handler
@@ -37,7 +37,7 @@ export const requests = new AsyncLocalStorage<HttpReq>();
  * - longestConnection is the longest timeout for a response handling and transporting, unit is ms.
  * @returns a handler function for Node `http`、`https`、`http2` modules
  */
-export function shimHTTP(
+export function freesia(
     entry: EntryPoint,
     extraOptions?: {
         errHandler?: (err: any) => void;
