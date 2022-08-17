@@ -6,7 +6,7 @@ import { requests } from "./shimHTTP";
  *
  * @returns `HttpReq` object
  */
- export const useRequest = () => {
+export const useRequest = () => {
     const req = requests.getStore();
     if (req === undefined)
         throw new Error(

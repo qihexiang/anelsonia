@@ -1,6 +1,11 @@
 import { useURL } from "../core";
 import { RouteParams } from "./pathToRegExp";
-import { match, ParseOptions, RegexpToFunctionOptions, TokensToRegexpOptions } from "path-to-regexp";
+import {
+    match,
+    ParseOptions,
+    RegexpToFunctionOptions,
+    TokensToRegexpOptions,
+} from "path-to-regexp";
 
 export type RouteHandler<P extends string, R> =
     | {

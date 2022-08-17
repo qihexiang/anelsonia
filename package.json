@@ -36,7 +36,8 @@
     "build:doc": "typedoc ./src/index.ts",
     "check": "eslint ./src",
     "lint": "eslint --fix ./src",
-    "fmt": "prettier --write ./src"
+    "fmt": "prettier --write ./src",
+    "test": "jest"
   },
   "exports": {
     "import": "./dist/index.mjs",

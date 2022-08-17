@@ -1,4 +1,8 @@
-import { ParseOptions, RegexpToFunctionOptions, TokensToRegexpOptions } from "path-to-regexp";
+import {
+    ParseOptions,
+    RegexpToFunctionOptions,
+    TokensToRegexpOptions,
+} from "path-to-regexp";
 import {
     createRoute,
     createRouteX,
@@ -132,7 +136,11 @@ export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
              * @param handler a handler dealing with the route
              * @returns a router chain.
              */
-            const route: RouteChainAdderX<R, X> = (pattern, handler, options) => {
+            const route: RouteChainAdderX<R, X> = (
+                pattern,
+                handler,
+                options
+            ) => {
                 routes = [...routes, createRouteX(pattern, handler, options)];
                 return {
                     route,

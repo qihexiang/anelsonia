@@ -1,9 +1,9 @@
 /**
  * Check if a string/number is a enumed value
- * 
+ *
  * @param value The value to be checked
  * @param enums The enums
- * @returns 
+ * @returns
  */
 export function isEnum<E extends string | number>(
     value: string | number,
