@@ -14,9 +14,9 @@ import { Route, RouteX } from "./createRoute";
  * result, otherwise return undefined.
  */
 export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
-    return (url: string): R | undefined =>
+    return (pathname: string): R | undefined =>
         routes.reduce<R | undefined>(
-            (lastRouted, nextRoute) => lastRouted ?? nextRoute(url),
+            (lastRouted, nextRoute) => lastRouted ?? nextRoute(pathname),
             undefined
         );
 }
@@ -36,9 +36,9 @@ export function createSwitcher<R>(...routes: Route<R>[]): Route<R> {
  * undefined.
  */
 export function createSwitcherX<R, X>(...routes: RouteX<R, X>[]): RouteX<R, X> {
-    return (url: string, extra: X): R | undefined =>
+    return (pathname: string, extra: X): R | undefined =>
         routes.reduce<R | undefined>(
-            (lastRouted, nextRoute) => lastRouted ?? nextRoute(url, extra),
+            (lastRouted, nextRoute) => lastRouted ?? nextRoute(pathname, extra),
             undefined
         );
 }
