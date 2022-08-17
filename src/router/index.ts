@@ -1,5 +1,5 @@
-export * from "./params";
-export * from "./createRoute";
-export * from "./createSwitcher";
-export * from "./createSwRt";
-export * from "./condition";
+export { RouteParams } from "./pathToRegExp";
+export { createRoute, createRouteX } from "./createRoute";
+export { createSwitcher, createSwitcherX } from "./createSwitcher";
+export { createSwRt, createSwRtX } from "./createSwRt";
+export { condition } from "./condition";

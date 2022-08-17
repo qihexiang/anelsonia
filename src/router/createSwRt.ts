@@ -1,3 +1,4 @@
+import { ParseOptions, RegexpToFunctionOptions, TokensToRegexpOptions } from "path-to-regexp";
 import {
     createRoute,
     createRouteX,
@@ -12,13 +13,13 @@ export type RouteChainInit<R> = {
     route: <P extends string>(
         pattern: P,
         handler: RouteHandler<P, R>,
-        flags?: string
+        options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
     ) => RouteChain<R>;
 };
 export type RouteChainAdder<R> = <P extends string>(
     pattern: P,
     handler: RouteHandler<P, R>,
-    flags?: string
+    options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
 ) => RouteChain<R>;
 export type RouteChainFallback<R> = (
     handler: (url: string) => R
@@ -33,13 +34,13 @@ export type RouteChainInitX<R, X> = {
     route: <P extends string>(
         pattern: P,
         handler: RouteHandlerX<P, X, R>,
-        flags?: string
+        options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
     ) => RouteChainX<R, X>;
 };
 export type RouteChainAdderX<R, X> = <P extends string>(
     pattern: P,
     handler: RouteHandlerX<P, X, R>,
-    flags?: string
+    options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
 ) => RouteChainX<R, X>;
 export type RouteChainFallbackX<R, X> = (
     handler: (url: string, extra: X) => R
@@ -63,8 +64,8 @@ export function createSwRt<R>(): RouteChainInit<R> {
          * @param handler a handler dealing with the route
          * @returns a router chain.
          */
-        route: (pattern, handler, flags) => {
-            let routes = [createRoute(pattern, handler, flags)];
+        route: (pattern, handler, options) => {
+            let routes = [createRoute(pattern, handler, options)];
             /**
              * Handler the request when no routes matched
              *
@@ -84,8 +85,8 @@ export function createSwRt<R>(): RouteChainInit<R> {
              * @param handler a handler dealing with the route
              * @returns a router chain.
              */
-            const route: RouteChainAdder<R> = (pattern, handler, flags) => {
-                routes = [...routes, createRoute(pattern, handler, flags)];
+            const route: RouteChainAdder<R> = (pattern, handler, options) => {
+                routes = [...routes, createRoute(pattern, handler, options)];
                 return {
                     route,
                     build: () => createSwitcher(...routes),
@@ -110,8 +111,8 @@ export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
          * @param handler a handler dealing with the route
          * @returns a router chain.
          */
-        route: (pattern, handler, flags) => {
-            let routes = [createRouteX(pattern, handler, flags)];
+        route: (pattern, handler, options) => {
+            let routes = [createRouteX(pattern, handler, options)];
             /**
              * Handler the request when no routes matched
              *
@@ -131,8 +132,8 @@ export function createSwRtX<R, X>(): RouteChainInitX<R, X> {
              * @param handler a handler dealing with the route
              * @returns a router chain.
              */
-            const route: RouteChainAdderX<R, X> = (pattern, handler, flags) => {
-                routes = [...routes, createRouteX(pattern, handler, flags)];
+            const route: RouteChainAdderX<R, X> = (pattern, handler, options) => {
+                routes = [...routes, createRouteX(pattern, handler, options)];
                 return {
                     route,
                     fallback,

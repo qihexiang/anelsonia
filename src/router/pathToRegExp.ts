@@ -1,5 +1,4 @@
-import { Empty } from "./params";
-
+type Empty = Record<never, never>;
 type Merge<T, E> = Omit<T, keyof E> & E;
 
 type Delimeter = "(" | "/" | "-" | "*" | "?" | "+";
@@ -28,10 +27,7 @@ export type RouteParams<Path extends string> =
     Path extends `${string}:${infer Next}`
         ? Next extends `${infer Name}(${string}`
             ? Name extends `${string}${Delimeter}${string}`
-                ? Merge<
-                      RouteParams<`:${Name}`>,
-                      RouteParams<TakeRight<Next>>
-                  >
+                ? Merge<RouteParams<`:${Name}`>, RouteParams<TakeRight<Next>>>
                 : Merge<
                       {
                           [key in RemoveFlower<Name>]: string;
