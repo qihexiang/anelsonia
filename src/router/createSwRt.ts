@@ -22,8 +22,8 @@ export type RouteChainAdder<R> = <P extends string>(
     options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
 ) => RouteChain<R>;
 export type RouteChainFallback<R> = (
-    handler: (url: string) => R
-) => (url: string) => R;
+    handler: (pathname: string) => R
+) => (pathname: string) => R;
 export type RouteChain<R> = {
     route: RouteChainAdder<R>;
     fallback: RouteChainFallback<NonNullable<R>>;
@@ -43,8 +43,8 @@ export type RouteChainAdderX<R, X> = <P extends string>(
     options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
 ) => RouteChainX<R, X>;
 export type RouteChainFallbackX<R, X> = (
-    handler: (url: string, extra: X) => R
-) => (url: string, extra: X) => R;
+    handler: (pathname: string, extra: X) => R
+) => (pathname: string, extra: X) => R;
 export type RouteChainX<R, X> = {
     route: RouteChainAdderX<R, X>;
     fallback: RouteChainFallbackX<NonNullable<R>, X>;

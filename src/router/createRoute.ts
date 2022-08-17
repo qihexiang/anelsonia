@@ -34,8 +34,8 @@ export function createRoute<P extends string, R>(
     options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
 ): Route<R> {
     const re = match(pattern, options);
-    return (url: string) => {
-        const matched = re(url);
+    return (pathname: string) => {
+        const matched = re(pathname);
         if (matched && typeof handlers === "function") {
             return handlers(matched.params as RouteParams<P>);
         }
@@ -67,8 +67,8 @@ export function createRouteX<P extends string, X, R>(
     options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions
 ): RouteX<R, X> {
     const re = match(pattern, options);
-    return (url: string, extra: X) => {
-        const matched = re(url);
+    return (pathname: string, extra: X) => {
+        const matched = re(pathname);
         const method = useURL("method");
         if (matched && typeof handlers === "function") {
             return handlers(matched.params as RouteParams<P>, extra);
