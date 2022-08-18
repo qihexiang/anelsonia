@@ -74,10 +74,10 @@ export function createRouteX<P extends string, X, R>(
     const re = match(pattern, options);
     return (pathname: string, extra: X) => {
         const matched = re(pathname);
-        const method = useURL("method");
         if (matched && typeof handlers === "function") {
             return handlers(matched.params as RouteParams<P>, extra);
         }
+        const method = useURL("method");
         if (matched && typeof handlers === "object" && method in handlers) {
             return handlers[method](matched.params as RouteParams<P>, extra);
         }
