@@ -14,7 +14,7 @@ test("calc with mapNN method", () => {
 test("calc with Promise result", async () => {
     const readFileSafely = async (target: string) => {
         try {
-            return readFile(target)
+            return await readFile(target)
         } catch(err) {
             return null
         }
@@ -22,6 +22,21 @@ test("calc with Promise result", async () => {
     const originRes = await readFileSafely("./package.json").then(buf => buf !== null ? `# test\n${buf.toString()}` : "Failed to read")
     const streamRes = await computeStream(readFileSafely("./package.json")).mapNN(buf => buf.toString()).mapNN(text => `# test\n${text}`).map(fillNullable("Failed to read")).value
     const lazyStreamRes = await computeStreamLazy(() => readFileSafely("./package.json")).mapNN(buf => buf.toString()).mapNN(text => `# test\n${text}`).map(fillNullable("Failed to read")).value
+    expect(streamRes).toBe(originRes)
+    expect(lazyStreamRes).toBe(originRes)
+})
+
+test("calc with Promise failed", async () => {
+    const readFileSafely = async (target: string) => {
+        try {
+            return await readFile(target)
+        } catch(err) {
+            return null
+        }
+    }
+    const originRes = await readFileSafely("./non_exist.json").then(buf => buf !== null ? `# test\n${buf.toString()}` : "Failed to read")
+    const streamRes = await computeStream(readFileSafely("./non_exist.json")).mapNN(buf => buf.toString()).mapNN(text => `# test\n${text}`).map(fillNullable("Failed to read")).value
+    const lazyStreamRes = await computeStreamLazy(() => readFileSafely("./non_exist.json")).mapNN(buf => buf.toString()).mapNN(text => `# test\n${text}`).map(fillNullable("Failed to read")).value
     expect(streamRes).toBe(originRes)
     expect(lazyStreamRes).toBe(originRes)
 })
