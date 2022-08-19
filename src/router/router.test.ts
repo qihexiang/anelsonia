@@ -21,9 +21,7 @@ test("Router creation test", () => {
             });
         })
         .fallback(() => response("Nothing found"));
-    expect(router("/hello/hexiang")).toStrictEqual(
-        response("hello, hexiang")
-    );
+    expect(router("/hello/hexiang")).toStrictEqual(response("hello, hexiang"));
 });
 
 test("RouterX creation test", () => {
@@ -53,18 +51,31 @@ test("RouterX creation test", () => {
     );
 });
 
-test("condition tool test", () => {
+test("condition tool test (single mode)", () => {
     const os = condition(platform)
         .match("linux", () => "Linux")
         .match("darwin", () => "macOS")
         .match("win32", () => "Windows")
-        .withDefault(() => "Others");
-    expect(os).toMatch(/(Linux)|(Windows)|(macOS)|(Others)/);
+        const maybeVoid = os.getValue()
+        expect(maybeVoid === undefined || maybeVoid.match(/(Linux)|(Windows)|(macOS)/)).toBeTruthy();
+        expect(os.withDefault(() => "Others")).toMatch(/(Linux)|(Windows)|(macOS)|(Others)/);
 });
 
-test("condition tool test", () => {
+test("condition tool test (RegExp mode)", () => {
     const currentPlatform = condition(platform)
         .match(/(win32|darwin)/, () => "Desktop")
+        .match(/(linux|(net|open|free)bsd)/, () => "Desktop or Server")
         .withDefault(() => "Server");
-    expect(currentPlatform).toMatch(/(Desktop|Server)/);
+    expect(currentPlatform).toMatch(/Desktop|(Desktop or Server)/);
+});
+
+test("condition tool test (Array mode mode)", () => {
+    const currentPlatform = condition(platform)
+        .match(["win32", "darwin", "linux"], () => "Desktop")
+        .match(
+            ["freebsd", "netbsd", "openbsd", "linux"],
+            () => "Desktop or Server"
+        )
+        .withDefault(() => "Server");
+    expect(currentPlatform).toMatch(/Desktop|(Desktop or Server)/);
 });
