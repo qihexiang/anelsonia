@@ -1,14 +1,19 @@
 import { Respond, response } from "../core";
 import { condition, createSwRt, createSwRtX } from "./index";
-import {platform} from "process"
+import { platform } from "process";
 
 test("Router creation test", () => {
     const router = createSwRt<Respond<string>>()
         .route("/hello/:username", ({ username }) => {
             return response(`hello, ${username}`);
         })
-        .route("/info", () => {
-            return response(`This is a test case of freesia`);
+        .route("/info", {
+            GET: () => {
+                return response(`This is a test case of freesia`);
+            },
+            POST: () => {
+                return response(`This is a test case of freesia`);
+            },
         })
         .route("/about", () => {
             return response(undefined, 302, {
@@ -16,17 +21,26 @@ test("Router creation test", () => {
             });
         })
         .fallback(() => response("Nothing found"));
-    expect(router("/hello/hexiang")).toStrictEqual(["hello, hexiang", 200])
+    expect(router("/hello/hexiang")).toStrictEqual(
+        response("hello, hexiang")
+    );
 });
 
 test("RouterX creation test", () => {
     const buf = Buffer.from("hello, world\n");
     const router = createSwRtX<Respond<string>, Buffer>()
         .route("/hello/:username", ({ username }, buf) => {
-            return response(`hello, ${username}, prepared buffer is ${buf.toString()}`);
+            return response(
+                `hello, ${username}, prepared buffer is ${buf.toString()}`
+            );
         })
-        .route("/info", () => {
-            return response(`This is a test case of freesia`);
+        .route("/info", {
+            GET: () => {
+                return response(`This is a test case of freesia`);
+            },
+            POST: () => {
+                return response(`This is a test case of freesia`);
+            },
         })
         .route("/about", () => {
             return response(undefined, 302, {
@@ -34,7 +48,9 @@ test("RouterX creation test", () => {
             });
         })
         .fallback(() => response("Nothing found"));
-    expect(router("/hello/hexiang", buf)).toStrictEqual(["hello, hexiang, prepared buffer is hello, world\n", 200])
+    expect(router("/hello/hexiang", buf)).toStrictEqual(
+        response("hello, hexiang, prepared buffer is hello, world\n")
+    );
 });
 
 test("condition tool test", () => {
@@ -42,6 +58,13 @@ test("condition tool test", () => {
         .match("linux", () => "Linux")
         .match("darwin", () => "macOS")
         .match("win32", () => "Windows")
-        .withDefault(() => "Others")
-    expect(os).toMatch(/(Linux)|(Windows)|(macOS)|(Others)/)
-})
+        .withDefault(() => "Others");
+    expect(os).toMatch(/(Linux)|(Windows)|(macOS)|(Others)/);
+});
+
+test("condition tool test", () => {
+    const currentPlatform = condition(platform)
+        .match(/(win32|darwin)/, () => "Desktop")
+        .withDefault(() => "Server");
+    expect(currentPlatform).toMatch(/(Desktop|Server)/);
+});
