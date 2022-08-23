@@ -65,12 +65,9 @@ function getResponser(
                 Symbol.toPrimitive
             ]();
         try {
-            const [body, status, ...headers] = await entry(req);
+            const [body, status, httpHeader] = await entry(req);
             const statusCode = status instanceof Array ? status[0] : status;
             const statusText = status instanceof Array ? status[1] : undefined;
-            const httpHeader = headers.reduce((current, next) => {
-                return { ...current, ...next };
-            }, {});
             if (statusText === undefined) res.writeHead(statusCode, httpHeader);
             else res.writeHead(statusCode, statusText, httpHeader);
             if (body instanceof Readable) {

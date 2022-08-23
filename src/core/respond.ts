@@ -23,11 +23,11 @@ export type HttpHeader = { [headerName: string]: string | string[] };
  * A tuple that can describe a http response. `[body, status, ...httpHeaders]`.
  * If body is undefined, server will response nothing.
  */
-export type Respond<T> = [T | undefined, Status, ...HttpHeader[]];
+export type Respond<T> = [T | undefined, Status, HttpHeader];
 export type Transformer<T, N> = (
     body: T | undefined,
     status: Status,
-    headers: HttpHeader[]
+    headers: HttpHeader
 ) => MaybePromise<Respond<N>>;
 
 /**
@@ -74,7 +74,7 @@ export function response<T, N>(
     transformer: (
         body: T | undefined,
         status: Status,
-        headers: HttpHeader[]
+        headers: HttpHeader
     ) => Respond<N>
 ): Respond<N>;
 /**
@@ -88,7 +88,7 @@ export function response<T, N>(
     transformer: (
         body: T | undefined,
         status: Status,
-        headers: HttpHeader[]
+        headers: HttpHeader
     ) => Promise<Respond<N>>
 ): Promise<Respond<N>>;
 export function response<T, N>(
@@ -104,27 +104,37 @@ export function response<T, N>(
         if (typeof arg2 === "function") {
             const res = arg1 as Respond<T>;
             const transformer = arg2;
-            const [body, status, ...headers] = res;
+            const [body, status, headers] = res;
             return transformer(body, status, headers);
         } else if (typeof arg2 === "number" || arg2 instanceof Array) {
             const body = arg1 as T | undefined;
             const status = arg2 as Status;
             return [body, status];
         } else {
-            const res = arg1 as Respond<T>;
+            const [body, status, headers] = arg1 as Respond<T>;
             const header = arg2 as HttpHeader;
-            return [...res, header];
+            return [body, status, mergeHeaders(headers, header)];
         }
     }
     if (arguments.length >= 3) {
         if (typeof arg2 === "number" || arg2 instanceof Array) {
             const body = arg1 as T | undefined;
             const status = arg2 as Status;
-            return [body, status, ...headers];
+            return [body, status, mergeHeaders(...headers)];
         } else {
-            const res = arg1 as Respond<T>;
-            return [...res, arg2 as HttpHeader, ...headers];
+            const [body, status, originHeaders] = arg1 as Respond<T>;
+            return [
+                body,
+                status,
+                mergeHeaders(originHeaders, arg2 as HttpHeader, ...headers),
+            ];
         }
     }
     throw new Error("Invalid given arguments.");
+}
+
+function mergeHeaders(...headers: HttpHeader[]): HttpHeader {
+    return headers.reduce((current, next) => {
+        return { ...current, ...next };
+    }, {});
 }
