@@ -55,10 +55,14 @@ test("condition tool test (single mode)", () => {
     const os = condition(platform)
         .match("linux", () => "Linux")
         .match("darwin", () => "macOS")
-        .match("win32", () => "Windows")
-        const maybeVoid = os.getValue()
-        expect(maybeVoid === undefined || maybeVoid.match(/(Linux)|(Windows)|(macOS)/)).toBeTruthy();
-        expect(os.withDefault(() => "Others")).toMatch(/(Linux)|(Windows)|(macOS)|(Others)/);
+        .match("win32", () => "Windows");
+    const maybeVoid = os.getValue();
+    expect(
+        maybeVoid === undefined || maybeVoid.match(/(Linux)|(Windows)|(macOS)/)
+    ).toBeTruthy();
+    expect(os.withDefault(() => "Others")).toMatch(
+        /(Linux)|(Windows)|(macOS)|(Others)/
+    );
 });
 
 test("condition tool test (RegExp mode)", () => {
