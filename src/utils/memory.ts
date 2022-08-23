@@ -1,7 +1,7 @@
 import { createProxy } from "./createWrapper";
 import { isVoid } from "./isVoid";
 
-export const CacheMap = <K extends Array<any>, V>() => {
+const CacheMap = <K extends Array<any>, V>() => {
     let keyArray: K[] = [];
     let valueArray: V[] = [];
     const has = (key: K) => {
@@ -16,17 +16,11 @@ export const CacheMap = <K extends Array<any>, V>() => {
         return isVoid(element) ? null : keyArray.indexOf(element);
     };
     return {
-        has(k: K) {
-            return !isVoid(has(k));
-        },
         set(k: K, v: V) {
             const index = has(k);
             if (isVoid(index)) {
                 keyArray = [...keyArray, k];
                 valueArray = [...valueArray, v];
-            } else {
-                keyArray[index] = k;
-                valueArray[index] = v;
             }
         },
         get(k: K) {
