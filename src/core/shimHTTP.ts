@@ -171,7 +171,7 @@ export const createContext: CreateContext = <T>(
  * Transform an entry function to Node HTTP request handler
  *
  * @param entry a function receives request object and return a reponse object.
- * @param extraOptions {errHandler, longestConnection}
+ * @param extraOptions `{errHandler, longestConnection}`
  * - errHandler is a function that can handler errors on request,
  * - longestConnection is the longest timeout for a response handling and transporting, unit is ms.
  * @returns a handler function for Node `http`、`https`、`http2` modules
